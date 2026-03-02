@@ -1,109 +1,993 @@
 // lib/presentation/screens/home_screen.dart
 
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:calisthenics_app/domain/enums/exercise_level.dart';
-import 'package:calisthenics_app/domain/enums/muscle_group.dart';
-import 'package:calisthenics_app/presentation/providers/exercise_list_provider.dart';
-import 'package:calisthenics_app/presentation/providers/filter_provider.dart';
-import 'package:calisthenics_app/presentation/providers/favorite_provider.dart';
-import 'package:calisthenics_app/presentation/widgets/exercise_card.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final exercisesAsync = ref.watch(filteredExerciseListProvider);
-    final filterState = ref.watch(filterStateNotifierProvider);
-    final favorites = ref.watch(favoriteProvider);
+  Widget build(BuildContext context) {
+    return const HomeTodayScreen();
+  }
+}
 
+class HomeTodayScreen extends StatelessWidget {
+  const HomeTodayScreen({super.key});
+
+  static const double _radiusLg = 24.0;
+  static const double _radiusMd = 18.0;
+  static const double _spaceXs = 8.0;
+  static const double _spaceSm = 12.0;
+  static const double _spaceMd = 16.0;
+  static const double _spaceLg = 24.0;
+
+  static const Color _bgTop = Color(0xFF1A1230);
+  static const Color _bgBottom = Color(0xFF120A22);
+  static const Color _cardSurface = Color(0xFF231A3B);
+  static const Color _cardSurfaceSoft = Color(0xFF2A2048);
+  static const Color _cardSurfaceTint = Color(0xFF2E2552);
+  static const Color _accentPurple = Color(0xFF6D5BFF);
+  static const Color _accentBlue = Color(0xFF4FC3F7);
+  static const Color _textHigh = Color(0xFFEDE9FF);
+  static const Color _textMid = Color(0xFFB4A9D8);
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Calisthenics Exercises'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.favorite),
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.favorites);
-            },
+      backgroundColor: _bgBottom,
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [_bgTop, _bgBottom],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+          ),
+          Positioned(
+            top: -120.0,
+            right: -80.0,
+            child: Container(
+              width: 260.0,
+              height: 260.0,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _accentPurple.withOpacity(0.18),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 140.0,
+            left: -120.0,
+            child: Container(
+              width: 240.0,
+              height: 240.0,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _accentBlue.withOpacity(0.12),
+              ),
+            ),
+          ),
+          SafeArea(
+            child: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      _spaceMd,
+                      _spaceLg,
+                      _spaceMd,
+                      _spaceSm,
+                    ),
+                    child: const EnergeticHeadline(),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      _spaceMd,
+                      _spaceSm,
+                      _spaceMd,
+                      _spaceSm,
+                    ),
+                    child: const GreetingAppBar(),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: _spaceMd),
+                    child: const TodayWorkoutCard(progress: 0.65),
+                  ),
+                ),
+                const SliverToBoxAdapter(
+                  child: SizedBox(height: _spaceLg),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: _spaceMd),
+                    child: const QuickStatsCard(),
+                  ),
+                ),
+                const SliverToBoxAdapter(
+                  child: SizedBox(height: _spaceLg),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: _spaceMd),
+                    child: const WeeklyActivityCard(),
+                  ),
+                ),
+                const SliverToBoxAdapter(
+                  child: SizedBox(height: _spaceLg),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: _spaceMd),
+                    child: const BrowseCategoriesRow(),
+                  ),
+                ),
+                const SliverToBoxAdapter(
+                  child: SizedBox(height: _spaceLg),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: _spaceMd),
+                    child: const RecommendedList(),
+                  ),
+                ),
+                const SliverToBoxAdapter(
+                  child: SizedBox(height: 96.0),
+                ),
+              ],
+            ),
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Level Selector
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: DropdownButtonFormField<ExerciseLevel?>(
-              value: filterState.level,
-              decoration: InputDecoration(
-                labelText: 'Select Level',
-                labelStyle: Theme.of(context).textTheme.bodyMedium,
-                border: const OutlineInputBorder(),
+      bottomNavigationBar: const AppBottomNav(selectedIndex: 0),
+    );
+  }
+}
+
+class GreetingAppBar extends StatelessWidget {
+  const GreetingAppBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Momentum',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: HomeTodayScreen._textMid,
+                      fontWeight: FontWeight.w500,
+                    ),
               ),
-              items: [
-                const DropdownMenuItem<ExerciseLevel?>(
-                  value: null,
-                  child: Text('All Levels'),
+              const SizedBox(height: 4.0),
+              Text(
+                '7-Day Streak',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: HomeTodayScreen._textHigh,
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 12.0),
+        Stack(
+          children: [
+            const CircleAvatar(
+              radius: 20.0,
+              backgroundColor: HomeTodayScreen._cardSurfaceTint,
+              child: Icon(
+                Icons.person,
+                color: HomeTodayScreen._textHigh,
+              ),
+            ),
+            Positioned(
+              right: 2.0,
+              bottom: 2.0,
+              child: Container(
+                width: 10.0,
+                height: 10.0,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF4CD964),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: HomeTodayScreen._bgTop,
+                    width: 2.0,
+                  ),
                 ),
-                ...ExerciseLevel.values.map((level) => DropdownMenuItem(
-                      value: level,
-                      child: Text(level.name.toUpperCase()),
-                    )),
-              ],
-              onChanged: (value) {
-                ref.read(filterStateNotifierProvider.notifier).setLevel(value);
-              },
-            ),
-          ),
-          // Muscle Group Filters
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Wrap(
-              spacing: 8.0,
-              children: MuscleGroup.values.map((muscle) {
-                final isSelected = filterState.muscleGroups.contains(muscle);
-                return FilterChip(
-                  label: Text(muscle.name.toUpperCase()),
-                  selected: isSelected,
-                  onSelected: (selected) {
-                    ref.read(filterStateNotifierProvider.notifier).toggleMuscleGroup(muscle);
-                  },
-                );
-              }).toList(),
-            ),
-          ),
-          // Exercise List
-          Expanded(
-            child: exercisesAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => Center(child: Text('Error: $error')),
-              data: (exercises) => ListView.builder(
-                itemCount: exercises.length,
-                itemBuilder: (context, index) {
-                  final exercise = exercises[index];
-                  final isFavorite = favorites.contains(exercise.id);
-                  return ExerciseCard(
-                    exercise: exercise,
-                    isFavorite: isFavorite,
-                    onFavoriteToggle: () {
-                      ref.read(favoriteProvider.notifier).toggleFavorite(exercise.id);
-                    },
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        AppRoutes.detail,
-                        arguments: exercise,
-                      );
-                    },
-                  );
-                },
               ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class TodayWorkoutCard extends StatelessWidget {
+  const TodayWorkoutCard({super.key, required this.progress});
+
+  final double progress;
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      borderRadius: HomeTodayScreen._radiusLg,
+      child: Padding(
+        padding: const EdgeInsets.all(HomeTodayScreen._spaceMd),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+                    decoration: BoxDecoration(
+                      color: HomeTodayScreen._accentPurple.withOpacity(0.18),
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    child: Text(
+                      'Today\'s Workout',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: HomeTodayScreen._accentPurple,
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                  ),
+                  const SizedBox(height: 10.0),
+                  Text(
+                    'Full Body Power',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: HomeTodayScreen._textHigh,
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                  const SizedBox(height: 6.0),
+                  Text(
+                    '45 mins • Intermediate',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: HomeTodayScreen._textMid,
+                        ),
+                  ),
+                  const SizedBox(height: 14.0),
+                  Row(
+                    children: [
+                      Text(
+                        'Progress',
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: HomeTodayScreen._textMid,
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        '${(progress * 100).round()}%',
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: HomeTodayScreen._textHigh,
+                              fontWeight: FontWeight.w700,
+                            ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8.0),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12.0),
+                          child: LinearProgressIndicator(
+                            value: progress,
+                            minHeight: 6.0,
+                            backgroundColor:
+                                HomeTodayScreen._cardSurfaceSoft,
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                              HomeTodayScreen._accentBlue,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12.0),
+                    ],
+                  ),
+                  const SizedBox(height: 14.0),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          _AvatarStack(
+                            avatars: const [
+                              Icons.person,
+                              Icons.person_outline,
+                              Icons.person_outline,
+                            ],
+                          ),
+                          const SizedBox(width: 8.0),
+                          Expanded(
+                            child: Text(
+                              '+5 friends active now',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    color: HomeTodayScreen._textMid,
+                                  ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10.0),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.of(context)
+                                .pushNamed(AppRoutes.workoutLibrary);
+                          },
+                          style: TextButton.styleFrom(
+                            foregroundColor: HomeTodayScreen._textHigh,
+                            backgroundColor: HomeTodayScreen._cardSurfaceSoft,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14.0,
+                              vertical: 8.0,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            textStyle: Theme.of(context)
+                                .textTheme
+                                .labelSmall
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
+                          child: const Text('Explore Workouts'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12.0),
+            const _PlayButton(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class EnergeticHeadline extends StatelessWidget {
+  const EnergeticHeadline({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Good Morning,',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: HomeTodayScreen._textMid,
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+        const SizedBox(height: 6.0),
+        Text(
+          'Let\'s Crush Today 💪',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: HomeTodayScreen._textHigh,
+                fontWeight: FontWeight.w800,
+              ),
+        ),
+      ],
+    );
+  }
+}
+
+class WeeklyActivityCard extends StatelessWidget {
+  const WeeklyActivityCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      borderRadius: HomeTodayScreen._radiusLg,
+      child: Padding(
+        padding: const EdgeInsets.all(HomeTodayScreen._spaceMd),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  'Weekly Activity',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: HomeTodayScreen._textHigh,
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+                const Spacer(),
+                Text(
+                  'View All',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: HomeTodayScreen._accentPurple,
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12.0),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: HomeTodayScreen._spaceSm,
+                vertical: 12.0,
+              ),
+              decoration: BoxDecoration(
+                color: HomeTodayScreen._cardSurfaceTint,
+                borderRadius: BorderRadius.circular(HomeTodayScreen._radiusMd),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: const [
+                  _WeekDayChip(label: 'M'),
+                  _WeekDayChip(label: 'T'),
+                  _WeekDayChip(label: 'W', isActive: true),
+                  _WeekDayChip(label: 'T'),
+                  _WeekDayChip(label: 'F'),
+                  _WeekDayChip(label: 'S'),
+                  _WeekDayChip(label: 'S'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class QuickStatsCard extends StatelessWidget {
+  const QuickStatsCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      borderRadius: HomeTodayScreen._radiusLg,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: HomeTodayScreen._spaceMd,
+          vertical: HomeTodayScreen._spaceSm,
+        ),
+        child: Row(
+          children: const [
+            Expanded(
+              child: _QuickStatItem(
+                value: '4h 20m',
+                label: 'Weekly Time',
+              ),
+            ),
+            _QuickStatDivider(),
+            Expanded(
+              child: _QuickStatItem(
+                value: '5 Days',
+                label: 'Active Days',
+              ),
+            ),
+            _QuickStatDivider(),
+            Expanded(
+              child: _QuickStatItem(
+                value: '2 PRs',
+                label: 'New Records',
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _QuickStatItem extends StatelessWidget {
+  const _QuickStatItem({required this.value, required this.label});
+
+  final String value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          value,
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: HomeTodayScreen._textHigh,
+                fontWeight: FontWeight.w700,
+              ),
+        ),
+        const SizedBox(height: 4.0),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: HomeTodayScreen._textMid,
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+      ],
+    );
+  }
+}
+
+class _QuickStatDivider extends StatelessWidget {
+  const _QuickStatDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 1.0,
+      height: 42.0,
+      margin: const EdgeInsets.symmetric(horizontal: 12.0),
+      color: HomeTodayScreen._cardSurfaceTint,
+    );
+  }
+}
+
+class BrowseCategoriesRow extends StatelessWidget {
+  const BrowseCategoriesRow({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Browse Categories',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: HomeTodayScreen._textHigh,
+                fontWeight: FontWeight.w700,
+              ),
+        ),
+        const SizedBox(height: 12.0),
+        SizedBox(
+          height: 120.0,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: const [
+              CategoryCard(label: 'Strength'),
+              SizedBox(width: 12.0),
+              CategoryCard(label: 'Cardio'),
+              SizedBox(width: 12.0),
+              CategoryCard(label: 'HIIT'),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class RecommendedList extends StatelessWidget {
+  const RecommendedList({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Recommended for You',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: HomeTodayScreen._textHigh,
+                fontWeight: FontWeight.w700,
+              ),
+        ),
+        const SizedBox(height: 12.0),
+        const RecommendedItem(
+          title: 'Upper Body Crush',
+          meta: '30 mins • Advanced',
+        ),
+        const SizedBox(height: 12.0),
+        const RecommendedItem(
+          title: 'Night Run Intervals',
+          meta: '45 mins • Intermediate',
+        ),
+      ],
+    );
+  }
+}
+
+class AppBottomNav extends StatelessWidget {
+  const AppBottomNav({super.key, required this.selectedIndex});
+
+  final int selectedIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        decoration: BoxDecoration(
+          color: HomeTodayScreen._cardSurface,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(HomeTodayScreen._radiusLg),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.35),
+              blurRadius: 20.0,
+              offset: const Offset(0, -6),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            AppBottomNavItem(
+              icon: Icons.home_rounded,
+              label: 'Home',
+              selected: selectedIndex == 0,
+              onTap: () => Navigator.of(context).pushNamed(AppRoutes.home),
+            ),
+            AppBottomNavItem(
+              icon: Icons.fitness_center,
+              label: 'Workouts',
+              selected: selectedIndex == 1,
+              onTap: () =>
+                  Navigator.of(context).pushNamed(AppRoutes.workoutLibrary),
+            ),
+            AppBottomNavItem(
+              icon: Icons.bar_chart_rounded,
+              label: 'Stats',
+              selected: selectedIndex == 2,
+              onTap: () => Navigator.of(context).pushNamed(AppRoutes.stats),
+            ),
+            AppBottomNavItem(
+              icon: Icons.person,
+              label: 'Profile',
+              selected: selectedIndex == 3,
+              onTap: () =>
+                  Navigator.of(context).pushNamed(AppRoutes.userProfile),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AppBottomNavItem extends StatelessWidget {
+  const AppBottomNavItem({
+    super.key,
+    required this.icon,
+    required this.label,
+    this.selected = false,
+    this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final color =
+        selected ? HomeTodayScreen._accentPurple : HomeTodayScreen._textMid;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18.0),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: color, size: 24.0),
+            const SizedBox(height: 4.0),
+            Text(
+              label,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: color,
+                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                  ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CategoryCard extends StatelessWidget {
+  const CategoryCard({super.key, required this.label, this.image});
+
+  final String label;
+  final ImageProvider? image;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 120.0,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(HomeTodayScreen._radiusLg),
+        image: image == null
+            ? null
+            : DecorationImage(
+                image: image!,
+                fit: BoxFit.cover,
+              ),
+        gradient: image == null
+            ? const LinearGradient(
+                colors: [
+                  Color(0xFF2A2050),
+                  Color(0xFF3A2F6C),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
+            : null,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.35),
+            blurRadius: 16.0,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            left: 12.0,
+            bottom: 12.0,
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: HomeTodayScreen._textHigh,
+                    fontWeight: FontWeight.w700,
+                  ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class RecommendedItem extends StatelessWidget {
+  const RecommendedItem({
+    super.key,
+    required this.title,
+    required this.meta,
+    this.thumbnail,
+  });
+
+  final String title;
+  final String meta;
+  final ImageProvider? thumbnail;
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      borderRadius: HomeTodayScreen._radiusLg,
+      child: Padding(
+        padding: const EdgeInsets.all(HomeTodayScreen._spaceSm),
+        child: Row(
+          children: [
+            Container(
+              width: 64.0,
+              height: 64.0,
+              decoration: BoxDecoration(
+                borderRadius:
+                    BorderRadius.circular(HomeTodayScreen._radiusMd),
+                image: thumbnail == null
+                    ? null
+                    : DecorationImage(
+                        image: thumbnail!,
+                        fit: BoxFit.cover,
+                      ),
+                gradient: thumbnail == null
+                    ? const LinearGradient(
+                        colors: [
+                          Color(0xFF2C224E),
+                          Color(0xFF453579),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      )
+                    : null,
+              ),
+              child: thumbnail == null
+                  ? const Icon(
+                      Icons.fitness_center,
+                      color: HomeTodayScreen._textHigh,
+                    )
+                  : null,
+            ),
+            const SizedBox(width: 12.0),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: HomeTodayScreen._textHigh,
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                  const SizedBox(height: 4.0),
+                  Text(
+                    meta,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: HomeTodayScreen._textMid,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8.0),
+            Container(
+              width: 36.0,
+              height: 36.0,
+              decoration: BoxDecoration(
+                color: HomeTodayScreen._cardSurfaceSoft,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.add,
+                color: HomeTodayScreen._accentPurple,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class GlassCard extends StatelessWidget {
+  const GlassCard({
+    super.key,
+    required this.child,
+    this.borderRadius = 20.0,
+  });
+
+  final Widget child;
+  final double borderRadius;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(borderRadius),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+        child: Container(
+          decoration: BoxDecoration(
+            color: HomeTodayScreen._cardSurface.withOpacity(0.78),
+            borderRadius: BorderRadius.circular(borderRadius),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.08),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.35),
+                blurRadius: 20.0,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
+class _PlayButton extends StatelessWidget {
+  const _PlayButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 54.0,
+      height: 54.0,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: const LinearGradient(
+          colors: [Color(0xFF4FC3F7), Color(0xFF3A8DFF)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: HomeTodayScreen._accentBlue.withOpacity(0.45),
+            blurRadius: 18.0,
+            spreadRadius: 2.0,
+          ),
+        ],
+      ),
+      child: const Icon(
+        Icons.play_arrow,
+        color: Colors.white,
+        size: 28.0,
+      ),
+    );
+  }
+}
+
+class _AvatarStack extends StatelessWidget {
+  const _AvatarStack({required this.avatars});
+
+  final List<IconData> avatars;
+
+  @override
+  Widget build(BuildContext context) {
+    final width = 12.0 + (avatars.length - 1) * 16.0 + 24.0;
+    return SizedBox(
+      height: 26.0,
+      width: width,
+      child: Stack(
+        children: List.generate(avatars.length, (index) {
+          return Positioned(
+            left: index * 16.0,
+            child: CircleAvatar(
+              radius: 12.0,
+              backgroundColor: HomeTodayScreen._cardSurfaceSoft,
+              child: Icon(
+                avatars[index],
+                size: 14.0,
+                color: HomeTodayScreen._textHigh,
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+}
+
+class _WeekDayChip extends StatelessWidget {
+  const _WeekDayChip({required this.label, this.isActive = false});
+
+  final String label;
+  final bool isActive;
+
+  @override
+  Widget build(BuildContext context) {
+    final bgColor =
+        isActive ? HomeTodayScreen._accentPurple : HomeTodayScreen._cardSurface;
+    return Container(
+      width: 28.0,
+      height: 28.0,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: HomeTodayScreen._textHigh,
+              fontWeight: FontWeight.w600,
+            ),
       ),
     );
   }

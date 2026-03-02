@@ -9,6 +9,37 @@ A Flutter-based mobile application for listing and exploring bodyweight calisthe
 - **Exercise Detail Screen**: View exercise information including difficulty, target muscles, and description
 - **Favorites**: Add/remove exercises to/from favorites with local storage
 - **Clean Architecture + Riverpod**: State management with separation of concerns
+- **Home/Today UI (New)**: Reference-based dark themed dashboard with hero workout card, weekly activity, categories, recommended list, and bottom nav
+
+## ✅ Recent Progress (2026-03-01)
+
+- `home_screen.dart` tamamen yeniden yazıldı ve referans görsele yakın bir **Home/Today** ekranı oluşturuldu.
+- Ekran bölümleri ayrı widget sınıflarına ayrıldı:
+    - `HomeTodayScreen`
+    - `GreetingAppBar`
+    - `TodayWorkoutCard`
+    - `WeeklyActivityCard`
+    - `BrowseCategoriesRow`
+    - `RecommendedList`
+    - `AppBottomNav`
+- Yeniden kullanılabilir UI parçaları eklendi:
+    - `GlassCard` (blur + translucent card hissi)
+    - `CategoryCard` (opsiyonel `ImageProvider` destekli)
+    - `RecommendedItem` (opsiyonel thumbnail destekli)
+    - `AppBottomNavItem`, `_WeekDayChip`, `_AvatarStack`, `_PlayButton`
+- Tasarım yaklaşımı uygulandı:
+    - Koyu mor degrade arka plan
+    - 8pt grid spacing (8/12/16/24)
+    - Tutarlı radius sistemi (18–24)
+    - İnce progress bar + %65 gösterimi
+    - Mavi glow efektli dairesel play butonu
+- Çalıştırma doğrulaması: `flutter run` komutu başarıyla çalıştı (Exit Code: 0).
+
+## 🧪 Home/Today Ekranı Notları
+
+- Kategori ve önerilen öğe görselleri şu an placeholder gradient ile gösterilir.
+- API tasarımı ileriye dönük hazırdır: `CategoryCard.image` ve `RecommendedItem.thumbnail` alanları üzerinden gerçek `ImageProvider` bağlanabilir.
+- Alt navigasyon görsel olarak tamamlandı; bu ekranda demo odaklı statik kullanım vardır.
 
 ## 🧱 Project Architecture
 
@@ -33,7 +64,15 @@ lib/
 │   ├── screens/
 │   │   ├── home_screen.dart
 │   │   ├── exercise_detail_screen.dart
-│   │   └── favorites_screen.dart
+│   │   ├── favorites_screen.dart
+│   │   ├── training_program_screen.dart
+│   │   ├── user_profile_screen.dart
+│   │   ├── athlete_profile_screen.dart
+│   │   ├── streak_details_screen.dart
+│   │   ├── weekly_goal_screen.dart
+│   │   ├── total_time_screen.dart
+│   │   ├── workout_session_screen.dart
+│   │   └── workout_summary_screen.dart
 │   ├── widgets/
 │   │   └── exercise_card.dart
 │   ├── providers/
@@ -41,8 +80,7 @@ lib/
 │   │   └── app_routes.dart
 │   └── theme/
 │       └── app_theme.dart
-└── app/
-    └── main.dart
+└── main.dart
 ```
 
 ## 🛠️ Tech Stack
