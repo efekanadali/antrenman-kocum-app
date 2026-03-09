@@ -321,54 +321,67 @@ class _CustomProgramCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return _GlassCard(
-      borderRadius: 22.0,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Container(
-              width: 44.0,
-              height: 44.0,
-              decoration: BoxDecoration(
-                color: StatsScreen._accentPurple.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(14.0),
-              ),
-              child: const Icon(
-                Icons.event_note_rounded,
-                color: StatsScreen._accentPurple,
-              ),
-            ),
-            const SizedBox(width: 12.0),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    program.name,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: StatsScreen._textHigh,
-                          fontWeight: FontWeight.w700,
-                        ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => Navigator.pushNamed(
+          context,
+          AppRoutes.customProgramDetail,
+          arguments: program,
+        ),
+        borderRadius: BorderRadius.circular(22.0),
+        splashColor: StatsScreen._accentBlue.withOpacity(0.12),
+        highlightColor: StatsScreen._accentBlue.withOpacity(0.06),
+        child: _GlassCard(
+          borderRadius: 22.0,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Container(
+                  width: 44.0,
+                  height: 44.0,
+                  decoration: BoxDecoration(
+                    color: StatsScreen._accentPurple.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(14.0),
                   ),
-                  const SizedBox(height: 4.0),
-                  Text(
-                    '${program.daysCount} gun • ${program.totalExercises} egzersiz',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: StatsScreen._textMid,
-                        ),
+                  child: const Icon(
+                    Icons.event_note_rounded,
+                    color: StatsScreen._accentPurple,
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 12.0),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        program.name,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: StatsScreen._textHigh,
+                              fontWeight: FontWeight.w700,
+                            ),
+                      ),
+                      const SizedBox(height: 4.0),
+                      Text(
+                        '${program.daysCount} gun • ${program.totalExercises} egzersiz',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: StatsScreen._textMid,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => _confirmDelete(context, ref),
+                  icon: const Icon(Icons.delete_outline),
+                  color: Colors.redAccent,
+                  splashRadius: 22.0,
+                  tooltip: 'Programi sil',
+                ),
+              ],
             ),
-            IconButton(
-              onPressed: () => _confirmDelete(context, ref),
-              icon: const Icon(Icons.delete_outline),
-              color: Colors.redAccent,
-              splashRadius: 22.0,
-              tooltip: 'Programi sil',
-            ),
-          ],
+          ),
         ),
       ),
     );
