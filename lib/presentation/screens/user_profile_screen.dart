@@ -138,7 +138,7 @@ class _ProfileHeader extends StatelessWidget {
               ),
               const SizedBox(height: 4.0),
               Text(
-                'Calisthenics Level: Intermediate',
+                'Kalisthenik Seviyesi: Orta',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: UserProfileScreen._textMid,
                       fontWeight: FontWeight.w500,
@@ -154,7 +154,7 @@ class _ProfileHeader extends StatelessWidget {
             borderRadius: BorderRadius.circular(16.0),
           ),
           child: Text(
-            'PRO',
+            'UZMAN',
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   color: UserProfileScreen._accentPurple,
                   fontWeight: FontWeight.w700,
@@ -198,7 +198,7 @@ class _StreakCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '7-Day Streak',
+                    '7 Günlük Seri',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: UserProfileScreen._textHigh,
                           fontWeight: FontWeight.w700,
@@ -206,7 +206,7 @@ class _StreakCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6.0),
                   Text(
-                    'Keep the momentum going',
+                    'İvmeyi koru',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: UserProfileScreen._textMid,
                         ),
@@ -239,18 +239,18 @@ class _GoalsCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Weekly Goals',
+              'Haftalık Hedefler',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: UserProfileScreen._textHigh,
                     fontWeight: FontWeight.w700,
                   ),
             ),
             const SizedBox(height: 12.0),
-            const _GoalRow(label: 'Workouts', value: '4 / 5'),
+            const _GoalRow(label: 'Antrenmanlar', value: '4 / 5'),
             const SizedBox(height: 10.0),
-            const _GoalRow(label: 'Total Time', value: '3h 10m / 4h'),
+            const _GoalRow(label: 'Toplam Süre', value: '3s 10d / 4s'),
             const SizedBox(height: 10.0),
-            const _GoalRow(label: 'Mobility', value: '2 / 3'),
+            const _GoalRow(label: 'Mobilite', value: '2 / 3'),
           ],
         ),
       ),
@@ -269,7 +269,7 @@ class _RecentSessionsCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Recent Sessions',
+              'Son Seanslar',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: UserProfileScreen._textHigh,
                     fontWeight: FontWeight.w700,
@@ -277,18 +277,18 @@ class _RecentSessionsCard extends StatelessWidget {
             ),
             const SizedBox(height: 12.0),
             const _SessionRow(
-              title: 'Upper Body Strength',
-              meta: '42 min - Chest + Triceps',
+              title: 'Üst Vücut Güç',
+              meta: '42 dk - Göğüs + Triseps',
             ),
             const SizedBox(height: 10.0),
             const _SessionRow(
-              title: 'Pull Focus',
-              meta: '35 min - Back + Biceps',
+              title: 'Çekiş Odak',
+              meta: '35 dk - Sırt + Biseps',
             ),
             const SizedBox(height: 10.0),
             const _SessionRow(
-              title: 'Core Finisher',
-              meta: '18 min - Core + Mobility',
+              title: 'Karın Bitirici',
+              meta: '18 dk - Karın + Mobilite',
             ),
           ],
         ),

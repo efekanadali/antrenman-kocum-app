@@ -166,7 +166,7 @@ class GreetingAppBar extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Momentum',
+                'İvme',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: HomeTodayScreen._textMid,
                       fontWeight: FontWeight.w500,
@@ -174,7 +174,7 @@ class GreetingAppBar extends StatelessWidget {
               ),
               const SizedBox(height: 4.0),
               Text(
-                '7-Day Streak',
+                '7 Günlük Seri',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: HomeTodayScreen._textHigh,
                       fontWeight: FontWeight.w700,
@@ -243,7 +243,7 @@ class TodayWorkoutCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12.0),
                     ),
                     child: Text(
-                      'Today\'s Workout',
+                      'Günün Antrenmanı',
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
                             color: HomeTodayScreen._accentPurple,
                             fontWeight: FontWeight.w600,
@@ -252,7 +252,7 @@ class TodayWorkoutCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 10.0),
                   Text(
-                    'Full Body Power',
+                    'Tüm Vücut Güç',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: HomeTodayScreen._textHigh,
                           fontWeight: FontWeight.w700,
@@ -260,7 +260,7 @@ class TodayWorkoutCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6.0),
                   Text(
-                    '45 mins • Intermediate',
+                    '45 dk • Orta seviye',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: HomeTodayScreen._textMid,
                         ),
@@ -269,7 +269,7 @@ class TodayWorkoutCard extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        'Progress',
+                        'İlerleme',
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                               color: HomeTodayScreen._textMid,
                               fontWeight: FontWeight.w600,
@@ -321,7 +321,7 @@ class TodayWorkoutCard extends StatelessWidget {
                           const SizedBox(width: 8.0),
                           Expanded(
                             child: Text(
-                              '+5 friends active now',
+                              '+5 arkadaş şu an aktif',
                               style: Theme.of(context)
                                   .textTheme
                                   .bodySmall
@@ -357,7 +357,7 @@ class TodayWorkoutCard extends StatelessWidget {
                                   fontWeight: FontWeight.w600,
                                 ),
                           ),
-                          child: const Text('Explore Workouts'),
+                          child: const Text('Hareketleri keşfet'),
                         ),
                       ),
                     ],
@@ -383,7 +383,7 @@ class EnergeticHeadline extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Good Morning,',
+          'Günaydın,',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: HomeTodayScreen._textMid,
                 fontWeight: FontWeight.w600,
@@ -391,7 +391,7 @@ class EnergeticHeadline extends StatelessWidget {
         ),
         const SizedBox(height: 6.0),
         Text(
-          'Let\'s Crush Today 💪',
+          'Bugünü domine edelim 💪',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 color: HomeTodayScreen._textHigh,
                 fontWeight: FontWeight.w800,
@@ -417,7 +417,7 @@ class WeeklyActivityCard extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  'Weekly Activity',
+                  'Haftalık Aktivite',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: HomeTodayScreen._textHigh,
                         fontWeight: FontWeight.w700,
@@ -425,7 +425,7 @@ class WeeklyActivityCard extends StatelessWidget {
                 ),
                 const Spacer(),
                 Text(
-                  'View All',
+                  'Tümünü gör',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: HomeTodayScreen._accentPurple,
                         fontWeight: FontWeight.w600,
@@ -446,13 +446,13 @@ class WeeklyActivityCard extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: const [
-                  _WeekDayChip(label: 'M'),
-                  _WeekDayChip(label: 'T'),
-                  _WeekDayChip(label: 'W', isActive: true),
-                  _WeekDayChip(label: 'T'),
-                  _WeekDayChip(label: 'F'),
-                  _WeekDayChip(label: 'S'),
-                  _WeekDayChip(label: 'S'),
+                  _WeekDayChip(label: 'Pzt'),
+                  _WeekDayChip(label: 'Sal'),
+                  _WeekDayChip(label: 'Çar', isActive: true),
+                  _WeekDayChip(label: 'Per'),
+                  _WeekDayChip(label: 'Cum'),
+                  _WeekDayChip(label: 'Cmt'),
+                  _WeekDayChip(label: 'Paz'),
                 ],
               ),
             ),
@@ -479,22 +479,22 @@ class QuickStatsCard extends StatelessWidget {
           children: const [
             Expanded(
               child: _QuickStatItem(
-                value: '4h 20m',
-                label: 'Weekly Time',
+                value: '4s 20d',
+                label: 'Haftalık süre',
               ),
             ),
             _QuickStatDivider(),
             Expanded(
               child: _QuickStatItem(
                 value: '5 Days',
-                label: 'Active Days',
+                label: 'Aktif Gün',
               ),
             ),
             _QuickStatDivider(),
             Expanded(
               child: _QuickStatItem(
-                value: '2 PRs',
-                label: 'New Records',
+                value: '2 KR',
+                label: 'Yeni Rekor',
               ),
             ),
           ],
@@ -559,7 +559,7 @@ class BrowseCategoriesRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Browse Categories',
+          'Kategorilere Göz At',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: HomeTodayScreen._textHigh,
                 fontWeight: FontWeight.w700,
@@ -571,11 +571,11 @@ class BrowseCategoriesRow extends StatelessWidget {
           child: ListView(
             scrollDirection: Axis.horizontal,
             children: const [
-              CategoryCard(label: 'Strength'),
+              CategoryCard(label: 'Güç'),
               SizedBox(width: 12.0),
-              CategoryCard(label: 'Cardio'),
+              CategoryCard(label: 'Kardiyo'),
               SizedBox(width: 12.0),
-              CategoryCard(label: 'HIIT'),
+              CategoryCard(label: 'YYA'),
             ],
           ),
         ),
@@ -593,7 +593,7 @@ class RecommendedList extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Recommended for You',
+          'Sana Özel Öneriler',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: HomeTodayScreen._textHigh,
                 fontWeight: FontWeight.w700,
@@ -601,13 +601,13 @@ class RecommendedList extends StatelessWidget {
         ),
         const SizedBox(height: 12.0),
         const RecommendedItem(
-          title: 'Upper Body Crush',
-          meta: '30 mins • Advanced',
+          title: 'Üst Vücut Güç',
+          meta: '30 dk • İleri',
         ),
         const SizedBox(height: 12.0),
         const RecommendedItem(
-          title: 'Night Run Intervals',
-          meta: '45 mins • Intermediate',
+          title: 'Gece Koşu Aralıkları',
+          meta: '45 dk • Orta seviye',
         ),
       ],
     );
@@ -643,29 +643,37 @@ class AppBottomNav extends StatelessWidget {
           children: [
             AppBottomNavItem(
               icon: Icons.home_rounded,
-              label: 'Home',
+              label: 'Ana Sayfa',
               selected: selectedIndex == 0,
-              onTap: () => Navigator.of(context).pushNamed(AppRoutes.home),
+              onTap: selectedIndex == 0
+                  ? null
+                  : () => Navigator.of(context).pushNamed(AppRoutes.home),
             ),
             AppBottomNavItem(
               icon: Icons.fitness_center,
-              label: 'Workouts',
+              label: 'Hareketler',
               selected: selectedIndex == 1,
-              onTap: () =>
-                  Navigator.of(context).pushNamed(AppRoutes.workoutLibrary),
+              onTap: selectedIndex == 1
+                  ? null
+                  : () => Navigator.of(context)
+                      .pushNamed(AppRoutes.workoutLibrary),
             ),
             AppBottomNavItem(
-              icon: Icons.bar_chart_rounded,
-              label: 'Stats',
+              icon: Icons.event_note,
+              label: 'Program',
               selected: selectedIndex == 2,
-              onTap: () => Navigator.of(context).pushNamed(AppRoutes.stats),
+              onTap: selectedIndex == 2
+                  ? null
+                  : () => Navigator.of(context).pushNamed(AppRoutes.stats),
             ),
             AppBottomNavItem(
               icon: Icons.person,
-              label: 'Profile',
+              label: 'Profil',
               selected: selectedIndex == 3,
-              onTap: () =>
-                  Navigator.of(context).pushNamed(AppRoutes.userProfile),
+              onTap: selectedIndex == 3
+                  ? null
+                  : () => Navigator.of(context)
+                      .pushNamed(AppRoutes.userProfile),
             ),
           ],
         ),

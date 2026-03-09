@@ -3,9 +3,14 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:calisthenics_app/core/utils/enum_label.dart';
+import 'package:calisthenics_app/domain/enums/muscle_group.dart';
+import 'package:calisthenics_app/domain/models/exercise.dart';
+import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
 import 'package:calisthenics_app/presentation/screens/home_screen.dart';
 
-class WorkoutLibraryScreen extends StatefulWidget {
+class WorkoutLibraryScreen extends ConsumerStatefulWidget {
   const WorkoutLibraryScreen({super.key});
 
   static const Color _bgTop = Color(0xFF151028);
@@ -17,62 +22,71 @@ class WorkoutLibraryScreen extends StatefulWidget {
   static const Color _textHigh = Color(0xFFEDE9FF);
   static const Color _textMid = Color(0xFFB4A9D8);
 
-  static const List<_WorkoutCardData> _workouts = [
-    _WorkoutCardData(
-      title: 'Push-up',
-      description: 'Klasik itis hareketi. Govdeyi sabit tutarak kontrollu calis.',
-      muscleGroups: ['Gogus', 'Omuz', 'Triceps', 'Core'],
-      level: 'Beginner',
-    ),
-    _WorkoutCardData(
-      title: 'Pull-up',
-      description: 'Bar cekisi. Sirt ve kol kuvveti icin temel hareket.',
-      muscleGroups: ['Sirt', 'Biceps', 'Core'],
-      level: 'Intermediate',
-    ),
-    _WorkoutCardData(
-      title: 'Dips',
-      description: 'Paralel bar itis. Gogus ve triceps odakli.',
-      muscleGroups: ['Gogus', 'Triceps', 'Omuz'],
-      level: 'Intermediate',
-    ),
-    _WorkoutCardData(
-      title: 'Pike Push-up',
-      description: 'Omuzlara yuklenen bir itis varyasyonu.',
-      muscleGroups: ['Omuz', 'Triceps', 'Ust Gogus'],
-      level: 'Intermediate',
-    ),
-    _WorkoutCardData(
-      title: 'Squat',
-      description: 'Vucut agirligi squat ile temel bacak kuvveti.',
-      muscleGroups: ['Quadriceps', 'Glute', 'Hamstring'],
-      level: 'Beginner',
-    ),
-    _WorkoutCardData(
-      title: 'Hollow Hold',
-      description: 'Core stabilitesi icin sabit tutus.',
-      muscleGroups: ['Core', 'Alt Karin'],
-      level: 'Beginner',
-    ),
+  @override
+  ConsumerState<WorkoutLibraryScreen> createState() =>
+      _WorkoutLibraryScreenState();
+}
+
+class _WorkoutLibraryScreenState extends ConsumerState<WorkoutLibraryScreen> {
+  final Set<MuscleGroup> _selectedMuscleGroups = {};
+  late final Future<List<Exercise>> _exerciseFuture;
+
+  static const List<MuscleGroup> _libraryGroups = [
+    MuscleGroup.chest,
+    MuscleGroup.back,
+    MuscleGroup.shoulders,
+    MuscleGroup.biceps,
+    MuscleGroup.triceps,
+    MuscleGroup.core,
+    MuscleGroup.quads,
+    MuscleGroup.hamstrings,
+    MuscleGroup.glutes,
+    MuscleGroup.calves,
   ];
 
   @override
-  State<WorkoutLibraryScreen> createState() => _WorkoutLibraryScreenState();
-}
-
-class _WorkoutLibraryScreenState extends State<WorkoutLibraryScreen> {
-  final Set<String> _selectedMuscleGroups = {};
-
-  List<String> get _allMuscleGroups {
-    final groups = <String>{};
-    for (final workout in WorkoutLibraryScreen._workouts) {
-      groups.addAll(workout.muscleGroups);
-    }
-    final sorted = groups.toList()..sort();
-    return sorted;
+  void initState() {
+    super.initState();
+    _exerciseFuture =
+        ref.read(exerciseRepositoryProvider).getAllExercises();
   }
 
-  void _toggleMuscleGroup(String group) {
+  List<MuscleGroup> _allMuscleGroups() {
+    return _libraryGroups;
+  }
+
+  List<String> _exerciseMuscleLabels(Exercise exercise) {
+    return exercise.targetMuscleGroups.map(_muscleLabel).toList();
+  }
+
+  String _muscleLabel(MuscleGroup group) {
+    switch (group) {
+      case MuscleGroup.chest:
+        return 'Chest';
+      case MuscleGroup.back:
+        return 'Back';
+      case MuscleGroup.shoulders:
+        return 'Shoulders';
+      case MuscleGroup.biceps:
+        return 'Biceps';
+      case MuscleGroup.triceps:
+        return 'Triceps';
+      case MuscleGroup.core:
+        return 'Core';
+      case MuscleGroup.quads:
+        return 'Quads';
+      case MuscleGroup.hamstrings:
+        return 'Hamstrings';
+      case MuscleGroup.glutes:
+        return 'Glutes';
+      case MuscleGroup.calves:
+        return 'Calves';
+      case MuscleGroup.legs:
+        return 'Legs';
+    }
+  }
+
+  void _toggleMuscleGroup(MuscleGroup group) {
     setState(() {
       if (_selectedMuscleGroups.contains(group)) {
         _selectedMuscleGroups.remove(group);
@@ -90,14 +104,6 @@ class _WorkoutLibraryScreenState extends State<WorkoutLibraryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredWorkouts = _selectedMuscleGroups.isEmpty
-        ? WorkoutLibraryScreen._workouts
-        : WorkoutLibraryScreen._workouts
-            .where(
-              (workout) => _selectedMuscleGroups
-                  .every((group) => workout.muscleGroups.contains(group)),
-            )
-            .toList();
     return Scaffold(
       backgroundColor: WorkoutLibraryScreen._bgBottom,
       body: Stack(
@@ -139,8 +145,32 @@ class _WorkoutLibraryScreenState extends State<WorkoutLibraryScreen> {
             ),
           ),
           SafeArea(
-            child: CustomScrollView(
-              slivers: [
+            child: FutureBuilder<List<Exercise>>(
+              future: _exerciseFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(child: Text('Hata: ${snapshot.error}'));
+                }
+
+                final exercises = snapshot.data ?? <Exercise>[];
+                final availableGroups = _allMuscleGroups();
+                final filteredWorkouts = _selectedMuscleGroups.isEmpty
+                    ? exercises
+                    : exercises
+                        .where(
+                          (exercise) => _selectedMuscleGroups.every(
+                            (group) =>
+                                exercise.targetMuscleGroups.contains(group),
+                          ),
+                        )
+                        .toList();
+
+                return CustomScrollView(
+                  slivers: [
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 12.0),
@@ -154,7 +184,7 @@ class _WorkoutLibraryScreenState extends State<WorkoutLibraryScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Workout Library',
+                              'Hareket Kütüphanesi',
                               style:
                                   Theme.of(context).textTheme.titleLarge?.copyWith(
                                         color: WorkoutLibraryScreen._textHigh,
@@ -163,7 +193,7 @@ class _WorkoutLibraryScreenState extends State<WorkoutLibraryScreen> {
                             ),
                             const SizedBox(height: 4.0),
                             Text(
-                              'Calisthenics hareketleri',
+                              'Kalisthenik hareketler',
                               style:
                                   Theme.of(context).textTheme.bodySmall?.copyWith(
                                         color: WorkoutLibraryScreen._textMid,
@@ -180,7 +210,7 @@ class _WorkoutLibraryScreenState extends State<WorkoutLibraryScreen> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: Text(
-                      'Hareket kartlarina dokunup detayli bilgi alabilirsin.',
+                      'Hareket kartlarına dokunup detaylı bilgi alabilirsin.',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: WorkoutLibraryScreen._textMid,
                           ),
@@ -190,10 +220,11 @@ class _WorkoutLibraryScreenState extends State<WorkoutLibraryScreen> {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20.0, 16.0, 20.0, 8.0),
-                    child: _BodyMap(
-                      availableGroups: _allMuscleGroups,
+                    child: _TargetRegionPicker(
+                      availableGroups: availableGroups,
                       selectedGroups: _selectedMuscleGroups,
                       onToggleGroup: _toggleMuscleGroup,
+                      labelBuilder: _muscleLabel,
                       onClear: _clearMuscleGroups,
                     ),
                   ),
@@ -207,7 +238,10 @@ class _WorkoutLibraryScreenState extends State<WorkoutLibraryScreen> {
                         final item = filteredWorkouts[index];
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 14.0),
-                          child: _WorkoutCard(data: item),
+                          child: _WorkoutCard(
+                            exercise: item,
+                            muscleLabels: _exerciseMuscleLabels(item),
+                          ),
                         );
                       },
                       childCount: filteredWorkouts.length,
@@ -217,7 +251,9 @@ class _WorkoutLibraryScreenState extends State<WorkoutLibraryScreen> {
                 const SliverToBoxAdapter(
                   child: SizedBox(height: 32.0),
                 ),
-              ],
+                  ],
+                );
+              },
             ),
           ),
         ],
@@ -227,53 +263,23 @@ class _WorkoutLibraryScreenState extends State<WorkoutLibraryScreen> {
   }
 }
 
-class _WorkoutCardData {
-  const _WorkoutCardData({
-    required this.title,
-    required this.description,
-    required this.muscleGroups,
-    required this.level,
-  });
-
-  final String title;
-  final String description;
-  final List<String> muscleGroups;
-  final String level;
-}
-
-class _BodyMap extends StatelessWidget {
-  const _BodyMap({
+class _TargetRegionPicker extends StatelessWidget {
+  const _TargetRegionPicker({
     required this.availableGroups,
     required this.selectedGroups,
     required this.onToggleGroup,
+    required this.labelBuilder,
     required this.onClear,
   });
 
-  final List<String> availableGroups;
-  final Set<String> selectedGroups;
-  final ValueChanged<String> onToggleGroup;
+  final List<MuscleGroup> availableGroups;
+  final Set<MuscleGroup> selectedGroups;
+  final ValueChanged<MuscleGroup> onToggleGroup;
+  final String Function(MuscleGroup) labelBuilder;
   final VoidCallback onClear;
-
-  static const List<_MuscleMarker> _markers = [
-    _MuscleMarker(group: 'Ust Gogus', position: Offset(0.50, 0.26)),
-    _MuscleMarker(group: 'Gogus', position: Offset(0.50, 0.32)),
-    _MuscleMarker(group: 'Omuz', position: Offset(0.32, 0.28)),
-    _MuscleMarker(group: 'Biceps', position: Offset(0.22, 0.36)),
-    _MuscleMarker(group: 'Triceps', position: Offset(0.78, 0.36)),
-    _MuscleMarker(group: 'Core', position: Offset(0.50, 0.46)),
-    _MuscleMarker(group: 'Alt Karin', position: Offset(0.50, 0.56)),
-    _MuscleMarker(group: 'Sirt', position: Offset(0.80, 0.30)),
-    _MuscleMarker(group: 'Glute', position: Offset(0.50, 0.64)),
-    _MuscleMarker(group: 'Quadriceps', position: Offset(0.44, 0.76)),
-    _MuscleMarker(group: 'Hamstring', position: Offset(0.56, 0.82)),
-  ];
 
   @override
   Widget build(BuildContext context) {
-    final activeMarkers = _markers
-        .where((marker) => availableGroups.contains(marker.group))
-        .toList();
-
     return _GlassCard(
       borderRadius: 22.0,
       child: Padding(
@@ -284,7 +290,7 @@ class _BodyMap extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  'Vucut haritasi',
+                  'Hedeflediğin bölge',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         color: WorkoutLibraryScreen._textHigh,
                         fontWeight: FontWeight.w700,
@@ -306,47 +312,33 @@ class _BodyMap extends StatelessWidget {
             ),
             const SizedBox(height: 6.0),
             Text(
-              'Kas gruplarinin yerini gor ve dokunarak filtrele.',
+              'Kartlara dokunarak hedef bölgeyi seç.',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: WorkoutLibraryScreen._textMid,
                   ),
             ),
             const SizedBox(height: 14.0),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final width = constraints.maxWidth;
-                final height = width * 1.15;
-                return SizedBox(
-                  width: width,
-                  height: height,
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: Image.asset(
-                          'assets/images/body_map.png',
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Align(
-                              alignment: Alignment.center,
-                              child: _BodySilhouette(
-                                color: WorkoutLibraryScreen._cardSurfaceSoft,
-                              ),
-                            );
-                          },
-                        ),
+            if (availableGroups.isEmpty)
+              Text(
+                'Şu an listelenecek bölge yok.',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: WorkoutLibraryScreen._textMid,
+                    ),
+              )
+            else
+              Wrap(
+                spacing: 10.0,
+                runSpacing: 10.0,
+                children: availableGroups
+                    .map(
+                      (group) => _RegionCard(
+                        label: labelBuilder(group),
+                        isSelected: selectedGroups.contains(group),
+                        onTap: () => onToggleGroup(group),
                       ),
-                      for (final marker in activeMarkers)
-                        _MuscleMarkerDot(
-                          marker: marker,
-                          size: Size(width, height),
-                          isSelected: selectedGroups.contains(marker.group),
-                          onTap: () => onToggleGroup(marker.group),
-                        ),
-                    ],
-                  ),
-                );
-              },
-            ),
+                    )
+                    .toList(),
+              ),
           ],
         ),
       ),
@@ -354,172 +346,59 @@ class _BodyMap extends StatelessWidget {
   }
 }
 
-class _MuscleMarker {
-  const _MuscleMarker({required this.group, required this.position});
-
-  final String group;
-  final Offset position;
-}
-
-class _MuscleMarkerDot extends StatelessWidget {
-  const _MuscleMarkerDot({
-    required this.marker,
-    required this.size,
+class _RegionCard extends StatelessWidget {
+  const _RegionCard({
+    required this.label,
     required this.isSelected,
     required this.onTap,
   });
 
-  final _MuscleMarker marker;
-  final Size size;
+  final String label;
   final bool isSelected;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final dotColor = isSelected
-        ? WorkoutLibraryScreen._accentPurple
-        : WorkoutLibraryScreen._textMid;
     final bgColor = isSelected
-        ? WorkoutLibraryScreen._accentPurple.withOpacity(0.18)
-        : WorkoutLibraryScreen._cardSurface.withOpacity(0.65);
+        ? WorkoutLibraryScreen._accentPurple.withOpacity(0.22)
+        : WorkoutLibraryScreen._cardSurfaceSoft;
+    final borderColor = isSelected
+        ? WorkoutLibraryScreen._accentPurple
+        : Colors.white.withOpacity(0.08);
+    final textColor = isSelected
+        ? WorkoutLibraryScreen._accentPurple
+        : WorkoutLibraryScreen._textHigh;
 
-    return Positioned(
-      left: (size.width * marker.position.dx) - 24.0,
-      top: (size.height * marker.position.dy) - 16.0,
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(14.0),
-            border: Border.all(
-              color: dotColor.withOpacity(0.6),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 8.0,
-                height: 8.0,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: dotColor,
-                ),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16.0),
+      child: Ink(
+        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(16.0),
+          border: Border.all(color: borderColor),
+        ),
+        child: Text(
+          label,
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                color: textColor,
+                fontWeight: FontWeight.w600,
               ),
-              const SizedBox(width: 6.0),
-              Text(
-                marker.group,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: WorkoutLibraryScreen._textHigh,
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-            ],
-          ),
         ),
       ),
     );
   }
 }
 
-class _BodySilhouette extends StatelessWidget {
-  const _BodySilhouette({required this.color});
-
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 52.0,
-          height: 52.0,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: color.withOpacity(0.55),
-          ),
-        ),
-        const SizedBox(height: 8.0),
-        Container(
-          width: 120.0,
-          height: 140.0,
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.65),
-            borderRadius: BorderRadius.circular(40.0),
-          ),
-          child: Stack(
-            children: [
-              Positioned(
-                left: -30.0,
-                top: 20.0,
-                child: Container(
-                  width: 40.0,
-                  height: 90.0,
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.55),
-                    borderRadius: BorderRadius.circular(30.0),
-                  ),
-                ),
-              ),
-              Positioned(
-                right: -30.0,
-                top: 20.0,
-                child: Container(
-                  width: 40.0,
-                  height: 90.0,
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.55),
-                    borderRadius: BorderRadius.circular(30.0),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 10.0),
-        Container(
-          width: 86.0,
-          height: 36.0,
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.6),
-            borderRadius: BorderRadius.circular(26.0),
-          ),
-        ),
-        const SizedBox(height: 10.0),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40.0,
-              height: 110.0,
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.55),
-                borderRadius: BorderRadius.circular(26.0),
-              ),
-            ),
-            const SizedBox(width: 12.0),
-            Container(
-              width: 40.0,
-              height: 110.0,
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.55),
-                borderRadius: BorderRadius.circular(26.0),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
 class _WorkoutCard extends StatelessWidget {
-  const _WorkoutCard({required this.data});
+  const _WorkoutCard({
+    required this.exercise,
+    required this.muscleLabels,
+  });
 
-  final _WorkoutCardData data;
+  final Exercise exercise;
+  final List<String> muscleLabels;
 
   @override
   Widget build(BuildContext context) {
@@ -551,7 +430,7 @@ class _WorkoutCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        data.title,
+                        exercise.name,
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               color: WorkoutLibraryScreen._textHigh,
                               fontWeight: FontWeight.w700,
@@ -559,7 +438,7 @@ class _WorkoutCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 6.0),
                       Text(
-                        data.description,
+                        exercise.description,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: WorkoutLibraryScreen._textMid,
                             ),
@@ -568,14 +447,14 @@ class _WorkoutCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8.0),
-                _LevelPill(level: data.level),
+                _LevelPill(level: exercise.level.label),
               ],
             ),
             const SizedBox(height: 12.0),
             Wrap(
               spacing: 8.0,
               runSpacing: 8.0,
-              children: data.muscleGroups
+              children: muscleLabels
                   .map(
                     (group) => _MuscleChip(label: group),
                   )

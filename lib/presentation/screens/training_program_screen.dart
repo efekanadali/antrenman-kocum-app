@@ -8,15 +8,15 @@ class TrainingProgramScreen extends StatelessWidget {
 
   static const List<Map<String, dynamic>> _programData = [
     {
-      "level": "beginner",
+      "level": "evde",
       "week": 1,
       "days": [
         {
-          "name": "Gun 1",
-          "focus": "Itis + Core",
+          "name": "Gün 1",
+          "focus": "İtiş + Karın",
           "warmup": [
-            "Eklem isinmasi (boyun-omuz-dirsek-bilek) 3 dk",
-            "Hafif yerde yuruyus + kol salinimi 2 dk",
+            "Eklem isinmasi 3 dk",
+            "Hafif yuruyus + kol acma 2 dk",
             "Duvara itis 2 x 10"
           ],
           "workout": [
@@ -26,15 +26,15 @@ class TrainingProgramScreen extends StatelessWidget {
               "reps_or_time": "8-12 tekrar",
               "rest": "60 sn",
               "progression": "Tam sinava gec",
-              "regression": "Eğimli (yukseltiye) sinav"
+              "regression": "Egimli sinav"
             },
             {
-              "exercise": "Sandalyeye Triceps Dip (dizler bukulu)",
+              "exercise": "Sandalyeye Triceps Dip",
               "sets": "3",
               "reps_or_time": "8-10 tekrar",
               "rest": "60 sn",
               "progression": "Bacaklari duzlestir",
-              "regression": "Daha kisa hareket araligi"
+              "regression": "Kisa hareket araligi"
             },
             {
               "exercise": "Plank",
@@ -52,8 +52,8 @@ class TrainingProgramScreen extends StatelessWidget {
           ]
         },
         {
-          "name": "Gun 2",
-          "focus": "Bacak + Core",
+          "name": "Gün 2",
+          "focus": "Bacak + Karın",
           "warmup": [
             "Dinamik kalca acma 1 dk",
             "Hafif squat 2 x 10",
@@ -74,15 +74,15 @@ class TrainingProgramScreen extends StatelessWidget {
               "reps_or_time": "10 tekrar/ayak",
               "rest": "60 sn",
               "progression": "Split squat",
-              "regression": "Kisa adimli lunge"
+              "regression": "Kisa adim"
             },
             {
               "exercise": "Dead Bug",
               "sets": "3",
               "reps_or_time": "8-10 tekrar/yan",
               "rest": "45 sn",
-              "progression": "Bacaklari daha duz tut",
-              "regression": "Daha kisa hareket"
+              "progression": "Bacaklari duz tut",
+              "regression": "Kisa hareket"
             }
           ],
           "cooldown": [
@@ -92,21 +92,21 @@ class TrainingProgramScreen extends StatelessWidget {
           ]
         },
         {
-          "name": "Gun 3",
-          "focus": "Cekis + Core",
+          "name": "Gün 3",
+          "focus": "Çekiş + Karın",
           "warmup": [
             "Sirt-omuz mobilite 2 dk",
-            "Duvar sirt aktivasyonu 2 x 8",
+            "Ters sinav 2 x 8",
             "Kollari daire 1 dk"
           ],
           "workout": [
             {
-              "exercise": "Ters Sinav (Floor Row simulasyonu)",
+              "exercise": "Ters Sinav (Row)",
               "sets": "3",
               "reps_or_time": "10-12 tekrar",
               "rest": "60 sn",
               "progression": "Daha yavas inis",
-              "regression": "Daha kisa hareket araligi"
+              "regression": "Kisa hareket"
             },
             {
               "exercise": "Superman",
@@ -134,357 +134,127 @@ class TrainingProgramScreen extends StatelessWidget {
       ]
     },
     {
-      "level": "intermediate",
+      "level": "spor salonu",
       "week": 1,
       "days": [
         {
-          "name": "Gun 1",
-          "focus": "Itis + Core",
+          "name": "Gün 1",
+          "focus": "İtiş + Karın",
           "warmup": [
-            "Eklem isinmasi 3 dk",
-            "Yavas sinav 2 x 6",
-            "Omuz mobilite 1 dk"
-          ],
-          "workout": [
-            {
-              "exercise": "Sinav",
-              "sets": "4",
-              "reps_or_time": "10-15 tekrar",
-              "rest": "60 sn",
-              "progression": "Ayak yukselt",
-              "regression": "Egimli sinav"
-            },
-            {
-              "exercise": "Pike Push-up",
-              "sets": "3",
-              "reps_or_time": "8-10 tekrar",
-              "rest": "60 sn",
-              "progression": "Ayak yukselt pike",
-              "regression": "Diz pike"
-            },
-            {
-              "exercise": "Hollow Hold",
-              "sets": "3",
-              "reps_or_time": "25-35 sn",
-              "rest": "45 sn",
-              "progression": "Kollari bas ustune al",
-              "regression": "Dizler bukulu hollow"
-            }
-          ],
-          "cooldown": [
-            "Gogus esnetme 30 sn",
-            "Omuz esnetme 30 sn",
-            "Cocuk pozu 45 sn"
-          ]
-        },
-        {
-          "name": "Gun 2",
-          "focus": "Bacak + Core",
-          "warmup": [
-            "Dinamik squat 2 x 10",
-            "Kalca daire 1 dk",
-            "Bacak savurma 1 dk"
-          ],
-          "workout": [
-            {
-              "exercise": "Tempo Squat (3 sn inis)",
-              "sets": "4",
-              "reps_or_time": "10-12 tekrar",
-              "rest": "60 sn",
-              "progression": "Pause squat (altta 2 sn)",
-              "regression": "Normal squat"
-            },
-            {
-              "exercise": "Bulgarian Split Squat",
-              "sets": "3",
-              "reps_or_time": "8-10 tekrar/ayak",
-              "rest": "75 sn",
-              "progression": "Daha yavas inis",
-              "regression": "Split squat (arka ayak yerde)"
-            },
-            {
-              "exercise": "Leg Raise",
-              "sets": "3",
-              "reps_or_time": "10-12 tekrar",
-              "rest": "60 sn",
-              "progression": "Yavas negatif",
-              "regression": "Diz cekme"
-            }
-          ],
-          "cooldown": [
-            "Quadriceps esnetme 30 sn",
-            "Hamstring esnetme 30 sn",
-            "Bel gevsetme 30 sn"
-          ]
-        },
-        {
-          "name": "Gun 3",
-          "focus": "Cekis + Core",
-          "warmup": [
-            "Sirt mobilite 2 dk",
-            "Yuzustu kurek simulasyonu 2 x 8",
-            "Omuz daire 1 dk"
-          ],
-          "workout": [
-            {
-              "exercise": "Ters Sinav (Strict)",
-              "sets": "4",
-              "reps_or_time": "10-12 tekrar",
-              "rest": "60 sn",
-              "progression": "Tempolu 3 sn inis",
-              "regression": "Daha kisa hareket"
-            },
-            {
-              "exercise": "Superman Hold",
-              "sets": "3",
-              "reps_or_time": "25-35 sn",
-              "rest": "45 sn",
-              "progression": "Kollari bas ustunde tut",
-              "regression": "Tek kol/tek bacak"
-            },
-            {
-              "exercise": "Side Plank Reach",
-              "sets": "3",
-              "reps_or_time": "8-10 tekrar/yan",
-              "rest": "45 sn",
-              "progression": "Daha yavas tempo",
-              "regression": "Klasik yan plank"
-            }
-          ],
-          "cooldown": [
-            "Lat esnetme 30 sn",
-            "Gogus acma 30 sn",
-            "Kedi-inek 45 sn"
-          ]
-        },
-        {
-          "name": "Gun 4 (Opsiyonel HIIT)",
-          "focus": "Tam vucut kondisyon",
-          "warmup": [
-            "Hafif ziplama 2 dk",
-            "Dinamik mobilite 2 dk"
-          ],
-          "workout": [
-            {
-              "exercise": "Jumping Jack",
-              "sets": "4 tur",
-              "reps_or_time": "30 sn",
-              "rest": "20 sn",
-              "progression": "Daha hizli tempo",
-              "regression": "Adimli jumping jack"
-            },
-            {
-              "exercise": "Dag Tirmanisi",
-              "sets": "4 tur",
-              "reps_or_time": "30 sn",
-              "rest": "20 sn",
-              "progression": "Daha hizli tempo",
-              "regression": "Yavas tempo"
-            },
-            {
-              "exercise": "Squat Jump",
-              "sets": "4 tur",
-              "reps_or_time": "20 sn",
-              "rest": "40 sn",
-              "progression": "Daha yuksek ziplama",
-              "regression": "Normal squat"
-            }
-          ],
-          "cooldown": [
-            "Yuruyus 2 dk",
-            "Tam vucut esneme 2-3 dk"
-          ]
-        }
-      ]
-    },
-    {
-      "level": "advanced",
-      "week": 1,
-      "days": [
-        {
-          "name": "Gun 1",
-          "focus": "Itis + Core",
-          "warmup": [
-            "Omuz mobilite 3 dk",
-            "Yavas sinav 2 x 8",
-            "El bilegi isinma 1 dk"
-          ],
-          "workout": [
-            {
-              "exercise": "Archer Push-up",
-              "sets": "4",
-              "reps_or_time": "6-8 tekrar/yan",
-              "rest": "75 sn",
-              "progression": "Tek kol sinav yolu",
-              "regression": "Genis sinav"
-            },
-            {
-              "exercise": "Pike Push-up (Ayak yukselt)",
-              "sets": "4",
-              "reps_or_time": "8-10 tekrar",
-              "rest": "75 sn",
-              "progression": "Handstand push-up negatif",
-              "regression": "Duz pike"
-            },
-            {
-              "exercise": "Hollow Rocks",
-              "sets": "3",
-              "reps_or_time": "20-25 tekrar",
-              "rest": "60 sn",
-              "progression": "Daha genis salinim",
-              "regression": "Hollow hold"
-            }
-          ],
-          "cooldown": [
-            "Gogus esnetme 30 sn",
-            "Omuz esnetme 30 sn",
-            "Cocuk pozu 45 sn"
-          ]
-        },
-        {
-          "name": "Gun 2",
-          "focus": "Bacak + Core",
-          "warmup": [
-            "Dinamik squat 2 x 12",
-            "Kalca mobilite 2 dk"
-          ],
-          "workout": [
-            {
-              "exercise": "Pistol Squat (Yardimli)",
-              "sets": "4",
-              "reps_or_time": "5-6 tekrar/ayak",
-              "rest": "90 sn",
-              "progression": "Pistol squat tam",
-              "regression": "Box pistol"
-            },
-            {
-              "exercise": "Jump Lunge",
-              "sets": "3",
-              "reps_or_time": "8-10 tekrar/ayak",
-              "rest": "75 sn",
-              "progression": "Daha hizli tempo",
-              "regression": "Geri lunge"
-            },
-            {
-              "exercise": "V-Up",
-              "sets": "3",
-              "reps_or_time": "10-12 tekrar",
-              "rest": "60 sn",
-              "progression": "Hollow to V-Up",
-              "regression": "Diz cekme"
-            }
-          ],
-          "cooldown": [
-            "Quadriceps esnetme 30 sn",
-            "Hamstring esnetme 30 sn",
-            "Bel gevsetme 30 sn"
-          ]
-        },
-        {
-          "name": "Gun 3",
-          "focus": "Cekis + Core (Ekipmansiz)",
-          "warmup": [
-            "Sirt aktivasyon 2 dk",
-            "Yuzustu kurek 2 x 10"
-          ],
-          "workout": [
-            {
-              "exercise": "Ters Sinav (Tempo 3-1-1)",
-              "sets": "4",
-              "reps_or_time": "10-12 tekrar",
-              "rest": "75 sn",
-              "progression": "Daha yavas inis",
-              "regression": "Daha kisa hareket"
-            },
-            {
-              "exercise": "Superman Pull",
-              "sets": "3",
-              "reps_or_time": "10-12 tekrar",
-              "rest": "60 sn",
-              "progression": "Ustte 2 sn tut",
-              "regression": "Superman"
-            },
-            {
-              "exercise": "Side Plank Reach + Rotasyon",
-              "sets": "3",
-              "reps_or_time": "10 tekrar/yan",
-              "rest": "60 sn",
-              "progression": "Daha yavas tempo",
-              "regression": "Klasik yan plank"
-            }
-          ],
-          "cooldown": [
-            "Lat esnetme 30 sn",
-            "Gogus acma 30 sn",
-            "Kedi-inek 45 sn"
-          ]
-        },
-        {
-          "name": "Gun 4 (Opsiyonel HIIT)",
-          "focus": "Kondisyon + Core",
-          "warmup": [
-            "Hafif ziplama 2 dk",
-            "Dinamik mobilite 2 dk"
-          ],
-          "workout": [
-            {
-              "exercise": "Burpee",
-              "sets": "4 tur",
-              "reps_or_time": "20 sn",
-              "rest": "40 sn",
-              "progression": "Daha hizli tempo",
-              "regression": "Burpee (sinavsiz)"
-            },
-            {
-              "exercise": "Dag Tirmanisi",
-              "sets": "4 tur",
-              "reps_or_time": "30 sn",
-              "rest": "30 sn",
-              "progression": "Daha hizli tempo",
-              "regression": "Yavas tempo"
-            },
-            {
-              "exercise": "Plank Jack",
-              "sets": "4 tur",
-              "reps_or_time": "20 sn",
-              "rest": "40 sn",
-              "progression": "Daha hizli tempo",
-              "regression": "Plank hold"
-            }
-          ],
-          "cooldown": [
-            "Yuruyus 2 dk",
-            "Tam vucut esneme 2-3 dk"
-          ]
-        },
-        {
-          "name": "Gun 5 (Opsiyonel Skill)",
-          "focus": "Skill Pratik",
-          "warmup": [
+            "Kardiyo 5 dk",
             "Omuz mobilite 2 dk",
-            "El bilegi isinma 1 dk"
+            "Bos bar ile itis 2 x 10"
           ],
           "workout": [
             {
-              "exercise": "Handstand Kick-up",
-              "sets": "5",
-              "reps_or_time": "3-5 deneme",
-              "rest": "45 sn",
-              "progression": "Duvara handstand hold",
-              "regression": "Duvara yuz donuk kick-up"
+              "exercise": "Bench Press",
+              "sets": "4",
+              "reps_or_time": "8-10 tekrar",
+              "rest": "90 sn",
+              "progression": "Agirligi artir",
+              "regression": "Dumbbell press"
             },
             {
-              "exercise": "L-Sit Tuck",
-              "sets": "4",
-              "reps_or_time": "10-15 sn",
+              "exercise": "Incline Dumbbell Press",
+              "sets": "3",
+              "reps_or_time": "10-12 tekrar",
+              "rest": "75 sn",
+              "progression": "Yavas inis",
+              "regression": "Daha hafif agirlik"
+            },
+            {
+              "exercise": "Cable Triceps Pushdown",
+              "sets": "3",
+              "reps_or_time": "12-15 tekrar",
               "rest": "60 sn",
-              "progression": "L-Sit",
-              "regression": "Dizler bukulu"
+              "progression": "Agirligi artir",
+              "regression": "Band pushdown"
             }
           ],
           "cooldown": [
-            "Bilek esnetme 30 sn",
-            "Omuz esnetme 30 sn"
+            "Gogus esnetme 30 sn",
+            "Omuz esnetme 30 sn",
+            "Cocuk pozu 45 sn"
+          ]
+        },
+        {
+          "name": "Gün 2",
+          "focus": "Bacak + Karın",
+          "warmup": [
+            "Bisiklet 5 dk",
+            "Dinamik squat 2 x 10",
+            "Kalca mobilite 1 dk"
+          ],
+          "workout": [
+            {
+              "exercise": "Leg Press",
+              "sets": "4",
+              "reps_or_time": "10-12 tekrar",
+              "rest": "90 sn",
+              "progression": "Agirligi artir",
+              "regression": "Daha hafif agirlik"
+            },
+            {
+              "exercise": "Romanian Deadlift",
+              "sets": "3",
+              "reps_or_time": "8-10 tekrar",
+              "rest": "90 sn",
+              "progression": "Yavas negatif",
+              "regression": "Dumbbell RDL"
+            },
+            {
+              "exercise": "Hanging Knee Raise",
+              "sets": "3",
+              "reps_or_time": "10-12 tekrar",
+              "rest": "60 sn",
+              "progression": "Leg raise",
+              "regression": "Kapitli knee raise"
+            }
+          ],
+          "cooldown": [
+            "Quadriceps esnetme 30 sn",
+            "Hamstring esnetme 30 sn",
+            "Bel gevsetme 30 sn"
+          ]
+        },
+        {
+          "name": "Gün 3",
+          "focus": "Çekiş + Karın",
+          "warmup": [
+            "Kardiyo 5 dk",
+            "Sirt-omuz mobilite 2 dk",
+            "Bos bar row 2 x 10"
+          ],
+          "workout": [
+            {
+              "exercise": "Lat Pulldown",
+              "sets": "4",
+              "reps_or_time": "10-12 tekrar",
+              "rest": "90 sn",
+              "progression": "Agirligi artir",
+              "regression": "Band pulldown"
+            },
+            {
+              "exercise": "Seated Cable Row",
+              "sets": "3",
+              "reps_or_time": "10-12 tekrar",
+              "rest": "75 sn",
+              "progression": "Yavas inis",
+              "regression": "Daha hafif agirlik"
+            },
+            {
+              "exercise": "Face Pull",
+              "sets": "3",
+              "reps_or_time": "12-15 tekrar",
+              "rest": "60 sn",
+              "progression": "Agirligi artir",
+              "regression": "Band face pull"
+            }
+          ],
+          "cooldown": [
+            "Lat esnetme 30 sn",
+            "Gogus acma 30 sn",
+            "Kedi-inek 45 sn"
           ]
         }
       ]
@@ -617,7 +387,7 @@ class TrainingProgramScreen extends StatelessWidget {
                 icon: Icons.event_note,
                 selected: true,
               ),
-              label: 'Antrenman Programi',
+              label: 'Antrenman Programı',
             ),
             NavigationDestination(
               icon: _buildNavIcon(
@@ -643,7 +413,76 @@ class TrainingProgramScreen extends StatelessWidget {
                 icon: Icons.person,
                 selected: true,
               ),
-              label: 'Kullanici',
+              label: 'Kullanıcı',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCustomPlanCard(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(20.0),
+      onTap: () {
+        Navigator.pushNamed(context, AppRoutes.customPlan);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(18.0),
+        decoration: BoxDecoration(
+          color: colorScheme.primary.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(20.0),
+          border: Border.all(color: colorScheme.primary.withOpacity(0.25)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12.0),
+              decoration: BoxDecoration(
+                color: colorScheme.primary.withOpacity(0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.auto_awesome,
+                color: colorScheme.primary,
+              ),
+            ),
+            const SizedBox(width: 14.0),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Senin Planin',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                  const SizedBox(height: 6.0),
+                  Text(
+                    'Kendi antrenman programini olustur ve kaydet.',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8.0),
+            OutlinedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, AppRoutes.customPlan);
+              },
+              style: OutlinedButton.styleFrom(
+                foregroundColor: colorScheme.primary,
+                side: BorderSide(color: colorScheme.primary.withOpacity(0.5)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14.0),
+                ),
+              ),
+              child: const Text('Olustur'),
             ),
           ],
         ),
@@ -657,20 +496,20 @@ class TrainingProgramScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Antrenman Programi'),
+        title: const Text('Antrenman Programı'),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 24.0),
+        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 112.0),
         children: [
           Text(
-            'Haftalik Rutin',
+            'Programlar',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
           ),
           const SizedBox(height: 8.0),
           Text(
-            'Tamamen vucut agirligi ile evde uygulanabilir program.',
+            'Evde ve spor salonunda uygulanacak iki plan.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -678,6 +517,8 @@ class TrainingProgramScreen extends StatelessWidget {
           const SizedBox(height: 16.0),
           for (final program in _programData)
             _LevelSection(program: program),
+          const SizedBox(height: 8.0),
+          _buildCustomPlanCard(context),
         ],
       ),
       bottomNavigationBar: _buildBottomNavBar(context, selectedIndex: 1),
@@ -868,13 +709,13 @@ class _WorkoutItem extends StatelessWidget {
           ),
           const SizedBox(height: 6.0),
           Text(
-            'Progression: ${item["progression"]}',
+            'İlerleme: ${item["progression"]}',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
           ),
           Text(
-            'Regression: ${item["regression"]}',
+            'Kolaylaştırma: ${item["regression"]}',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),

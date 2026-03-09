@@ -3,9 +3,13 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:calisthenics_app/domain/models/custom_program.dart';
+import 'package:calisthenics_app/presentation/providers/custom_program_provider.dart';
 import 'package:calisthenics_app/presentation/screens/home_screen.dart';
+import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 
-class StatsScreen extends StatelessWidget {
+class StatsScreen extends ConsumerWidget {
   const StatsScreen({super.key});
 
   static const Color _bgTop = Color(0xFF151028);
@@ -19,7 +23,8 @@ class StatsScreen extends StatelessWidget {
   static const Color _textMid = Color(0xFFB4A9D8);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final programs = ref.watch(customProgramProvider);
     return Scaffold(
       backgroundColor: _bgBottom,
       body: Stack(
@@ -67,7 +72,7 @@ class StatsScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Stats',
+                          'Antrenman Programı',
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                 color: _textHigh,
                                 fontWeight: FontWeight.w800,
@@ -75,7 +80,7 @@ class StatsScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 6.0),
                         Text(
-                          'Progress at a glance',
+                          'Haftalık rutin ve günlük akış',
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 color: _textMid,
                                 fontWeight: FontWeight.w500,
@@ -88,7 +93,15 @@ class StatsScreen extends StatelessWidget {
                 SliverPadding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   sliver: SliverToBoxAdapter(
-                    child: _StatSummaryCard(),
+                    child: _ProgramTypeCard(
+                      title: 'Evde Antrenman',
+                      subtitle: 'Ekipmansız vücut ağırlığı plan',
+                      schedule: '3 Gün',
+                      duration: '35-45 dk',
+                      location: 'Ev',
+                      icon: Icons.home_rounded,
+                      accent: StatsScreen._accentPurple,
+                    ),
                   ),
                 ),
                 const SliverToBoxAdapter(
@@ -97,25 +110,65 @@ class StatsScreen extends StatelessWidget {
                 SliverPadding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   sliver: SliverToBoxAdapter(
-                    child: _ConsistencyCard(),
+                    child: _ProgramTypeCard(
+                      title: 'Spor Salonu',
+                      subtitle: 'Serbest ağırlık + makine plan',
+                      schedule: '3 Gün',
+                      duration: '45-60 dk',
+                      location: 'Salon',
+                      icon: Icons.fitness_center,
+                      accent: StatsScreen._accentBlue,
+                    ),
                   ),
                 ),
                 const SliverToBoxAdapter(
-                  child: SizedBox(height: 16.0),
+                  child: SizedBox(height: 32.0),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 8.0),
+                    child: Text(
+                      'Programlarım',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: _textHigh,
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                  ),
                 ),
                 SliverPadding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   sliver: SliverToBoxAdapter(
-                    child: _MuscleFocusCard(),
+                    child: programs.when(
+                      data: (items) {
+                        if (items.isEmpty) {
+                          return const _EmptyProgramCard();
+                        }
+                        return Column(
+                          children: [
+                            for (final program in items)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 12.0),
+                                child: _CustomProgramCard(program: program),
+                              ),
+                          ],
+                        );
+                      },
+                      loading: () => const Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                      error: (err, _) => _ErrorProgramCard(message: '$err'),
+                    ),
                   ),
                 ),
                 const SliverToBoxAdapter(
-                  child: SizedBox(height: 16.0),
+                  child: SizedBox(height: 32.0),
                 ),
                 SliverPadding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   sliver: SliverToBoxAdapter(
-                    child: _PersonalBestCard(),
+                    child: _CustomPlanCard(),
                   ),
                 ),
                 const SliverToBoxAdapter(
@@ -131,7 +184,79 @@ class StatsScreen extends StatelessWidget {
   }
 }
 
-class _StatSummaryCard extends StatelessWidget {
+class _CustomPlanCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(context, AppRoutes.customPlan),
+      child: _GlassCard(
+        borderRadius: 22.0,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Container(
+                width: 44.0,
+                height: 44.0,
+                decoration: BoxDecoration(
+                  color: StatsScreen._accentPurple.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(14.0),
+                ),
+                child: const Icon(
+                  Icons.auto_awesome,
+                  color: StatsScreen._accentPurple,
+                ),
+              ),
+              const SizedBox(width: 12.0),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Senin Planin',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: StatsScreen._textHigh,
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                    const SizedBox(height: 4.0),
+                    Text(
+                      'Kendi antrenman programını oluştur.',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: StatsScreen._textMid,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8.0),
+              OutlinedButton(
+                onPressed: () =>
+                    Navigator.pushNamed(context, AppRoutes.customPlan),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: StatsScreen._textHigh,
+                  side: BorderSide(
+                    color: Colors.white.withOpacity(0.24),
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14.0),
+                  ),
+                ),
+                child: const Text('Olustur'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CustomProgramCard extends StatelessWidget {
+  const _CustomProgramCard({required this.program});
+
+  final CustomProgram program;
+
   @override
   Widget build(BuildContext context) {
     return _GlassCard(
@@ -139,25 +264,39 @@ class _StatSummaryCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
-          children: const [
-            Expanded(
-              child: _StatTile(
-                value: '4h 20m',
-                label: 'Weekly Time',
+          children: [
+            Container(
+              width: 44.0,
+              height: 44.0,
+              decoration: BoxDecoration(
+                color: StatsScreen._accentPurple.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(14.0),
+              ),
+              child: const Icon(
+                Icons.event_note_rounded,
+                color: StatsScreen._accentPurple,
               ),
             ),
-            _StatDivider(),
+            const SizedBox(width: 12.0),
             Expanded(
-              child: _StatTile(
-                value: '5 Days',
-                label: 'Active Days',
-              ),
-            ),
-            _StatDivider(),
-            Expanded(
-              child: _StatTile(
-                value: '2 PRs',
-                label: 'New Records',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    program.name,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: StatsScreen._textHigh,
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                  const SizedBox(height: 4.0),
+                  Text(
+                    '${program.daysCount} gun • ${program.totalExercises} egzersiz',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: StatsScreen._textMid,
+                        ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -167,7 +306,67 @@ class _StatSummaryCard extends StatelessWidget {
   }
 }
 
-class _ConsistencyCard extends StatelessWidget {
+class _EmptyProgramCard extends StatelessWidget {
+  const _EmptyProgramCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return _GlassCard(
+      borderRadius: 22.0,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Text(
+          'Henüz program yok. “Senin Planın” bölümünden oluşturabilirsin.',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: StatsScreen._textMid,
+              ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ErrorProgramCard extends StatelessWidget {
+  const _ErrorProgramCard({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return _GlassCard(
+      borderRadius: 22.0,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Text(
+          'Programlar yüklenemedi: $message',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: StatsScreen._textMid,
+              ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProgramTypeCard extends StatelessWidget {
+  const _ProgramTypeCard({
+    required this.title,
+    required this.subtitle,
+    required this.schedule,
+    required this.duration,
+    required this.location,
+    required this.icon,
+    required this.accent,
+  });
+
+  final String title;
+  final String subtitle;
+  final String schedule;
+  final String duration;
+  final String location;
+  final IconData icon;
+  final Color accent;
+
   @override
   Widget build(BuildContext context) {
     return _GlassCard(
@@ -177,67 +376,52 @@ class _ConsistencyCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Consistency',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: StatsScreen._textHigh,
-                    fontWeight: FontWeight.w700,
-                  ),
-            ),
-            const SizedBox(height: 12.0),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                _DayPill(label: 'M', active: true),
-                _DayPill(label: 'T', active: true),
-                _DayPill(label: 'W', active: true),
-                _DayPill(label: 'T', active: true),
-                _DayPill(label: 'F', active: true),
-                _DayPill(label: 'S'),
-                _DayPill(label: 'S'),
+              children: [
+                Container(
+                  width: 44.0,
+                  height: 44.0,
+                  decoration: BoxDecoration(
+                    color: accent.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(14.0),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: accent,
+                  ),
+                ),
+                const SizedBox(width: 12.0),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: StatsScreen._textHigh,
+                              fontWeight: FontWeight.w700,
+                            ),
+                      ),
+                      const SizedBox(height: 4.0),
+                      Text(
+                        subtitle,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: StatsScreen._textMid,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
-            ),
-            const SizedBox(height: 10.0),
-            Text(
-              '5 of 7 days completed',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: StatsScreen._textMid,
-                  ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _MuscleFocusCard extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return _GlassCard(
-      borderRadius: 22.0,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Weekly Focus',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: StatsScreen._textHigh,
-                    fontWeight: FontWeight.w700,
-                  ),
             ),
             const SizedBox(height: 12.0),
             Wrap(
               spacing: 8.0,
               runSpacing: 8.0,
-              children: const [
-                _FocusChip(label: 'Chest'),
-                _FocusChip(label: 'Back'),
-                _FocusChip(label: 'Core'),
-                _FocusChip(label: 'Shoulders'),
-                _FocusChip(label: 'Legs'),
+              children: [
+                _InfoPill(label: schedule),
+                _InfoPill(label: duration),
+                _InfoPill(label: location),
               ],
             ),
           ],
@@ -247,123 +431,18 @@ class _MuscleFocusCard extends StatelessWidget {
   }
 }
 
-class _PersonalBestCard extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return _GlassCard(
-      borderRadius: 22.0,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Personal Bests',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: StatsScreen._textHigh,
-                    fontWeight: FontWeight.w700,
-                  ),
-            ),
-            const SizedBox(height: 12.0),
-            const _BestRow(title: 'Push-up max reps', value: '32'),
-            const SizedBox(height: 10.0),
-            const _BestRow(title: 'Pull-up max reps', value: '10'),
-            const SizedBox(height: 10.0),
-            const _BestRow(title: 'Plank hold', value: '2m 15s'),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _StatTile extends StatelessWidget {
-  const _StatTile({required this.value, required this.label});
-
-  final String value;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          value,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: StatsScreen._textHigh,
-                fontWeight: FontWeight.w700,
-              ),
-        ),
-        const SizedBox(height: 4.0),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: StatsScreen._textMid,
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-      ],
-    );
-  }
-}
-
-class _StatDivider extends StatelessWidget {
-  const _StatDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 1.0,
-      height: 42.0,
-      margin: const EdgeInsets.symmetric(horizontal: 12.0),
-      color: StatsScreen._cardSurfaceTint,
-    );
-  }
-}
-
-class _DayPill extends StatelessWidget {
-  const _DayPill({required this.label, this.active = false});
-
-  final String label;
-  final bool active;
-
-  @override
-  Widget build(BuildContext context) {
-    final bgColor = active
-        ? StatsScreen._accentPurple
-        : StatsScreen._cardSurfaceSoft;
-    return Container(
-      width: 30.0,
-      height: 30.0,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: StatsScreen._textHigh,
-              fontWeight: FontWeight.w600,
-            ),
-      ),
-    );
-  }
-}
-
-class _FocusChip extends StatelessWidget {
-  const _FocusChip({required this.label});
+class _InfoPill extends StatelessWidget {
+  const _InfoPill({required this.label});
 
   final String label;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
       decoration: BoxDecoration(
         color: StatsScreen._cardSurfaceSoft,
-        borderRadius: BorderRadius.circular(16.0),
+        borderRadius: BorderRadius.circular(14.0),
       ),
       child: Text(
         label,
@@ -372,43 +451,6 @@ class _FocusChip extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
       ),
-    );
-  }
-}
-
-class _BestRow extends StatelessWidget {
-  const _BestRow({required this.title, required this.value});
-
-  final String title;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            title,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: StatsScreen._textMid,
-                ),
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
-          decoration: BoxDecoration(
-            color: StatsScreen._cardSurfaceSoft,
-            borderRadius: BorderRadius.circular(14.0),
-          ),
-          child: Text(
-            value,
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: StatsScreen._textHigh,
-                  fontWeight: FontWeight.w700,
-                ),
-          ),
-        ),
-      ],
     );
   }
 }

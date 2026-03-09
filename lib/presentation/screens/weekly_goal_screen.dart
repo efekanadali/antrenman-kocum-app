@@ -11,7 +11,7 @@ class WeeklyGoalScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Haftalik Hedef'),
+        title: const Text('Haftalık Hedef'),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 24.0),
@@ -61,19 +61,19 @@ class WeeklyGoalScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16.0),
           Text(
-            'Haftalik Plan',
+            'Haftalık Plan',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
           ),
           const SizedBox(height: 12.0),
-          _PlanRow(day: 'Pzt', status: 'Tamamlandi'),
+          _PlanRow(day: 'Pzt', status: 'Tamamlandı'),
           const SizedBox(height: 8.0),
-          _PlanRow(day: 'Car', status: 'Tamamlandi'),
+          _PlanRow(day: 'Çar', status: 'Tamamlandı'),
           const SizedBox(height: 8.0),
-          _PlanRow(day: 'Cum', status: 'Tamamlandi'),
+          _PlanRow(day: 'Cum', status: 'Tamamlandı'),
           const SizedBox(height: 8.0),
-          _PlanRow(day: 'Cmt', status: 'Tamamlandi'),
+          _PlanRow(day: 'Cmt', status: 'Tamamlandı'),
           const SizedBox(height: 8.0),
           _PlanRow(day: 'Paz', status: 'Bekliyor'),
           const SizedBox(height: 16.0),
@@ -86,15 +86,15 @@ class WeeklyGoalScreen extends StatelessWidget {
           const SizedBox(height: 12.0),
           _TagRow(
             tags: const [
-              _TagData(label: 'Push', icon: Icons.north),
-              _TagData(label: 'Pull', icon: Icons.south),
-              _TagData(label: 'Core', icon: Icons.bolt),
-              _TagData(label: 'Mobility', icon: Icons.self_improvement),
+              _TagData(label: 'İtiş', icon: Icons.north),
+              _TagData(label: 'Çekiş', icon: Icons.south),
+              _TagData(label: 'Karın', icon: Icons.bolt),
+              _TagData(label: 'Mobilite', icon: Icons.self_improvement),
             ],
           ),
           const SizedBox(height: 16.0),
           Text(
-            'Onerilen Seanslar',
+            'Önerilen Seanslar',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -103,12 +103,12 @@ class WeeklyGoalScreen extends StatelessWidget {
           _SessionListCard(
             items: const [
               _SessionItemData(
-                title: 'Skill + Push',
+                title: 'Yetenek + İtiş',
                 subtitle: 'Handstand + dip kombosu',
                 trailing: '35 dk',
               ),
               _SessionItemData(
-                title: 'Pull + Core',
+                title: 'Çekiş + Karın',
                 subtitle: 'Pull-up, row, hollow hold',
                 trailing: '40 dk',
               ),

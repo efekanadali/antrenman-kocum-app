@@ -142,7 +142,7 @@ class FavoritesScreen extends ConsumerWidget {
                 icon: Icons.event_note,
                 selected: true,
               ),
-              label: 'Antrenman Programi',
+              label: 'Antrenman Programı',
             ),
             NavigationDestination(
               icon: _buildNavIcon(
@@ -168,7 +168,7 @@ class FavoritesScreen extends ConsumerWidget {
                 icon: Icons.person,
                 selected: true,
               ),
-              label: 'Kullanici',
+              label: 'Kullanıcı',
             ),
           ],
         ),
@@ -211,7 +211,7 @@ class FavoritesScreen extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
-                    'Your Favorites 💪',
+                    'Favorilerin 💪',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
@@ -220,7 +220,7 @@ class FavoritesScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8.0),
                   Text(
-                    'Train smarter. Stay strong.',
+                    'Daha akıllı çalış. Güçlü kal.',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Colors.white.withAlpha(230),
                       fontWeight: FontWeight.w400,
@@ -250,7 +250,7 @@ class FavoritesScreen extends ConsumerWidget {
                   DropdownButtonFormField<ExerciseLevel?>(
                     initialValue: filterState.level,
                     decoration: InputDecoration(
-                      labelText: 'Filter by Level',
+                      labelText: 'Seviyeye göre filtrele',
                       labelStyle: Theme.of(context).textTheme.bodyMedium,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12.0),
@@ -263,7 +263,7 @@ class FavoritesScreen extends ConsumerWidget {
                     items: [
                       const DropdownMenuItem<ExerciseLevel?>(
                         value: null,
-                        child: Text('All Levels'),
+                        child: Text('Tüm seviyeler'),
                       ),
                       ...ExerciseLevel.values.map(
                         (level) => DropdownMenuItem(
@@ -281,7 +281,7 @@ class FavoritesScreen extends ConsumerWidget {
                   const SizedBox(height: 16.0),
                   // Muscle Group Chips
                   Text(
-                    'Target Muscle Groups',
+                    'Hedef Kas Grupları',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -336,7 +336,7 @@ class FavoritesScreen extends ConsumerWidget {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
+                    return Center(child: Text('Hata: ${snapshot.error}'));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return const EmptyState(title: 'Henüz favori eklemedin');
                   } else {
@@ -365,7 +365,7 @@ class FavoritesScreen extends ConsumerWidget {
 
                     if (favoriteExercises.isEmpty) {
                       return const EmptyState(
-                        title: 'No favorites match your filters',
+                        title: 'Filtrelerle eşleşen favori yok',
                       );
                     }
 

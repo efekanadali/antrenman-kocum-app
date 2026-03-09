@@ -139,7 +139,7 @@ class ExerciseDetailScreen extends StatelessWidget {
                 icon: Icons.event_note,
                 selected: true,
               ),
-              label: 'Antrenman Programi',
+              label: 'Antrenman Programı',
             ),
             NavigationDestination(
               icon: _buildNavIcon(
@@ -165,7 +165,7 @@ class ExerciseDetailScreen extends StatelessWidget {
                 icon: Icons.person,
                 selected: true,
               ),
-              label: 'Kullanici',
+              label: 'Kullanıcı',
             ),
           ],
         ),
@@ -193,7 +193,7 @@ class ExerciseDetailScreen extends StatelessWidget {
                 );
               },
               icon: const Icon(Icons.play_arrow),
-              label: const Text('Start Workout'),
+              label: const Text('Antrenmanı Başlat'),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 12.0),
                 shape: RoundedRectangleBorder(
@@ -204,18 +204,18 @@ class ExerciseDetailScreen extends StatelessWidget {
             const SizedBox(height: 16.0),
             // Level
             Text(
-              'Level: ${exercise.level.label.toUpperCase()}',
+              'Seviye: ${exercise.level.label.toUpperCase()}',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8.0),
             // Difficulty Chip
             Chip(
-              label: Text('Difficulty: ${exercise.difficulty.label.toUpperCase()}'),
+              label: Text('Zorluk: ${exercise.difficulty.label.toUpperCase()}'),
             ),
             const SizedBox(height: 16.0),
             // Target Muscle Groups
             Text(
-              'Target Muscle Groups:',
+              'Hedef Kas Grupları:',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8.0),

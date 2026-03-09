@@ -3,6 +3,12 @@ enum MuscleGroup {
   chest,
   back,
   shoulders,
+  biceps,
+  triceps,
   legs,
   core,
+  quads,
+  hamstrings,
+  glutes,
+  calves,
 }

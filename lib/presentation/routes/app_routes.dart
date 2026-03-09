@@ -15,6 +15,7 @@ import 'package:calisthenics_app/presentation/screens/workout_session_screen.dar
 import 'package:calisthenics_app/presentation/screens/workout_summary_screen.dart';
 import 'package:calisthenics_app/presentation/screens/workout_library_screen.dart';
 import 'package:calisthenics_app/presentation/screens/stats_screen.dart';
+import 'package:calisthenics_app/presentation/screens/custom_plan_screen.dart';
 
 class AppRoutes {
   static const String home = '/';
@@ -26,6 +27,7 @@ class AppRoutes {
   static const String workoutSummary = '/workout-summary';
   static const String workoutLibrary = '/workout-library';
   static const String stats = '/stats';
+  static const String customPlan = '/custom-plan';
   static const String athleteProfile = '/profile/athlete';
   static const String streakDetails = '/profile/streak';
   static const String weeklyGoal = '/profile/weekly-goal';
@@ -157,6 +159,11 @@ class AppRoutes {
       case stats:
         return _buildSlideRoute(
           page: const StatsScreen(),
+          settings: settings,
+        );
+      case customPlan:
+        return _buildSlideRoute(
+          page: const CustomPlanScreen(),
           settings: settings,
         );
       case athleteProfile:

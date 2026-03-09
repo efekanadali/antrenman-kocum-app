@@ -208,7 +208,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
             child: Column(
               children: [
                 Text(
-                  'SURE',
+                  'SÜRE',
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                         letterSpacing: 1.2,
@@ -234,7 +234,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
                             borderRadius: BorderRadius.circular(16.0),
                           ),
                         ),
-                        child: Text(_workRunning ? 'Duraklat' : 'Baslat'),
+                        child: Text(_workRunning ? 'Duraklat' : 'Başlat'),
                       ),
                     ),
                     const SizedBox(width: 12.0),
@@ -247,7 +247,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
                             borderRadius: BorderRadius.circular(16.0),
                           ),
                         ),
-                        child: const Text('Sifirla'),
+                        child: const Text('Sıfırla'),
                       ),
                     ),
                   ],

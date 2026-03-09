@@ -11,7 +11,7 @@ class TotalTimeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Toplam Sure'),
+        title: const Text('Toplam Süre'),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 24.0),
@@ -52,7 +52,7 @@ class TotalTimeScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16.0),
           Text(
-            'Haftalik Dagilim',
+            'Haftalık Dağılım',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -76,32 +76,32 @@ class TotalTimeScreen extends StatelessWidget {
           _SessionListCard(
             items: const [
               _SessionItemData(
-                title: 'Full Body',
+                title: 'Tüm Vücut',
                 subtitle: '6 hareket • 52 dk',
-                trailing: 'Bugun',
+                trailing: 'Bugün',
               ),
               _SessionItemData(
-                title: 'Pull + Core',
+                title: 'Çekiş + Karın',
                 subtitle: '5 hareket • 44 dk',
-                trailing: 'Dun',
+                trailing: 'Dün',
               ),
               _SessionItemData(
-                title: 'Push Day',
+                title: 'İtiş Günü',
                 subtitle: '5 hareket • 40 dk',
-                trailing: '3 gun once',
+                trailing: '3 gün önce',
               ),
             ],
           ),
           const SizedBox(height: 16.0),
           Text(
-            'Gunluk Dagilim',
+            'Günlük Dağılım',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
           ),
           const SizedBox(height: 12.0),
           _MiniBarChart(
-            title: 'Gunluk Dagilim',
+            title: 'Günlük Dağılım',
             bars: const [
               _BarData(label: 'Pzt', value: 0.5),
               _BarData(label: 'Sal', value: 0.7),
@@ -114,7 +114,7 @@ class TotalTimeScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16.0),
           Text(
-            'Aylik Toplamlar',
+            'Aylık Toplamlar',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),

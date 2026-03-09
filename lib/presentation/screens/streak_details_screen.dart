@@ -11,34 +11,34 @@ class StreakDetailsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Streak'),
+        title: const Text('Seri'),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 24.0),
         children: [
           _HighlightCard(
-            title: 'Mevcut Streak',
-            value: '7 gun',
+            title: 'Mevcut Seri',
+            value: '7 gün',
             subtitle: 'Araliksiz antrenman',
             icon: Icons.local_fire_department,
           ),
           const SizedBox(height: 12.0),
           _HighlightCard(
-            title: 'En Iyi Streak',
-            value: '14 gun',
+            title: 'En İyi Seri',
+            value: '14 gün',
             subtitle: 'Kendi rekorun',
             icon: Icons.emoji_events,
           ),
           const SizedBox(height: 12.0),
           _HighlightCard(
-            title: 'Son 30 Gun',
-            value: '18 gun',
+            title: 'Son 30 Gün',
+            value: '18 gün',
             subtitle: 'Aktif antrenman gunu',
             icon: Icons.calendar_month,
           ),
           const SizedBox(height: 16.0),
           Text(
-            'Streak Tavsiyeleri',
+            'Seri Tavsiyeleri',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -55,7 +55,7 @@ class StreakDetailsScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Bugun 10-15 dk core ekleyerek streaki koru.',
+                  'Bugün 10-15 dk karın ekleyerek seriyi koru.',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 8.0),
@@ -68,14 +68,14 @@ class StreakDetailsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16.0),
           Text(
-            'Son 7 Gun Aktivite',
+            'Son 7 Gün Aktivite',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
           ),
           const SizedBox(height: 12.0),
           _MiniBarChart(
-            title: 'Son 7 Gun Aktivite',
+            title: 'Son 7 Gün Aktivite',
             bars: const [
               _BarData(label: 'Pzt', value: 0.6),
               _BarData(label: 'Sal', value: 0.8),
@@ -88,7 +88,7 @@ class StreakDetailsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16.0),
           Text(
-            'Streak Gunlugu',
+            'Seri Günlüğü',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -97,19 +97,19 @@ class StreakDetailsScreen extends StatelessWidget {
           _LogListCard(
             items: const [
               _LogItemData(
-                title: 'Push Day',
+                title: 'İtiş Günü',
                 subtitle: '45 dk • 5 hareket',
-                trailing: 'Bugun',
+                trailing: 'Bugün',
               ),
               _LogItemData(
-                title: 'Pull Day',
+                title: 'Çekiş Günü',
                 subtitle: '50 dk • 6 hareket',
-                trailing: 'Dun',
+                trailing: 'Dün',
               ),
               _LogItemData(
-                title: 'Core + Mobilite',
+                title: 'Karın + Mobilite',
                 subtitle: '30 dk • 4 hareket',
-                trailing: '2 gun once',
+                trailing: '2 gün önce',
               ),
             ],
           ),

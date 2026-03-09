@@ -49,7 +49,7 @@ class WorkoutSummaryScreen extends StatelessWidget {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Kaydetme basarisiz')),
+        const SnackBar(content: Text('Kaydetme başarısız')),
       );
     }
   }
@@ -66,7 +66,7 @@ class WorkoutSummaryScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Seans Ozeti'),
+        title: const Text('Seans Özeti'),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 24.0),
@@ -103,7 +103,7 @@ class WorkoutSummaryScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16.0),
                 _SummaryRow(
-                  label: 'Toplam Sure',
+                  label: 'Toplam Süre',
                   value: _formatDuration(args.totalTime),
                 ),
                 const SizedBox(height: 10.0),
@@ -141,11 +141,11 @@ class WorkoutSummaryScreen extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Paylasim yakinda')),
+                      const SnackBar(content: Text('Paylaşım yakında')),
                     );
                   },
                   icon: const Icon(Icons.ios_share),
-                  label: const Text('Paylas'),
+                  label: const Text('Paylaş'),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14.0),
                     shape: RoundedRectangleBorder(
@@ -160,7 +160,7 @@ class WorkoutSummaryScreen extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: () => _saveSession(context),
             icon: const Icon(Icons.save_outlined),
-            label: const Text('Seansi Kaydet'),
+            label: const Text('Seansı Kaydet'),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 14.0),
               shape: RoundedRectangleBorder(
@@ -178,7 +178,7 @@ class WorkoutSummaryScreen extends StatelessWidget {
               );
             },
             icon: const Icon(Icons.home),
-            label: const Text('Hareketlere Don'),
+            label: const Text('Hareketlere Dön'),
           ),
         ],
       ),
