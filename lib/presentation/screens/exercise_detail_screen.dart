@@ -31,20 +31,80 @@ class ExerciseDetailScreen extends StatelessWidget {
     return rating;
   }
 
-  Widget _buildStarRating(BuildContext context, int rating) {
+  double _ratingToPercent(int rating) {
     final clamped = _clampRating(rating);
-    final stars = List.generate(5, (index) {
-      final isFilled = index < clamped;
-      return Icon(
-        isFilled ? Icons.star_rounded : Icons.star_border_rounded,
-        size: 18.0,
-        color: isFilled ? _accentBlue : Colors.white.withOpacity(0.18),
-      );
-    });
+    return clamped / 5.0;
+  }
+
+  String _activationLabel(int rating) {
+    switch (_clampRating(rating)) {
+      case 1:
+        return 'Cok Dusuk Aktivasyon';
+      case 2:
+        return 'Dusuk Aktivasyon';
+      case 3:
+        return 'Orta Aktivasyon';
+      case 4:
+        return 'Yuksek Aktivasyon';
+      default:
+        return 'Cok Yuksek Aktivasyon';
+    }
+  }
+
+  Color _segmentColor(int segmentIndex) {
+    switch (segmentIndex) {
+      case 0:
+        return const Color(0xFFEB5757);
+      case 1:
+        return const Color(0xFFF2994A);
+      case 2:
+        return const Color(0xFFF2C94C);
+      case 3:
+        return const Color(0xFF59D2FE);
+      default:
+        return const Color(0xFF3DDC84);
+    }
+  }
+
+  Widget _buildRatingBar(BuildContext context, int rating) {
+    final clamped = _clampRating(rating);
+    final percent = _ratingToPercent(rating).clamp(0.0, 1.0);
+    final activationLabel = _activationLabel(clamped);
+    final segmentGap = 4.0;
+    final segmentCount = 5;
 
     return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: stars,
+      children: [
+        Expanded(
+          child: Row(
+            children: List.generate(segmentCount, (index) {
+              final isActive = index < clamped;
+              return Expanded(
+                child: Container(
+                  height: 10.0,
+                  margin: EdgeInsets.only(
+                    right: index == segmentCount - 1 ? 0.0 : segmentGap,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isActive
+                        ? _segmentColor(index)
+                        : Colors.white.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(999.0),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
+        const SizedBox(width: 8.0),
+        Text(
+          '${(percent * 100).round()}% · $activationLabel',
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: ExerciseDetailScreen._textMid,
+                fontWeight: FontWeight.w700,
+              ),
+        ),
+      ],
     );
   }
 
@@ -189,8 +249,8 @@ class ExerciseDetailScreen extends StatelessWidget {
                                   (entry) => _RegionRatingChip(
                                     label: entry.key.label,
                                     rating: entry.value,
-                                    starBuilder: (rating) =>
-                                        _buildStarRating(context, rating),
+                                    barBuilder: (rating) =>
+                                        _buildRatingBar(context, rating),
                                   ),
                                 )
                                 .toList(),
@@ -349,12 +409,12 @@ class _RegionRatingChip extends StatelessWidget {
   const _RegionRatingChip({
     required this.label,
     required this.rating,
-    required this.starBuilder,
+    required this.barBuilder,
   });
 
   final String label;
   final int rating;
-  final Widget Function(int rating) starBuilder;
+  final Widget Function(int rating) barBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -383,7 +443,7 @@ class _RegionRatingChip extends StatelessWidget {
                     ),
               ),
               const SizedBox(height: 6.0),
-              starBuilder(rating),
+              barBuilder(rating),
             ],
           ),
         ),
