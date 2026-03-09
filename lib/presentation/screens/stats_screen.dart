@@ -362,12 +362,14 @@ class _CustomProgramCard extends ConsumerWidget {
                               fontWeight: FontWeight.w700,
                             ),
                       ),
-                      const SizedBox(height: 4.0),
-                      Text(
-                        '${program.daysCount} gun • ${program.totalExercises} egzersiz',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: StatsScreen._textMid,
-                            ),
+                      const SizedBox(height: 6.0),
+                      Wrap(
+                        spacing: 8.0,
+                        runSpacing: 8.0,
+                        children: [
+                          _InfoPill(label: '${program.daysCount} Gün'),
+                          _InfoPill(label: '${program.totalExercises} Egzersiz'),
+                        ],
                       ),
                     ],
                   ),
