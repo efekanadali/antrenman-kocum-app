@@ -181,24 +181,19 @@ class ExerciseDetailScreen extends StatelessWidget {
                                 ),
                           ),
                           const SizedBox(height: 12.0),
-                          ...muscleRatings.map(
-                            (entry) => Padding(
-                              padding: const EdgeInsets.only(bottom: 10.0),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      entry.key.label,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium
-                                          ?.copyWith(color: _textHigh),
-                                    ),
+                          Wrap(
+                            spacing: 10.0,
+                            runSpacing: 10.0,
+                            children: muscleRatings
+                                .map(
+                                  (entry) => _RegionRatingChip(
+                                    label: entry.key.label,
+                                    rating: entry.value,
+                                    starBuilder: (rating) =>
+                                        _buildStarRating(context, rating),
                                   ),
-                                  _buildStarRating(context, entry.value),
-                                ],
-                              ),
-                            ),
+                                )
+                                .toList(),
                           ),
                         ],
                       ),
@@ -344,6 +339,53 @@ class _InfoPill extends StatelessWidget {
                   ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RegionRatingChip extends StatelessWidget {
+  const _RegionRatingChip({
+    required this.label,
+    required this.rating,
+    required this.starBuilder,
+  });
+
+  final String label;
+  final int rating;
+  final Widget Function(int rating) starBuilder;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {},
+        borderRadius: BorderRadius.circular(16.0),
+        splashColor: ExerciseDetailScreen._accentBlue.withOpacity(0.16),
+        highlightColor: ExerciseDetailScreen._accentBlue.withOpacity(0.08),
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+          decoration: BoxDecoration(
+            color: ExerciseDetailScreen._cardSurfaceSoft,
+            borderRadius: BorderRadius.circular(16.0),
+            border: Border.all(color: Colors.white.withOpacity(0.08)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: ExerciseDetailScreen._textHigh,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+              const SizedBox(height: 6.0),
+              starBuilder(rating),
+            ],
+          ),
         ),
       ),
     );

@@ -368,31 +368,43 @@ class _RegionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bgColor = isSelected
-        ? WorkoutLibraryScreen._accentPurple.withOpacity(0.22)
-        : WorkoutLibraryScreen._cardSurfaceSoft;
+        ? WorkoutLibraryScreen._accentPurple.withOpacity(0.28)
+        : WorkoutLibraryScreen._cardSurface;
     final borderColor = isSelected
         ? WorkoutLibraryScreen._accentPurple
-        : Colors.white.withOpacity(0.08);
+        : Colors.white.withOpacity(0.18);
     final textColor = isSelected
         ? WorkoutLibraryScreen._accentPurple
         : WorkoutLibraryScreen._textHigh;
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16.0),
-      child: Ink(
-        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(16.0),
-          border: Border.all(color: borderColor),
-        ),
-        child: Text(
-          label,
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: textColor,
-                fontWeight: FontWeight.w600,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16.0),
+        splashColor: WorkoutLibraryScreen._accentBlue.withOpacity(0.2),
+        highlightColor: WorkoutLibraryScreen._accentBlue.withOpacity(0.08),
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(16.0),
+            border: Border.all(color: borderColor),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.18),
+                blurRadius: 10.0,
+                offset: const Offset(0, 6),
               ),
+            ],
+          ),
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: textColor,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
         ),
       ),
     );
