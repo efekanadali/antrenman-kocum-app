@@ -36,21 +36,26 @@ class CustomProgramExercise {
 
 class CustomProgramDay {
   final int dayIndex;
+  final String name;
   final List<CustomProgramExercise> exercises;
 
   const CustomProgramDay({
     required this.dayIndex,
+    required this.name,
     required this.exercises,
   });
 
   Map<String, dynamic> toJson() => {
         'dayIndex': dayIndex,
+        'name': name,
         'exercises': exercises.map((item) => item.toJson()).toList(),
       };
 
   factory CustomProgramDay.fromJson(Map<String, dynamic> json) {
+    final index = json['dayIndex'] as int;
     return CustomProgramDay(
-      dayIndex: json['dayIndex'] as int,
+      dayIndex: index,
+      name: (json['name'] as String?) ?? 'Gün $index',
       exercises: (json['exercises'] as List<dynamic>)
           .map((item) =>
               CustomProgramExercise.fromJson(item as Map<String, dynamic>))

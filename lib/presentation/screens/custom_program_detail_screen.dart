@@ -215,7 +215,7 @@ class CustomProgramDetailScreen extends ConsumerWidget {
                                   ),
                                   const SizedBox(width: 10.0),
                                   Text(
-                                    'Gün ${day.dayIndex}',
+                                    day.name,
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleMedium

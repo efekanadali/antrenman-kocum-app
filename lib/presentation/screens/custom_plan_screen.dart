@@ -8,6 +8,7 @@ import 'package:calisthenics_app/domain/models/exercise.dart';
 import 'package:calisthenics_app/domain/models/custom_program.dart';
 import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
 import 'package:calisthenics_app/presentation/providers/custom_program_provider.dart';
+import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 
 class CustomPlanScreen extends ConsumerStatefulWidget {
   const CustomPlanScreen({super.key});
@@ -407,6 +408,9 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
           .map(
             (day) => CustomProgramDay(
               dayIndex: day.dayIndex,
+              name: day.nameController.text.trim().isEmpty
+                  ? 'Gün ${day.dayIndex}'
+                  : day.nameController.text.trim(),
               exercises: day.exercises
                   .map(
                     (exercise) => CustomProgramExercise(
@@ -430,8 +434,21 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
       const SnackBar(content: Text('Program kaydedildi.')),
     );
 
+    if (!mounted) {
+      return;
+    }
+
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      AppRoutes.stats,
+      (route) => false,
+    );
+
     setState(() {
       _daysCount = null;
+      for (final day in _days) {
+        day.dispose();
+      }
       _days.clear();
       _nameController.text = 'Senin Programın';
     });
@@ -806,12 +823,36 @@ class _DayEditorCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Text(
-                    'Gün ${day.dayIndex}',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: CustomPlanScreen._textHigh,
-                          fontWeight: FontWeight.w700,
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12.0,
+                        vertical: 10.0,
+                      ),
+                      decoration: BoxDecoration(
+                        color: CustomPlanScreen._cardSurface.withOpacity(0.55),
+                        borderRadius: BorderRadius.circular(14.0),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.1),
                         ),
+                      ),
+                      child: TextField(
+                        controller: day.nameController,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: CustomPlanScreen._textHigh,
+                              fontWeight: FontWeight.w700,
+                            ),
+                        decoration: InputDecoration(
+                          hintText: 'Gün ${day.dayIndex}',
+                          hintStyle: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(color: CustomPlanScreen._textMid),
+                          border: InputBorder.none,
+                          isCollapsed: true,
+                        ),
+                      ),
+                    ),
                   ),
                   const Spacer(),
                   OutlinedButton.icon(
@@ -1185,10 +1226,16 @@ class _StepButton extends StatelessWidget {
 }
 
 class _DraftDay {
-  _DraftDay({required this.dayIndex});
+  _DraftDay({required this.dayIndex})
+      : nameController = TextEditingController(text: 'Gün $dayIndex');
 
   final int dayIndex;
   final List<_DraftExercise> exercises = [];
+  final TextEditingController nameController;
+
+  void dispose() {
+    nameController.dispose();
+  }
 }
 
 class _DraftExercise {
