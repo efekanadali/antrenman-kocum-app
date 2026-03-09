@@ -252,13 +252,75 @@ class _CustomPlanCard extends StatelessWidget {
   }
 }
 
-class _CustomProgramCard extends StatelessWidget {
+class _CustomProgramCard extends ConsumerWidget {
   const _CustomProgramCard({required this.program});
 
   final CustomProgram program;
 
+  Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: _GlassCard(
+            borderRadius: 22.0,
+            child: Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Programi sil',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: StatsScreen._textHigh,
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                  const SizedBox(height: 8.0),
+                  Text(
+                    '"${program.name}" programini silmek istedigine emin misin?',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: StatsScreen._textMid,
+                        ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  Row(
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('Vazgec'),
+                      ),
+                      const Spacer(),
+                      FilledButton.icon(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        icon: const Icon(Icons.delete_outline),
+                        label: const Text('Sil'),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Colors.redAccent,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    if (shouldDelete != true) {
+      return;
+    }
+
+    await ref.read(customProgramProvider.notifier).removeProgram(program.id);
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return _GlassCard(
       borderRadius: 22.0,
       child: Padding(
@@ -298,6 +360,13 @@ class _CustomProgramCard extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
+            IconButton(
+              onPressed: () => _confirmDelete(context, ref),
+              icon: const Icon(Icons.delete_outline),
+              color: Colors.redAccent,
+              splashRadius: 22.0,
+              tooltip: 'Programi sil',
             ),
           ],
         ),
