@@ -12,6 +12,7 @@ class Exercise {
   final ExerciseLevel level;
   final DifficultyLevel difficulty;
   final List<MuscleGroup> targetMuscleGroups; // Doğru alan adı ve tipi
+  final Map<MuscleGroup, int> muscleRatings;
   final String description;
 
   const Exercise({
@@ -20,6 +21,7 @@ class Exercise {
     required this.level,
     required this.difficulty,
     required this.targetMuscleGroups,
+    required this.muscleRatings,
     required this.description,
   });
 }

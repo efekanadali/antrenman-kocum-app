@@ -8,6 +8,7 @@ import 'package:calisthenics_app/core/utils/enum_label.dart';
 import 'package:calisthenics_app/domain/enums/muscle_group.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart';
 import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
+import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/presentation/screens/home_screen.dart';
 
 class WorkoutLibraryScreen extends ConsumerStatefulWidget {
@@ -241,6 +242,13 @@ class _WorkoutLibraryScreenState extends ConsumerState<WorkoutLibraryScreen> {
                           child: _WorkoutCard(
                             exercise: item,
                             muscleLabels: _exerciseMuscleLabels(item),
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                AppRoutes.detail,
+                                arguments: item,
+                              );
+                            },
                           ),
                         );
                       },
@@ -395,72 +403,87 @@ class _WorkoutCard extends StatelessWidget {
   const _WorkoutCard({
     required this.exercise,
     required this.muscleLabels,
+    required this.onTap,
   });
 
   final Exercise exercise;
   final List<String> muscleLabels;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return _GlassCard(
       borderRadius: 20.0,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(20.0),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 44.0,
-                  height: 44.0,
-                  decoration: BoxDecoration(
-                    color: WorkoutLibraryScreen._cardSurfaceSoft,
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  child: const Icon(
-                    Icons.fitness_center,
-                    color: WorkoutLibraryScreen._textHigh,
-                  ),
-                ),
-                const SizedBox(width: 12.0),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        exercise.name,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: WorkoutLibraryScreen._textHigh,
-                              fontWeight: FontWeight.w700,
-                            ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 44.0,
+                      height: 44.0,
+                      decoration: BoxDecoration(
+                        color: WorkoutLibraryScreen._cardSurfaceSoft,
+                        borderRadius: BorderRadius.circular(12.0),
                       ),
-                      const SizedBox(height: 6.0),
-                      Text(
-                        exercise.description,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: WorkoutLibraryScreen._textMid,
-                            ),
+                      child: const Icon(
+                        Icons.fitness_center,
+                        color: WorkoutLibraryScreen._textHigh,
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(width: 12.0),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            exercise.name,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                  color: WorkoutLibraryScreen._textHigh,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                          ),
+                          const SizedBox(height: 6.0),
+                          Text(
+                            exercise.description,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(
+                                  color: WorkoutLibraryScreen._textMid,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8.0),
+                    _LevelPill(level: exercise.level.label),
+                  ],
                 ),
-                const SizedBox(width: 8.0),
-                _LevelPill(level: exercise.level.label),
+                const SizedBox(height: 12.0),
+                Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: muscleLabels
+                      .map(
+                        (group) => _MuscleChip(label: group),
+                      )
+                      .toList(),
+                ),
               ],
             ),
-            const SizedBox(height: 12.0),
-            Wrap(
-              spacing: 8.0,
-              runSpacing: 8.0,
-              children: muscleLabels
-                  .map(
-                    (group) => _MuscleChip(label: group),
-                  )
-                  .toList(),
-            ),
-          ],
+          ),
         ),
       ),
     );

@@ -27,6 +27,11 @@ class FakeExerciseRepository implements ExerciseRepository {
         MuscleGroup.shoulders,
         MuscleGroup.triceps,
       ],
+      muscleRatings: {
+        MuscleGroup.chest: 4,
+        MuscleGroup.shoulders: 3,
+        MuscleGroup.triceps: 3,
+      },
       description: 'Üst vücut kuvveti için klasik vücut ağırlığı hareketi.',
     ),
     const Exercise(
@@ -38,6 +43,10 @@ class FakeExerciseRepository implements ExerciseRepository {
         MuscleGroup.quads,
         MuscleGroup.glutes,
       ],
+      muscleRatings: {
+        MuscleGroup.quads: 4,
+        MuscleGroup.glutes: 3,
+      },
       description: 'Quadriceps ve kalçayı hedefleyen temel alt vücut hareketi.',
     ),
     const Exercise(
@@ -46,6 +55,9 @@ class FakeExerciseRepository implements ExerciseRepository {
       level: ExerciseLevel.beginner,
       difficulty: DifficultyLevel.medium,
       targetMuscleGroups: [MuscleGroup.core],
+      muscleRatings: {
+        MuscleGroup.core: 4,
+      },
       description: 'Karın bölgesi için izometrik kuvvet hareketi.',
     ),
     const Exercise(
@@ -57,6 +69,10 @@ class FakeExerciseRepository implements ExerciseRepository {
         MuscleGroup.back,
         MuscleGroup.biceps,
       ],
+      muscleRatings: {
+        MuscleGroup.back: 5,
+        MuscleGroup.biceps: 4,
+      },
       description: 'Sırt ve biseps için zorlayıcı üst vücut hareketi.',
     ),
     const Exercise(
@@ -69,6 +85,11 @@ class FakeExerciseRepository implements ExerciseRepository {
         MuscleGroup.hamstrings,
         MuscleGroup.glutes,
       ],
+      muscleRatings: {
+        MuscleGroup.quads: 4,
+        MuscleGroup.hamstrings: 3,
+        MuscleGroup.glutes: 3,
+      },
       description: 'Her bacağı ayrı ayrı hedeflemek için etkilidir.',
     ),
     const Exercise(
@@ -81,6 +102,11 @@ class FakeExerciseRepository implements ExerciseRepository {
         MuscleGroup.shoulders,
         MuscleGroup.triceps,
       ],
+      muscleRatings: {
+        MuscleGroup.chest: 4,
+        MuscleGroup.shoulders: 3,
+        MuscleGroup.triceps: 4,
+      },
       description: 'Göğüs ve triseps için güçlü bir harekettir. Paralel bar gerektirir.',
     ),
     const Exercise(
@@ -89,6 +115,9 @@ class FakeExerciseRepository implements ExerciseRepository {
       level: ExerciseLevel.intermediate,
       difficulty: DifficultyLevel.hard,
       targetMuscleGroups: [MuscleGroup.core],
+      muscleRatings: {
+        MuscleGroup.core: 5,
+      },
       description: 'Alt karın için ileri seviye bir karın hareketi.',
     ),
     const Exercise(
@@ -100,6 +129,10 @@ class FakeExerciseRepository implements ExerciseRepository {
         MuscleGroup.quads,
         MuscleGroup.glutes,
       ],
+      muscleRatings: {
+        MuscleGroup.quads: 4,
+        MuscleGroup.glutes: 4,
+      },
       description: 'Tek bacak squat; ciddi güç ve denge gerektirir.',
     ),
     const Exercise(
@@ -111,6 +144,10 @@ class FakeExerciseRepository implements ExerciseRepository {
         MuscleGroup.shoulders,
         MuscleGroup.triceps,
       ],
+      muscleRatings: {
+        MuscleGroup.shoulders: 5,
+        MuscleGroup.triceps: 4,
+      },
       description: 'Omuz kuvveti için ileri seviye bir itiş hareketi.',
     ),
     const Exercise(
@@ -124,6 +161,12 @@ class FakeExerciseRepository implements ExerciseRepository {
         MuscleGroup.biceps,
         MuscleGroup.triceps,
       ],
+      muscleRatings: {
+        MuscleGroup.back: 4,
+        MuscleGroup.chest: 4,
+        MuscleGroup.biceps: 3,
+        MuscleGroup.triceps: 3,
+      },
       description: 'Pull-up ve dip hareketinin birleşimidir.',
     ),
   ];

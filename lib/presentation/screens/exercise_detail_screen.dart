@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart';
-import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/core/utils/enum_label.dart';
 
 class ExerciseDetailScreen extends StatelessWidget {
@@ -13,235 +12,340 @@ class ExerciseDetailScreen extends StatelessWidget {
 
   final Exercise exercise;
 
-  Widget _buildNavIcon(
-    BuildContext context, {
-    required IconData icon,
-    required bool selected,
-  }) {
-    final colorScheme = Theme.of(context).colorScheme;
+  static const Color _bgTop = Color(0xFF151028);
+  static const Color _bgBottom = Color(0xFF0E0A1D);
+  static const Color _cardSurface = Color(0xFF201836);
+  static const Color _cardSurfaceSoft = Color(0xFF2A2048);
+  static const Color _accentPurple = Color(0xFF6D5BFF);
+  static const Color _accentBlue = Color(0xFF4FC3F7);
+  static const Color _textHigh = Color(0xFFEDE9FF);
+  static const Color _textMid = Color(0xFFB4A9D8);
 
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.0, end: selected ? 1.0 : 0.0),
-      duration: const Duration(milliseconds: 220),
-      curve: Curves.easeOut,
-      builder: (context, value, child) {
-        return Container(
-          padding: const EdgeInsets.all(6.0),
-          decoration: BoxDecoration(
-            color: Color.lerp(
-              Colors.transparent,
-              colorScheme.primary.withOpacity(0.12),
-              value,
-            ),
-            borderRadius: BorderRadius.circular(12.0),
-            boxShadow: value == 0.0
-                ? []
-                : [
-                    BoxShadow(
-                      color: colorScheme.primary.withOpacity(0.25 * value),
-                      blurRadius: 12.0,
-                      spreadRadius: 1.0,
-                    ),
-                  ],
-          ),
-          child: Transform.scale(
-            scale: 1.0 + (0.06 * value),
-            child: Icon(
-              icon,
-              color: selected
-                  ? colorScheme.primary
-                  : colorScheme.onSurfaceVariant,
-            ),
-          ),
-        );
-      },
-    );
+  int _clampRating(int rating) {
+    if (rating < 1) {
+      return 1;
+    }
+    if (rating > 5) {
+      return 5;
+    }
+    return rating;
   }
 
-  void _showSoonSnack(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
+  Widget _buildStarRating(BuildContext context, int rating) {
+    final clamped = _clampRating(rating);
+    final stars = List.generate(5, (index) {
+      final isFilled = index < clamped;
+      return Icon(
+        isFilled ? Icons.star_rounded : Icons.star_border_rounded,
+        size: 18.0,
+        color: isFilled ? _accentBlue : Colors.white.withOpacity(0.18),
+      );
+    });
 
-  Widget _buildBottomNavBar(BuildContext context, {required int selectedIndex}) {
-    return SafeArea(
-      top: false,
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 12.0),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24.0)),
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).colorScheme.shadow.withOpacity(0.08),
-              blurRadius: 16.0,
-              offset: const Offset(0, -6),
-            ),
-          ],
-        ),
-        child: NavigationBar(
-          height: 68.0,
-          selectedIndex: selectedIndex,
-          onDestinationSelected: (index) {
-            if (index == selectedIndex) {
-              return;
-            }
-
-            if (index == 0) {
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                AppRoutes.home,
-                (route) => false,
-              );
-            } else if (index == 1) {
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                AppRoutes.trainingProgram,
-                (route) => false,
-              );
-            } else if (index == 2) {
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                AppRoutes.favorites,
-                (route) => false,
-              );
-            } else {
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                AppRoutes.userProfile,
-                (route) => false,
-              );
-            }
-          },
-          destinations: [
-            NavigationDestination(
-              icon: _buildNavIcon(
-                context,
-                icon: Icons.fitness_center_outlined,
-                selected: false,
-              ),
-              selectedIcon: _buildNavIcon(
-                context,
-                icon: Icons.fitness_center,
-                selected: true,
-              ),
-              label: 'Hareketler',
-            ),
-            NavigationDestination(
-              icon: _buildNavIcon(
-                context,
-                icon: Icons.event_note_outlined,
-                selected: false,
-              ),
-              selectedIcon: _buildNavIcon(
-                context,
-                icon: Icons.event_note,
-                selected: true,
-              ),
-              label: 'Antrenman Programı',
-            ),
-            NavigationDestination(
-              icon: _buildNavIcon(
-                context,
-                icon: Icons.favorite_border,
-                selected: false,
-              ),
-              selectedIcon: _buildNavIcon(
-                context,
-                icon: Icons.favorite,
-                selected: true,
-              ),
-              label: 'Favoriler',
-            ),
-            NavigationDestination(
-              icon: _buildNavIcon(
-                context,
-                icon: Icons.person_outline,
-                selected: false,
-              ),
-              selectedIcon: _buildNavIcon(
-                context,
-                icon: Icons.person,
-                selected: true,
-              ),
-              label: 'Kullanıcı',
-            ),
-          ],
-        ),
-      ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: stars,
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final muscleRatings = exercise.targetMuscleGroups
+        .map(
+          (muscle) => MapEntry(
+            muscle,
+            exercise.muscleRatings[muscle] ?? 1,
+          ),
+        )
+        .toList();
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(exercise.name),
+      backgroundColor: _bgBottom,
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  _bgTop,
+                  _bgBottom,
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+          ),
+          Positioned(
+            top: -110.0,
+            left: -70.0,
+            child: Container(
+              width: 220.0,
+              height: 220.0,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _accentPurple.withOpacity(0.16),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -120.0,
+            right: -50.0,
+            child: Container(
+              width: 240.0,
+              height: 240.0,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _accentBlue.withOpacity(0.12),
+              ),
+            ),
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 32.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      _BackButton(
+                        onPressed: () => Navigator.of(context).maybePop(),
+                      ),
+                      const SizedBox(width: 12.0),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              exercise.name,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge
+                                  ?.copyWith(
+                                    color: _textHigh,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                            ),
+                            const SizedBox(height: 4.0),
+                            Text(
+                              'Hareket Detayı',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    color: _textMid,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16.0),
+                  _GlassCard(
+                    borderRadius: 20.0,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        children: [
+                          _InfoPill(
+                            label: 'Seviye',
+                            value: exercise.level.label,
+                          ),
+                          const SizedBox(width: 10.0),
+                          _InfoPill(
+                            label: 'Zorluk',
+                            value: exercise.difficulty.label,
+                            accent: _accentBlue,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  _GlassCard(
+                    borderRadius: 20.0,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Çalıştırdığı Bölgeler',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                  color: _textHigh,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                          ),
+                          const SizedBox(height: 12.0),
+                          ...muscleRatings.map(
+                            (entry) => Padding(
+                              padding: const EdgeInsets.only(bottom: 10.0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      entry.key.label,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(color: _textHigh),
+                                    ),
+                                  ),
+                                  _buildStarRating(context, entry.value),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  _GlassCard(
+                    borderRadius: 20.0,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Detayli Aciklama',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                  color: _textHigh,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                          ),
+                          const SizedBox(height: 8.0),
+                          Text(
+                            exercise.description,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge
+                                ?.copyWith(color: _textMid),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+    );
+  }
+}
+
+class _BackButton extends StatelessWidget {
+  const _BackButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(14.0),
+      child: Ink(
+        decoration: BoxDecoration(
+          color: ExerciseDetailScreen._cardSurface,
+          borderRadius: BorderRadius.circular(14.0),
+        ),
+        child: const SizedBox(
+          width: 44.0,
+          height: 44.0,
+          child: Icon(
+            Icons.arrow_back_rounded,
+            color: ExerciseDetailScreen._textHigh,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _GlassCard extends StatelessWidget {
+  const _GlassCard({required this.child, this.borderRadius = 20.0});
+
+  final Widget child;
+  final double borderRadius;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(borderRadius),
+      child: Container(
+        decoration: BoxDecoration(
+          color: ExerciseDetailScreen._cardSurface.withOpacity(0.78),
+          borderRadius: BorderRadius.circular(borderRadius),
+          border: Border.all(
+            color: Colors.white.withOpacity(0.08),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.35),
+              blurRadius: 20.0,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: child,
+      ),
+    );
+  }
+}
+
+class _InfoPill extends StatelessWidget {
+  const _InfoPill({
+    required this.label,
+    required this.value,
+    this.accent,
+  });
+
+  final String label;
+  final String value;
+  final Color? accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final accentColor = accent ?? ExerciseDetailScreen._accentPurple;
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+        decoration: BoxDecoration(
+          color: ExerciseDetailScreen._cardSurfaceSoft,
+          borderRadius: BorderRadius.circular(14.0),
+          border: Border.all(color: Colors.white.withOpacity(0.08)),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.pushNamed(
-                  context,
-                  AppRoutes.workoutSession,
-                  arguments: exercise,
-                );
-              },
-              icon: const Icon(Icons.play_arrow),
-              label: const Text('Antrenmanı Başlat'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16.0),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            // Level
             Text(
-              'Seviye: ${exercise.level.label.toUpperCase()}',
-              style: Theme.of(context).textTheme.titleMedium,
+              label,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: ExerciseDetailScreen._textMid,
+                    fontWeight: FontWeight.w600,
+                  ),
             ),
-            const SizedBox(height: 8.0),
-            // Difficulty Chip
-            Chip(
-              label: Text('Zorluk: ${exercise.difficulty.label.toUpperCase()}'),
-            ),
-            const SizedBox(height: 16.0),
-            // Target Muscle Groups
+            const SizedBox(height: 4.0),
             Text(
-              'Hedef Kas Grupları:',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8.0),
-            Wrap(
-              spacing: 8.0,
-              children: exercise.targetMuscleGroups.map((muscle) {
-                return Chip(
-                  label: Text(muscle.label.toUpperCase()),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 16.0),
-            // Description
-            Text(
-              'Description:',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8.0),
-            Text(
-              exercise.description,
-              style: Theme.of(context).textTheme.bodyLarge,
+              value,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: accentColor,
+                    fontWeight: FontWeight.w700,
+                  ),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNavBar(context, selectedIndex: 0),
     );
   }
 }
