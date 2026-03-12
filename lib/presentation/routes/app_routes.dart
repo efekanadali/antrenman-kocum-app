@@ -18,7 +18,9 @@ import 'package:calisthenics_app/presentation/screens/workout_library_screen.dar
 import 'package:calisthenics_app/presentation/screens/stats_screen.dart';
 import 'package:calisthenics_app/presentation/screens/custom_plan_screen.dart';
 import 'package:calisthenics_app/presentation/screens/custom_program_detail_screen.dart';
+import 'package:calisthenics_app/presentation/screens/custom_program_day_session_screen.dart';
 import 'package:calisthenics_app/presentation/screens/main_swipe_shell.dart';
+import 'package:calisthenics_app/presentation/screens/training_day_session_screen.dart';
 
 class AppRoutes {
   static const String home = '/';
@@ -32,6 +34,8 @@ class AppRoutes {
   static const String stats = '/stats';
   static const String customPlan = '/custom-plan';
   static const String customProgramDetail = '/custom-program-detail';
+  static const String customProgramDaySession = '/custom-program/day-session';
+  static const String trainingDaySession = '/program/day-session';
   static const String athleteProfile = '/profile/athlete';
   static const String streakDetails = '/profile/streak';
   static const String weeklyGoal = '/profile/weekly-goal';
@@ -132,6 +136,12 @@ class AppRoutes {
           page: const TrainingProgramScreen(),
           settings: settings,
         );
+      case trainingDaySession:
+        final args = settings.arguments as TrainingDaySessionArgs;
+        return _buildSlideRoute(
+          page: TrainingDaySessionScreen(args: args),
+          settings: settings,
+        );
       case userProfile:
         return _buildSlideRoute(
           page: const UserProfileScreen(),
@@ -174,6 +184,12 @@ class AppRoutes {
         final program = settings.arguments as CustomProgram;
         return _buildSlideRoute(
           page: CustomProgramDetailScreen(program: program),
+          settings: settings,
+        );
+      case customProgramDaySession:
+        final args = settings.arguments as CustomProgramDaySessionArgs;
+        return _buildSlideRoute(
+          page: CustomProgramDaySessionScreen(args: args),
           settings: settings,
         );
       case athleteProfile:

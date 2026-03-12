@@ -9,6 +9,8 @@ import 'package:calisthenics_app/domain/models/custom_program.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart';
 import 'package:calisthenics_app/core/utils/enum_label.dart';
 import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
+import 'package:calisthenics_app/presentation/routes/app_routes.dart';
+import 'package:calisthenics_app/presentation/screens/custom_program_day_session_screen.dart';
 
 class CustomProgramDetailScreen extends ConsumerWidget {
   const CustomProgramDetailScreen({
@@ -303,7 +305,19 @@ class CustomProgramDetailScreen extends ConsumerWidget {
                               SizedBox(
                                 width: double.infinity,
                                 child: FilledButton.icon(
-                                  onPressed: () {},
+                                  onPressed: day.exercises.isEmpty
+                                      ? null
+                                      : () {
+                                          Navigator.pushNamed(
+                                            context,
+                                            AppRoutes.customProgramDaySession,
+                                            arguments:
+                                                CustomProgramDaySessionArgs(
+                                              programName: program.name,
+                                              day: day,
+                                            ),
+                                          );
+                                        },
                                   icon: const Icon(Icons.play_arrow_rounded),
                                   label: const Text('Antrenmana Başla'),
                                   style: FilledButton.styleFrom(

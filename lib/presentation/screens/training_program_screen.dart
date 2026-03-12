@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
+import 'package:calisthenics_app/presentation/screens/training_day_session_screen.dart';
 
 class TrainingProgramScreen extends StatelessWidget {
   const TrainingProgramScreen({super.key});
@@ -569,7 +570,11 @@ class _LevelSection extends StatelessWidget {
           ),
           const SizedBox(height: 12.0),
           for (final day in days)
-            _DayCard(day: day as Map<String, dynamic>),
+            _DayCard(
+              day: day as Map<String, dynamic>,
+              level: program["level"] as String,
+              week: program["week"] as int,
+            ),
         ],
       ),
     );
@@ -577,9 +582,15 @@ class _LevelSection extends StatelessWidget {
 }
 
 class _DayCard extends StatelessWidget {
-  const _DayCard({required this.day});
+  const _DayCard({
+    required this.day,
+    required this.level,
+    required this.week,
+  });
 
   final Map<String, dynamic> day;
+  final String level;
+  final int week;
 
   @override
   Widget build(BuildContext context) {
@@ -632,6 +643,25 @@ class _DayCard extends StatelessWidget {
             _WorkoutItem(item: item as Map<String, dynamic>),
           const SizedBox(height: 10.0),
           _SectionList(title: "Esneme", items: cooldown),
+          const SizedBox(height: 12.0),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: () {
+                Navigator.pushNamed(
+                  context,
+                  AppRoutes.trainingDaySession,
+                  arguments: TrainingDaySessionArgs(
+                    level: level,
+                    week: week,
+                    day: day,
+                  ),
+                );
+              },
+              icon: const Icon(Icons.play_arrow_rounded),
+              label: const Text('Antrenmana Basla'),
+            ),
+          ),
         ],
       ),
     );
