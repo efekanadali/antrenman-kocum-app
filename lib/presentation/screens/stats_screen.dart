@@ -10,7 +10,9 @@ import 'package:calisthenics_app/presentation/screens/home_screen.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 
 class StatsScreen extends ConsumerWidget {
-  const StatsScreen({super.key});
+  const StatsScreen({super.key, this.showBottomNav = true});
+
+  final bool showBottomNav;
 
   static const Color _bgTop = Color(0xFF151028);
   static const Color _bgBottom = Color(0xFF0E0A1D);
@@ -179,7 +181,8 @@ class StatsScreen extends ConsumerWidget {
           ),
         ],
       ),
-      bottomNavigationBar: const AppBottomNav(selectedIndex: 2),
+      bottomNavigationBar:
+          showBottomNav ? const AppBottomNav(selectedIndex: 2) : null,
     );
   }
 }

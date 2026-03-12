@@ -6,16 +6,20 @@ import 'package:flutter/material.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, this.showBottomNav = true});
+
+  final bool showBottomNav;
 
   @override
   Widget build(BuildContext context) {
-    return const HomeTodayScreen();
+    return HomeTodayScreen(showBottomNav: showBottomNav);
   }
 }
 
 class HomeTodayScreen extends StatelessWidget {
-  const HomeTodayScreen({super.key});
+  const HomeTodayScreen({super.key, this.showBottomNav = true});
+
+  final bool showBottomNav;
 
   static const double _radiusLg = 24.0;
   static const double _radiusMd = 18.0;
@@ -148,7 +152,8 @@ class HomeTodayScreen extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: const AppBottomNav(selectedIndex: 0),
+      bottomNavigationBar:
+          showBottomNav ? const AppBottomNav(selectedIndex: 0) : null,
     );
   }
 }
@@ -615,9 +620,14 @@ class RecommendedList extends StatelessWidget {
 }
 
 class AppBottomNav extends StatelessWidget {
-  const AppBottomNav({super.key, required this.selectedIndex});
+  const AppBottomNav({
+    super.key,
+    required this.selectedIndex,
+    this.onItemSelected,
+  });
 
   final int selectedIndex;
+  final ValueChanged<int>? onItemSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -647,7 +657,13 @@ class AppBottomNav extends StatelessWidget {
               selected: selectedIndex == 0,
               onTap: selectedIndex == 0
                   ? null
-                  : () => Navigator.of(context).pushNamed(AppRoutes.home),
+                  : () {
+                      if (onItemSelected != null) {
+                        onItemSelected?.call(0);
+                        return;
+                      }
+                      Navigator.of(context).pushNamed(AppRoutes.home);
+                    },
             ),
             AppBottomNavItem(
               icon: Icons.fitness_center,
@@ -655,8 +671,14 @@ class AppBottomNav extends StatelessWidget {
               selected: selectedIndex == 1,
               onTap: selectedIndex == 1
                   ? null
-                  : () => Navigator.of(context)
-                      .pushNamed(AppRoutes.workoutLibrary),
+                  : () {
+                      if (onItemSelected != null) {
+                        onItemSelected?.call(1);
+                        return;
+                      }
+                      Navigator.of(context)
+                          .pushNamed(AppRoutes.workoutLibrary);
+                    },
             ),
             AppBottomNavItem(
               icon: Icons.event_note,
@@ -664,7 +686,13 @@ class AppBottomNav extends StatelessWidget {
               selected: selectedIndex == 2,
               onTap: selectedIndex == 2
                   ? null
-                  : () => Navigator.of(context).pushNamed(AppRoutes.stats),
+                  : () {
+                      if (onItemSelected != null) {
+                        onItemSelected?.call(2);
+                        return;
+                      }
+                      Navigator.of(context).pushNamed(AppRoutes.stats);
+                    },
             ),
             AppBottomNavItem(
               icon: Icons.person,
@@ -672,8 +700,14 @@ class AppBottomNav extends StatelessWidget {
               selected: selectedIndex == 3,
               onTap: selectedIndex == 3
                   ? null
-                  : () => Navigator.of(context)
-                      .pushNamed(AppRoutes.userProfile),
+                  : () {
+                      if (onItemSelected != null) {
+                        onItemSelected?.call(3);
+                        return;
+                      }
+                      Navigator.of(context)
+                          .pushNamed(AppRoutes.userProfile);
+                    },
             ),
           ],
         ),

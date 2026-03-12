@@ -12,7 +12,9 @@ import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/presentation/screens/home_screen.dart';
 
 class WorkoutLibraryScreen extends ConsumerStatefulWidget {
-  const WorkoutLibraryScreen({super.key});
+  const WorkoutLibraryScreen({super.key, this.showBottomNav = true});
+
+  final bool showBottomNav;
 
   static const Color _bgTop = Color(0xFF151028);
   static const Color _bgBottom = Color(0xFF0E0A1D);
@@ -266,7 +268,8 @@ class _WorkoutLibraryScreenState extends ConsumerState<WorkoutLibraryScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: const AppBottomNav(selectedIndex: 1),
+      bottomNavigationBar:
+          widget.showBottomNav ? const AppBottomNav(selectedIndex: 1) : null,
     );
   }
 }

@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:calisthenics_app/presentation/screens/home_screen.dart';
 
 class UserProfileScreen extends StatelessWidget {
-  const UserProfileScreen({super.key});
+  const UserProfileScreen({super.key, this.showBottomNav = true});
+
+  final bool showBottomNav;
 
   static const Color _bgTop = Color(0xFF151028);
   static const Color _bgBottom = Color(0xFF0E0A1D);
@@ -98,7 +100,8 @@ class UserProfileScreen extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: const AppBottomNav(selectedIndex: 3),
+      bottomNavigationBar:
+          showBottomNav ? const AppBottomNav(selectedIndex: 3) : null,
     );
   }
 }

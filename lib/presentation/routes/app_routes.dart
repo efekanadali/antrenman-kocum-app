@@ -18,6 +18,7 @@ import 'package:calisthenics_app/presentation/screens/workout_library_screen.dar
 import 'package:calisthenics_app/presentation/screens/stats_screen.dart';
 import 'package:calisthenics_app/presentation/screens/custom_plan_screen.dart';
 import 'package:calisthenics_app/presentation/screens/custom_program_detail_screen.dart';
+import 'package:calisthenics_app/presentation/screens/main_swipe_shell.dart';
 
 class AppRoutes {
   static const String home = '/';
@@ -118,7 +119,7 @@ class AppRoutes {
     switch (settings.name) {
       case home:
         return _buildSlideRoute(
-          page: const HomeScreen(),
+          page: const MainSwipeShell(),
           settings: settings,
         );
       case favorites:
