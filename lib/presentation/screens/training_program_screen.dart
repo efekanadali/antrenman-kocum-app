@@ -598,6 +598,8 @@ class _DayCard extends StatelessWidget {
     final warmup = (day["warmup"] as List<dynamic>).cast<String>();
     final workout = day["workout"] as List<dynamic>;
     final cooldown = (day["cooldown"] as List<dynamic>).cast<String>();
+    const accent = Color(0xFFC7F54B);
+    const accentText = Color(0xFF121600);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12.0),
@@ -646,7 +648,9 @@ class _DayCard extends StatelessWidget {
           const SizedBox(height: 12.0),
           SizedBox(
             width: double.infinity,
-            child: FilledButton.icon(
+            child: _StartWorkoutButton(
+              accent: accent,
+              textColor: accentText,
               onPressed: () {
                 Navigator.pushNamed(
                   context,
@@ -658,11 +662,82 @@ class _DayCard extends StatelessWidget {
                   ),
                 );
               },
-              icon: const Icon(Icons.play_arrow_rounded),
-              label: const Text('Antrenmana Basla'),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _StartWorkoutButton extends StatelessWidget {
+  const _StartWorkoutButton({
+    required this.onPressed,
+    required this.accent,
+    required this.textColor,
+  });
+
+  final VoidCallback onPressed;
+  final Color accent;
+  final Color textColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(18.0),
+      onTap: onPressed,
+      child: Ink(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              accent,
+              accent.withOpacity(0.86),
+            ],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          borderRadius: BorderRadius.circular(18.0),
+          boxShadow: [
+            BoxShadow(
+              color: accent.withOpacity(0.35),
+              blurRadius: 16.0,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 34.0,
+              height: 34.0,
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.play_arrow_rounded,
+                color: textColor,
+                size: 22.0,
+              ),
+            ),
+            const SizedBox(width: 12.0),
+            Expanded(
+              child: Text(
+                'Antrenmana Basla',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: textColor,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.3,
+                    ),
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_rounded,
+              color: textColor,
+            ),
+          ],
+        ),
       ),
     );
   }
