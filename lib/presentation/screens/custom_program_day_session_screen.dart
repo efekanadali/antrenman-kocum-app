@@ -37,6 +37,9 @@ class CustomProgramDaySessionScreen extends StatefulWidget {
 class _CustomProgramDaySessionScreenState
     extends State<CustomProgramDaySessionScreen> {
   late final List<List<int?>> _actualValues;
+  Timer? _workTimer;
+  Duration _workElapsed = Duration.zero;
+  bool _workPaused = false;
   int _restDurationSeconds = 60;
   int _restRemainingSeconds = 0;
   Timer? _restTimer;
@@ -45,14 +48,48 @@ class _CustomProgramDaySessionScreenState
   void initState() {
     super.initState();
     _actualValues = widget.args.day.exercises
-      .map((exercise) => List<int?>.filled(exercise.sets, null))
-      .toList();
+        .map((exercise) => List<int?>.filled(exercise.sets, null))
+        .toList();
+    _startWorkTimer();
   }
 
   @override
   void dispose() {
+    _workTimer?.cancel();
     _restTimer?.cancel();
     super.dispose();
+  }
+
+  void _startWorkTimer() {
+    _workTimer?.cancel();
+    _workTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!_workPaused) {
+        setState(() {
+          _workElapsed += const Duration(seconds: 1);
+        });
+      }
+    });
+  }
+
+  void _togglePause() {
+    setState(() {
+      _workPaused = !_workPaused;
+    });
+  }
+
+  void _skipCurrentExercise(CustomProgramDay day) {
+    if (day.exercises.isEmpty || _isWorkoutComplete(day)) {
+      return;
+    }
+
+    final index = _currentExerciseIndex(day);
+    final exercise = day.exercises[index];
+
+    setState(() {
+      for (var i = 0; i < _actualValues[index].length; i++) {
+        _actualValues[index][i] ??= exercise.value;
+      }
+    });
   }
 
   int _currentExerciseIndex(CustomProgramDay day) {
@@ -103,28 +140,15 @@ class _CustomProgramDaySessionScreenState
     if (setIndex == -1) {
       return;
     }
-    final previousValue = _actualValues[index][setIndex];
     final targetValue = day.exercises[index].value;
 
     setState(() {
       _actualValues[index][setIndex] = targetValue;
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          '${day.exercises[index].exerciseName} set tamamlandi',
-        ),
-        action: SnackBarAction(
-          label: 'Geri al',
-          onPressed: () {
-            setState(() {
-              _actualValues[index][setIndex] = previousValue;
-            });
-          },
-        ),
-      ),
-    );
+    if (!_isWorkoutComplete(day)) {
+      _startRestTimer();
+    }
   }
 
   void _applyQuickAdjust(CustomProgramDay day, int delta) {
@@ -220,11 +244,6 @@ class _CustomProgramDaySessionScreenState
         setState(() {
           _restRemainingSeconds = 0;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Dinlenme bitti'),
-          ),
-        );
         return;
       }
 
@@ -249,6 +268,19 @@ class _CustomProgramDaySessionScreenState
     return '$minuteLabel:$secondLabel';
   }
 
+  int _timePart(Duration duration, String unit) {
+    switch (unit) {
+      case 'hour':
+        return duration.inHours;
+      case 'minute':
+        return duration.inMinutes.remainder(60);
+      case 'second':
+        return duration.inSeconds.remainder(60);
+      default:
+        return 0;
+    }
+  }
+
   Future<void> _openRestSheet() async {
     final selected = await showModalBottomSheet<int>(
       context: context,
@@ -269,16 +301,16 @@ class _CustomProgramDaySessionScreenState
                   Text(
                     'Dinlenme suresi',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: _textHigh,
-                          fontWeight: FontWeight.w700,
-                        ),
+                      color: _textHigh,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   const SizedBox(height: 6.0),
                   Text(
                     '${tempValue.toInt()} sn',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: _textMid,
-                        ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: _textMid),
                   ),
                   Slider(
                     value: tempValue,
@@ -335,17 +367,33 @@ class _CustomProgramDaySessionScreenState
     final completedSets = _completedSetCount();
     final progress = totalSets == 0 ? 0.0 : completedSets / totalSets;
     final activeIndex = _currentExerciseIndex(day);
-    final activeExercise =
-        day.exercises.isEmpty ? null : day.exercises[activeIndex];
-    final nextExercise = day.exercises.length > activeIndex + 1
-        ? day.exercises[activeIndex + 1]
-        : null;
+    final activeExercise = day.exercises.isEmpty
+        ? null
+        : day.exercises[activeIndex];
+    final activeSet = activeExercise == null
+        ? 0
+        : (_completedForExercise(activeIndex) + 1).clamp(
+            1,
+            activeExercise.sets,
+          );
+    final progressPercent = (progress * 100).round();
+    final actionLabel = _isWorkoutComplete(day)
+        ? 'Antrenmani Tamamla'
+        : 'Next Set';
 
     return Scaffold(
       backgroundColor: _bgBottom,
       appBar: AppBar(
-        title: Text(day.name),
         backgroundColor: _bgBottom,
+        foregroundColor: _textHigh,
+        title: const Text('Active Workout'),
+        actions: [
+          IconButton(
+            onPressed: _openRestSheet,
+            icon: const Icon(Icons.settings),
+            tooltip: 'Dinlenme ayari',
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -360,159 +408,329 @@ class _CustomProgramDaySessionScreenState
           ),
           SafeArea(
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 140.0),
+              padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 24.0),
               children: [
-                _ProgressHeader(
-                  programName: widget.args.programName,
-                  dayIndex: day.dayIndex,
-                  completed: completedSets,
-                  total: totalSets,
-                  progress: progress,
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Overall Progress',
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: _textMid,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      '$progressPercent%',
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: _accentBlue,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16.0),
-                if (activeExercise != null)
-                  _ActiveExerciseCard(
-                    exercise: activeExercise,
-                    completedSets: _completedForExercise(activeIndex),
-                  )
-                else
-                  _EmptyWorkoutCard(),
-                if (activeExercise != null) ...[
-                  const SizedBox(height: 16.0),
-                  _SetPanel(
-                    exercise: activeExercise,
-                    exerciseIndex: activeIndex,
-                    values: _actualValues[activeIndex],
-                    onEdit: (setIndex) => _openSetEditor(
-                      exercise: activeExercise,
-                      exerciseIndex: activeIndex,
-                      setIndex: setIndex,
+                const SizedBox(height: 8.0),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(999.0),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 7.0,
+                    backgroundColor: _cardSurfaceSoft,
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      _accentBlue,
                     ),
                   ),
-                  const SizedBox(height: 12.0),
+                ),
+                const SizedBox(height: 18.0),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _TimeUnitCard(
+                        value: _timePart(
+                          _workElapsed,
+                          'hour',
+                        ).toString().padLeft(2, '0'),
+                        label: 'HOURS',
+                      ),
+                    ),
+                    const SizedBox(width: 10.0),
+                    Expanded(
+                      child: _TimeUnitCard(
+                        value: _timePart(
+                          _workElapsed,
+                          'minute',
+                        ).toString().padLeft(2, '0'),
+                        label: 'MINUTES',
+                      ),
+                    ),
+                    const SizedBox(width: 10.0),
+                    Expanded(
+                      child: _TimeUnitCard(
+                        value: _timePart(
+                          _workElapsed,
+                          'second',
+                        ).toString().padLeft(2, '0'),
+                        label: 'SECONDS',
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18.0),
+                if (activeExercise != null) ...[
+                  Text(
+                    activeExercise.exerciseName,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: _textHigh,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 4.0),
+                  Text(
+                    'Set $activeSet of ${activeExercise.sets}',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: _accentPurple,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 14.0),
+                  Container(
+                    height: 168.0,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18.0),
+                      border: Border.all(color: Colors.white.withOpacity(0.14)),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(18.0),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Image.asset(
+                            'assets/images/body_map.png',
+                            fit: BoxFit.cover,
+                          ),
+                          Container(color: Colors.black.withOpacity(0.32)),
+                          Center(
+                            child: FilledButton(
+                              onPressed: () {},
+                              style: FilledButton.styleFrom(
+                                shape: const CircleBorder(),
+                                padding: const EdgeInsets.all(18.0),
+                                backgroundColor: _accentPurple,
+                                foregroundColor: Colors.white,
+                              ),
+                              child: const Icon(
+                                Icons.play_arrow_rounded,
+                                size: 30.0,
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            left: 12.0,
+                            bottom: 10.0,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10.0,
+                                vertical: 6.0,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.35),
+                                borderRadius: BorderRadius.circular(999.0),
+                              ),
+                              child: Text(
+                                'Formu Kontrol Et',
+                                style: Theme.of(context).textTheme.labelMedium
+                                    ?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14.0),
                   Row(
                     children: [
-                      _QuickAdjustButton(
-                        label: '+1',
-                        onTap: () => _applyQuickAdjust(day, 1),
+                      Expanded(
+                        child: _SessionInfoTile(
+                          title:
+                              'TARGET ${activeExercise.isTimed ? 'TIME' : 'REPS'}',
+                          value:
+                              '${activeExercise.value}${activeExercise.isTimed ? ' sn' : ''}',
+                        ),
                       ),
-                      const SizedBox(width: 8.0),
-                      _QuickAdjustButton(
-                        label: '+2',
-                        onTap: () => _applyQuickAdjust(day, 2),
-                      ),
-                      const SizedBox(width: 8.0),
-                      _QuickAdjustButton(
-                        label: '+5',
-                        onTap: () => _applyQuickAdjust(day, 5),
+                      const SizedBox(width: 10.0),
+                      Expanded(
+                        child: _SessionInfoTile(
+                          title: 'COMPLETED SETS',
+                          value:
+                              '${_completedForExercise(activeIndex)}/${activeExercise.sets}',
+                        ),
                       ),
                     ],
                   ),
-                ],
-                if (nextExercise != null) ...[
                   const SizedBox(height: 14.0),
-                  _NextUpCard(exercise: nextExercise),
-                ],
-                const SizedBox(height: 18.0),
-                _ExerciseOverviewList(
-                  exercises: day.exercises,
-                  completedSets: List<int>.generate(
-                    day.exercises.length,
-                    (index) => _completedForExercise(index),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (_restRemainingSeconds > 0)
-            Positioned(
-              left: 16.0,
-              right: 16.0,
-              bottom: 120.0,
-              child: _RestOverlay(
-                remaining: _formatSeconds(_restRemainingSeconds),
-                onStop: _stopRestTimer,
-              ),
-            ),
-        ],
-      ),
-      bottomNavigationBar: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: FilledButton.icon(
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
                       onPressed: _isWorkoutComplete(day)
                           ? () => Navigator.pop(context)
                           : () => _completeSet(day),
-                      icon: Icon(
-                        _isWorkoutComplete(day)
-                            ? Icons.check_circle_rounded
-                            : Icons.check_rounded,
-                      ),
-                      label: Text(
-                        _isWorkoutComplete(day)
-                            ? 'Antrenmani Tamamla'
-                            : 'Seti Tamamla',
-                      ),
                       style: FilledButton.styleFrom(
                         backgroundColor: _accentPurple,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14.0),
+                        padding: const EdgeInsets.symmetric(vertical: 15.0),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16.0),
+                          borderRadius: BorderRadius.circular(14.0),
                         ),
+                      ),
+                      child: Text(
+                        actionLabel,
+                        style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12.0),
-                  OutlinedButton(
-                    onPressed: _openRestSheet,
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: _textHigh,
-                      side: BorderSide(color: Colors.white.withOpacity(0.2)),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 14.0,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16.0),
-                      ),
-                    ),
-                    child: const Icon(Icons.timer_outlined),
-                  ),
-                  const SizedBox(width: 12.0),
-                  OutlinedButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Varyasyon yakinda eklenecek'),
+                  const SizedBox(height: 10.0),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: _togglePause,
+                          icon: Icon(
+                            _workPaused ? Icons.play_arrow : Icons.pause,
+                          ),
+                          label: Text(_workPaused ? 'Resume' : 'Pause'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: _textHigh,
+                            side: BorderSide(
+                              color: Colors.white.withOpacity(0.18),
+                            ),
+                            backgroundColor: _cardSurface.withOpacity(0.75),
+                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                          ),
                         ),
-                      );
-                    },
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: _textHigh,
-                      side: BorderSide(color: Colors.white.withOpacity(0.2)),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 14.0,
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16.0),
+                      const SizedBox(width: 10.0),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _skipCurrentExercise(day),
+                          icon: const Icon(Icons.skip_next_rounded),
+                          label: const Text('Skip'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: _textHigh,
+                            side: BorderSide(
+                              color: Colors.white.withOpacity(0.18),
+                            ),
+                            backgroundColor: _cardSurface.withOpacity(0.75),
+                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                    child: const Icon(Icons.tune_rounded),
+                    ],
+                  ),
+                ] else
+                  _EmptyWorkoutCard(),
+                if (_restRemainingSeconds > 0) ...[
+                  const SizedBox(height: 12.0),
+                  _RestOverlay(
+                    remaining: _formatSeconds(_restRemainingSeconds),
+                    onStop: _stopRestTimer,
                   ),
                 ],
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TimeUnitCard extends StatelessWidget {
+  const _TimeUnitCard({required this.value, required this.label});
+
+  final String value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      decoration: BoxDecoration(
+        color: _cardSurface,
+        borderRadius: BorderRadius.circular(14.0),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              color: _textHigh,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 2.0),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: _textMid,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.6,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SessionInfoTile extends StatelessWidget {
+  const _SessionInfoTile({required this.title, required this.value});
+
+  final String title;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12.0),
+      decoration: BoxDecoration(
+        color: _cardSurface,
+        borderRadius: BorderRadius.circular(12.0),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: _textMid,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.4,
+            ),
+          ),
+          const SizedBox(height: 4.0),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: _textHigh,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -548,17 +766,17 @@ class _ProgressHeader extends StatelessWidget {
           Text(
             programName,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: _textMid,
-                  fontWeight: FontWeight.w600,
-                ),
+              color: _textMid,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 6.0),
           Text(
             'Gun $dayIndex',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: _textHigh,
-                  fontWeight: FontWeight.w800,
-                ),
+              color: _textHigh,
+              fontWeight: FontWeight.w800,
+            ),
           ),
           const SizedBox(height: 12.0),
           ClipRRect(
@@ -573,9 +791,9 @@ class _ProgressHeader extends StatelessWidget {
           const SizedBox(height: 6.0),
           Text(
             '$completed / $total set tamamlandi',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: _textMid,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: _textMid),
           ),
         ],
       ),
@@ -618,24 +836,24 @@ class _ActiveExerciseCard extends StatelessWidget {
           Text(
             'Aktif Egzersiz',
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: _textMid,
-                  fontWeight: FontWeight.w600,
-                ),
+              color: _textMid,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 6.0),
           Text(
             exercise.exerciseName,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: _textHigh,
-                  fontWeight: FontWeight.w800,
-                ),
+              color: _textHigh,
+              fontWeight: FontWeight.w800,
+            ),
           ),
           const SizedBox(height: 6.0),
           Text(
             'Hedef: $detail',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: _textMid,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: _textMid),
           ),
           const SizedBox(height: 12.0),
           Row(
@@ -644,9 +862,9 @@ class _ActiveExerciseCard extends StatelessWidget {
                 child: Text(
                   'Tamamlanan set: $completedSets / ${exercise.sets}',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: _textHigh,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    color: _textHigh,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               Container(
@@ -661,9 +879,9 @@ class _ActiveExerciseCard extends StatelessWidget {
                 child: Text(
                   exercise.isTimed ? 'Sure' : 'Set-rep',
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: _accentPurple,
-                        fontWeight: FontWeight.w700,
-                      ),
+                    color: _accentPurple,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],
@@ -703,24 +921,24 @@ class _NextUpCard extends StatelessWidget {
                 Text(
                   'Sonraki',
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: _textMid,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    color: _textMid,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 4.0),
                 Text(
                   exercise.exerciseName,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: _textHigh,
-                        fontWeight: FontWeight.w700,
-                      ),
+                    color: _textHigh,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 const SizedBox(height: 2.0),
                 Text(
                   detail,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: _textMid,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: _textMid),
                 ),
               ],
             ),
@@ -752,26 +970,20 @@ class _ExerciseOverviewList extends StatelessWidget {
         Text(
           'Egzersiz Listesi',
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: _textHigh,
-                fontWeight: FontWeight.w700,
-              ),
+            color: _textHigh,
+            fontWeight: FontWeight.w700,
+          ),
         ),
         const SizedBox(height: 10.0),
         for (var i = 0; i < exercises.length; i++)
-          _ExerciseMiniRow(
-            exercise: exercises[i],
-            completed: completedSets[i],
-          ),
+          _ExerciseMiniRow(exercise: exercises[i], completed: completedSets[i]),
       ],
     );
   }
 }
 
 class _ExerciseMiniRow extends StatelessWidget {
-  const _ExerciseMiniRow({
-    required this.exercise,
-    required this.completed,
-  });
+  const _ExerciseMiniRow({required this.exercise, required this.completed});
 
   final CustomProgramExercise exercise;
   final int completed;
@@ -800,15 +1012,15 @@ class _ExerciseMiniRow extends StatelessWidget {
                 Text(
                   exercise.exerciseName,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: _textHigh,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    color: _textHigh,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 Text(
                   detail,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: _textMid,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: _textMid),
                 ),
               ],
             ),
@@ -816,9 +1028,9 @@ class _ExerciseMiniRow extends StatelessWidget {
           Text(
             '$completed/${exercise.sets}',
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: _textMid,
-                  fontWeight: FontWeight.w600,
-                ),
+              color: _textMid,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),
@@ -838,9 +1050,9 @@ class _EmptyWorkoutCard extends StatelessWidget {
       ),
       child: Text(
         'Bu gun icin egzersiz yok.',
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: _textMid,
-            ),
+        style: Theme.of(
+          context,
+        ).textTheme.bodyMedium?.copyWith(color: _textMid),
       ),
     );
   }
@@ -874,9 +1086,9 @@ class _SetPanel extends StatelessWidget {
           Text(
             'Set Paneli',
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: _textHigh,
-                  fontWeight: FontWeight.w700,
-                ),
+              color: _textHigh,
+              fontWeight: FontWeight.w700,
+            ),
           ),
           const SizedBox(height: 10.0),
           Wrap(
@@ -909,9 +1121,9 @@ class _SetPanel extends StatelessWidget {
                   child: Text(
                     label,
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: value == null ? _textMid : _accentBlue,
-                          fontWeight: FontWeight.w700,
-                        ),
+                      color: value == null ? _textMid : _accentBlue,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               );
@@ -978,15 +1190,12 @@ class _RestOverlay extends StatelessWidget {
             child: Text(
               'Dinlenme: $remaining',
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: _textHigh,
-                    fontWeight: FontWeight.w600,
-                  ),
+                color: _textHigh,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
-          TextButton(
-            onPressed: onStop,
-            child: const Text('Bitir'),
-          ),
+          TextButton(onPressed: onStop, child: const Text('Bitir')),
         ],
       ),
     );
