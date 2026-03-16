@@ -3,7 +3,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:calisthenics_app/core/utils/enum_label.dart';
 import 'package:calisthenics_app/domain/models/custom_program.dart';
+import 'package:calisthenics_app/domain/models/exercise.dart';
+import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
 
 const Color _bgTop = Color(0xFF151028);
 const Color _bgBottom = Color(0xFF0E0A1D);
@@ -24,19 +28,22 @@ class CustomProgramDaySessionArgs {
   final CustomProgramDay day;
 }
 
-class CustomProgramDaySessionScreen extends StatefulWidget {
+class CustomProgramDaySessionScreen extends ConsumerStatefulWidget {
   const CustomProgramDaySessionScreen({super.key, required this.args});
 
   final CustomProgramDaySessionArgs args;
 
   @override
-  State<CustomProgramDaySessionScreen> createState() =>
+  ConsumerState<CustomProgramDaySessionScreen> createState() =>
       _CustomProgramDaySessionScreenState();
 }
 
 class _CustomProgramDaySessionScreenState
-    extends State<CustomProgramDaySessionScreen> {
+    extends ConsumerState<CustomProgramDaySessionScreen> {
   late final List<List<int?>> _actualValues;
+  final Map<String, Exercise> _exerciseById = <String, Exercise>{};
+  final Map<String, Exercise> _exerciseByName = <String, Exercise>{};
+  bool _exerciseDetailsLoaded = false;
   Timer? _workTimer;
   Duration _workElapsed = Duration.zero;
   bool _workPaused = false;
@@ -50,7 +57,31 @@ class _CustomProgramDaySessionScreenState
     _actualValues = widget.args.day.exercises
         .map((exercise) => List<int?>.filled(exercise.sets, null))
         .toList();
+    _loadExerciseDetails();
     _startWorkTimer();
+  }
+
+  Future<void> _loadExerciseDetails() async {
+    final exerciseRepository = ref.read(exerciseRepositoryProvider);
+    final allExercises = await exerciseRepository.getAllExercises();
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _exerciseById
+        ..clear()
+        ..addEntries(allExercises.map((item) => MapEntry(item.id, item)));
+      _exerciseByName
+        ..clear()
+        ..addEntries(allExercises.map((item) => MapEntry(item.name, item)));
+      _exerciseDetailsLoaded = true;
+    });
+  }
+
+  Exercise? _resolveExerciseDetail(CustomProgramExercise exercise) {
+    return _exerciseById[exercise.exerciseId] ??
+        _exerciseByName[exercise.exerciseName];
   }
 
   @override
@@ -496,62 +527,33 @@ class _CustomProgramDaySessionScreenState
                     ),
                   ),
                   const SizedBox(height: 14.0),
-                  Container(
-                    height: 168.0,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(18.0),
-                      border: Border.all(color: Colors.white.withOpacity(0.14)),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(18.0),
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          Image.asset(
-                            'assets/images/body_map.png',
-                            fit: BoxFit.cover,
-                          ),
-                          Container(color: Colors.black.withOpacity(0.32)),
-                          Center(
-                            child: FilledButton(
-                              onPressed: () {},
-                              style: FilledButton.styleFrom(
-                                shape: const CircleBorder(),
-                                padding: const EdgeInsets.all(18.0),
-                                backgroundColor: _accentPurple,
-                                foregroundColor: Colors.white,
-                              ),
-                              child: const Icon(
-                                Icons.play_arrow_rounded,
-                                size: 30.0,
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            left: 12.0,
-                            bottom: 10.0,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10.0,
-                                vertical: 6.0,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.35),
-                                borderRadius: BorderRadius.circular(999.0),
-                              ),
-                              child: Text(
-                                'Formu Kontrol Et',
-                                style: Theme.of(context).textTheme.labelMedium
-                                    ?.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                  Builder(
+                    builder: (context) {
+                      if (!_exerciseDetailsLoaded) {
+                        return const _ExerciseInsightCard(
+                          description: 'Hareket aciklamasi yukleniyor...',
+                          muscleLabels: <String>[],
+                        );
+                      }
+
+                      final exerciseDetail = _resolveExerciseDetail(
+                        activeExercise,
+                      );
+                      if (exerciseDetail == null) {
+                        return const _ExerciseInsightCard(
+                          description:
+                              'Bu hareketin aciklama bilgisi henuz eklenmemis.',
+                          muscleLabels: <String>[],
+                        );
+                      }
+
+                      return _ExerciseInsightCard(
+                        description: exerciseDetail.description,
+                        muscleLabels: exerciseDetail.targetMuscleGroups
+                            .map((group) => group.label)
+                            .toList(),
+                      );
+                    },
                   ),
                   const SizedBox(height: 14.0),
                   Row(
@@ -730,6 +732,90 @@ class _SessionInfoTile extends StatelessWidget {
               fontWeight: FontWeight.w800,
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ExerciseInsightCard extends StatelessWidget {
+  const _ExerciseInsightCard({
+    required this.description,
+    required this.muscleLabels,
+  });
+
+  final String description;
+  final List<String> muscleLabels;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14.0),
+      decoration: BoxDecoration(
+        color: _cardSurface,
+        borderRadius: BorderRadius.circular(18.0),
+        border: Border.all(color: Colors.white.withOpacity(0.14)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Hareket Aciklamasi',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: _textMid,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 6.0),
+          Text(
+            description,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: _textHigh, height: 1.35),
+          ),
+          const SizedBox(height: 12.0),
+          Text(
+            'Calistirdigi Bolgeler',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: _textMid,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8.0),
+          if (muscleLabels.isEmpty)
+            Text(
+              'Bolge bilgisi bulunamadi.',
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: _textMid),
+            )
+          else
+            Wrap(
+              spacing: 8.0,
+              runSpacing: 8.0,
+              children: [
+                for (final label in muscleLabels)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                      vertical: 6.0,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _cardSurfaceSoft,
+                      borderRadius: BorderRadius.circular(999.0),
+                      border: Border.all(color: Colors.white.withOpacity(0.12)),
+                    ),
+                    child: Text(
+                      label,
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: _accentBlue,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
         ],
       ),
     );
