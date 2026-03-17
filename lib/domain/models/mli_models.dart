@@ -11,10 +11,23 @@ class Exercise {
 }
 
 class WorkoutSet {
-  const WorkoutSet({required this.reps, required this.rir});
+  const WorkoutSet({
+    required this.reps,
+    required this.rir,
+    this.durationInSeconds,
+  });
 
   final int reps;
   final int rir;
+  final int? durationInSeconds;
+
+  // Dynamic hareketlerde reps, statik hareketlerde saniye/3 kullanilir.
+  double get volume {
+    if (durationInSeconds != null) {
+      return durationInSeconds! / 3.0;
+    }
+    return reps.toDouble();
+  }
 }
 
 class ExerciseWorkoutEntry {

@@ -1,12 +1,39 @@
 import 'package:calisthenics_app/domain/models/mli_models.dart';
 
-/// MLI: set bazli basit yuk metriği.
+double _rirMultiplier(int rir) {
+  if (rir <= 0) {
+    return 1.05;
+  }
+  if (rir == 1) {
+    return 1.0;
+  }
+  if (rir == 2) {
+    return 0.9;
+  }
+  if (rir == 3) {
+    return 0.8;
+  }
+  if (rir == 4) {
+    return 0.6;
+  }
+  return 0.3;
+}
+
+/// MLI = volume x difficulty x RIR_multiplier
+///
+/// Backward compatibility icin reps parametresi de desteklenir.
 double calculateMLI({
-  required int reps,
+  double? volume,
+  int? reps,
   required double difficulty,
   required int rir,
 }) {
-  return reps * difficulty * (1 + (1 / (rir + 1)));
+  final resolvedVolume = volume ?? reps?.toDouble();
+  if (resolvedVolume == null) {
+    throw ArgumentError('Either volume or reps must be provided.');
+  }
+
+  return resolvedVolume * difficulty * _rirMultiplier(rir);
 }
 
 /// Tek bir setin kas bazli dagilimini hesaplar.
@@ -15,7 +42,7 @@ Map<String, double> calculateMuscleLoad({
   required WorkoutSet set,
 }) {
   final mli = calculateMLI(
-    reps: set.reps,
+    volume: set.volume,
     difficulty: exercise.difficulty,
     rir: set.rir,
   );
