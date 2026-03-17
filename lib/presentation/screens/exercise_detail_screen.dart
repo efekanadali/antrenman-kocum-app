@@ -5,10 +5,7 @@ import 'package:calisthenics_app/domain/models/exercise.dart';
 import 'package:calisthenics_app/core/utils/enum_label.dart';
 
 class ExerciseDetailScreen extends StatelessWidget {
-  const ExerciseDetailScreen({
-    super.key,
-    required this.exercise,
-  });
+  const ExerciseDetailScreen({super.key, required this.exercise});
 
   final Exercise exercise;
 
@@ -100,9 +97,12 @@ class ExerciseDetailScreen extends StatelessWidget {
         Text(
           '${(percent * 100).round()}% · $activationLabel',
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: ExerciseDetailScreen._textMid,
-                fontWeight: FontWeight.w700,
-              ),
+            color: ExerciseDetailScreen._textMid,
+            fontWeight: FontWeight.w700,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          softWrap: false,
         ),
       ],
     );
@@ -111,12 +111,7 @@ class ExerciseDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final muscleRatings = exercise.targetMuscleGroups
-        .map(
-          (muscle) => MapEntry(
-            muscle,
-            exercise.muscleRatings[muscle] ?? 1,
-          ),
-        )
+        .map((muscle) => MapEntry(muscle, exercise.muscleRatings[muscle] ?? 1))
         .toList();
 
     return Scaffold(
@@ -126,10 +121,7 @@ class ExerciseDetailScreen extends StatelessWidget {
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  _bgTop,
-                  _bgBottom,
-                ],
+                colors: [_bgTop, _bgBottom],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -177,9 +169,7 @@ class ExerciseDetailScreen extends StatelessWidget {
                           children: [
                             Text(
                               exercise.name,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
+                              style: Theme.of(context).textTheme.titleLarge
                                   ?.copyWith(
                                     color: _textHigh,
                                     fontWeight: FontWeight.w800,
@@ -188,9 +178,7 @@ class ExerciseDetailScreen extends StatelessWidget {
                             const SizedBox(height: 4.0),
                             Text(
                               'Hareket Detayı',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
+                              style: Theme.of(context).textTheme.bodySmall
                                   ?.copyWith(
                                     color: _textMid,
                                     fontWeight: FontWeight.w500,
@@ -232,25 +220,29 @@ class ExerciseDetailScreen extends StatelessWidget {
                         children: [
                           Text(
                             'Çalıştırdığı Bölgeler',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
+                            style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(
                                   color: _textHigh,
                                   fontWeight: FontWeight.w700,
                                 ),
                           ),
                           const SizedBox(height: 12.0),
-                          Wrap(
-                            spacing: 10.0,
-                            runSpacing: 10.0,
+                          Column(
                             children: muscleRatings
                                 .map(
-                                  (entry) => _RegionRatingChip(
-                                    label: entry.key.label,
-                                    rating: entry.value,
-                                    barBuilder: (rating) =>
-                                        _buildRatingBar(context, rating),
+                                  (entry) => Padding(
+                                    padding: const EdgeInsets.only(
+                                      bottom: 10.0,
+                                    ),
+                                    child: SizedBox(
+                                      width: double.infinity,
+                                      child: _RegionRatingChip(
+                                        label: entry.key.label,
+                                        rating: entry.value,
+                                        barBuilder: (rating) =>
+                                            _buildRatingBar(context, rating),
+                                      ),
+                                    ),
                                   ),
                                 )
                                 .toList(),
@@ -269,9 +261,7 @@ class ExerciseDetailScreen extends StatelessWidget {
                         children: [
                           Text(
                             'Detayli Aciklama',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
+                            style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(
                                   color: _textHigh,
                                   fontWeight: FontWeight.w700,
@@ -280,10 +270,9 @@ class ExerciseDetailScreen extends StatelessWidget {
                           const SizedBox(height: 8.0),
                           Text(
                             exercise.description,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyLarge
-                                ?.copyWith(color: _textMid),
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodyLarge?.copyWith(color: _textMid),
                           ),
                         ],
                       ),
@@ -341,9 +330,7 @@ class _GlassCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: ExerciseDetailScreen._cardSurface.withOpacity(0.78),
           borderRadius: BorderRadius.circular(borderRadius),
-          border: Border.all(
-            color: Colors.white.withOpacity(0.08),
-          ),
+          border: Border.all(color: Colors.white.withOpacity(0.08)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.35),
@@ -359,11 +346,7 @@ class _GlassCard extends StatelessWidget {
 }
 
 class _InfoPill extends StatelessWidget {
-  const _InfoPill({
-    required this.label,
-    required this.value,
-    this.accent,
-  });
+  const _InfoPill({required this.label, required this.value, this.accent});
 
   final String label;
   final String value;
@@ -386,17 +369,17 @@ class _InfoPill extends StatelessWidget {
             Text(
               label,
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: ExerciseDetailScreen._textMid,
-                    fontWeight: FontWeight.w600,
-                  ),
+                color: ExerciseDetailScreen._textMid,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const SizedBox(height: 4.0),
             Text(
               value,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: accentColor,
-                    fontWeight: FontWeight.w700,
-                  ),
+                color: accentColor,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ],
         ),
@@ -432,19 +415,22 @@ class _RegionRatingChip extends StatelessWidget {
             borderRadius: BorderRadius.circular(16.0),
             border: Border.all(color: Colors.white.withOpacity(0.08)),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: ExerciseDetailScreen._textHigh,
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-              const SizedBox(height: 6.0),
-              barBuilder(rating),
-            ],
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 72.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: ExerciseDetailScreen._textHigh,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 6.0),
+                barBuilder(rating),
+              ],
+            ),
           ),
         ),
       ),
