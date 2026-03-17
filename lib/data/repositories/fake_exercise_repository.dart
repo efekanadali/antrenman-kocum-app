@@ -4,9 +4,10 @@
 import 'package:calisthenics_app/domain/enums/difficulty_level.dart';
 import 'package:calisthenics_app/domain/enums/exercise_level.dart';
 import 'package:calisthenics_app/domain/enums/muscle_group.dart';
+import 'package:calisthenics_app/domain/models/exercise_database.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart';
+import 'package:calisthenics_app/domain/models/mli_models.dart' as mli;
 import 'package:calisthenics_app/data/repositories/exercise_repository.dart';
-
 
 /// A fake implementation of [ExerciseRepository] for development and testing.
 ///
@@ -14,162 +15,86 @@ import 'package:calisthenics_app/data/repositories/exercise_repository.dart';
 /// data fetch using `Future.delayed`. This allows the UI to be developed
 /// without needing a real backend.
 class FakeExerciseRepository implements ExerciseRepository {
-  // A static, hardcoded list of exercises. In a real app, this would
-  // come from a database or an API.
-  static final List<Exercise> _fakeExercises = [
-    const Exercise(
-      id: 'ex-01',
-      name: 'Push Up',
-      level: ExerciseLevel.beginner,
-      difficulty: DifficultyLevel.medium,
-      targetMuscleGroups: [
-        MuscleGroup.chest,
-        MuscleGroup.shoulders,
-        MuscleGroup.triceps,
-      ],
-      muscleRatings: {
-        MuscleGroup.chest: 4,
-        MuscleGroup.shoulders: 3,
-        MuscleGroup.triceps: 3,
-      },
-      description: 'Üst vücut kuvveti için klasik vücut ağırlığı hareketi.',
-    ),
-    const Exercise(
-      id: 'ex-02',
-      name: 'Bodyweight Squat',
-      level: ExerciseLevel.beginner,
-      difficulty: DifficultyLevel.easy,
-      targetMuscleGroups: [
-        MuscleGroup.quads,
-        MuscleGroup.glutes,
-      ],
-      muscleRatings: {
-        MuscleGroup.quads: 4,
-        MuscleGroup.glutes: 3,
-      },
-      description: 'Quadriceps ve kalçayı hedefleyen temel alt vücut hareketi.',
-    ),
-    const Exercise(
-      id: 'ex-03',
-      name: 'Plank',
-      level: ExerciseLevel.beginner,
-      difficulty: DifficultyLevel.medium,
-      targetMuscleGroups: [MuscleGroup.core],
-      muscleRatings: {
-        MuscleGroup.core: 4,
-      },
-      description: 'Karın bölgesi için izometrik kuvvet hareketi.',
-    ),
-    const Exercise(
-      id: 'ex-04',
-      name: 'Pull Up',
-      level: ExerciseLevel.intermediate,
-      difficulty: DifficultyLevel.hard,
-      targetMuscleGroups: [
-        MuscleGroup.back,
-        MuscleGroup.biceps,
-      ],
-      muscleRatings: {
-        MuscleGroup.back: 5,
-        MuscleGroup.biceps: 4,
-      },
-      description: 'Sırt ve biseps için zorlayıcı üst vücut hareketi.',
-    ),
-    const Exercise(
-      id: 'ex-05',
-      name: 'Lunges',
-      level: ExerciseLevel.intermediate,
-      difficulty: DifficultyLevel.medium,
-      targetMuscleGroups: [
-        MuscleGroup.quads,
-        MuscleGroup.hamstrings,
-        MuscleGroup.glutes,
-      ],
-      muscleRatings: {
-        MuscleGroup.quads: 4,
-        MuscleGroup.hamstrings: 3,
-        MuscleGroup.glutes: 3,
-      },
-      description: 'Her bacağı ayrı ayrı hedeflemek için etkilidir.',
-    ),
-    const Exercise(
-      id: 'ex-06',
-      name: 'Dips',
-      level: ExerciseLevel.intermediate,
-      difficulty: DifficultyLevel.hard,
-      targetMuscleGroups: [
-        MuscleGroup.chest,
-        MuscleGroup.shoulders,
-        MuscleGroup.triceps,
-      ],
-      muscleRatings: {
-        MuscleGroup.chest: 4,
-        MuscleGroup.shoulders: 3,
-        MuscleGroup.triceps: 4,
-      },
-      description: 'Göğüs ve triseps için güçlü bir harekettir. Paralel bar gerektirir.',
-    ),
-    const Exercise(
-      id: 'ex-07',
-      name: 'Hanging Leg Raises',
-      level: ExerciseLevel.intermediate,
-      difficulty: DifficultyLevel.hard,
-      targetMuscleGroups: [MuscleGroup.core],
-      muscleRatings: {
-        MuscleGroup.core: 5,
-      },
-      description: 'Alt karın için ileri seviye bir karın hareketi.',
-    ),
-    const Exercise(
-      id: 'ex-08',
-      name: 'Pistol Squat',
-      level: ExerciseLevel.advanced,
-      difficulty: DifficultyLevel.hard,
-      targetMuscleGroups: [
-        MuscleGroup.quads,
-        MuscleGroup.glutes,
-      ],
-      muscleRatings: {
-        MuscleGroup.quads: 4,
-        MuscleGroup.glutes: 4,
-      },
-      description: 'Tek bacak squat; ciddi güç ve denge gerektirir.',
-    ),
-    const Exercise(
-      id: 'ex-09',
-      name: 'Handstand Push Up',
-      level: ExerciseLevel.advanced,
-      difficulty: DifficultyLevel.hard,
-      targetMuscleGroups: [
-        MuscleGroup.shoulders,
-        MuscleGroup.triceps,
-      ],
-      muscleRatings: {
-        MuscleGroup.shoulders: 5,
-        MuscleGroup.triceps: 4,
-      },
-      description: 'Omuz kuvveti için ileri seviye bir itiş hareketi.',
-    ),
-    const Exercise(
-      id: 'ex-10',
-      name: 'Muscle Up',
-      level: ExerciseLevel.advanced,
-      difficulty: DifficultyLevel.hard,
-      targetMuscleGroups: [
-        MuscleGroup.back,
-        MuscleGroup.chest,
-        MuscleGroup.biceps,
-        MuscleGroup.triceps,
-      ],
-      muscleRatings: {
-        MuscleGroup.back: 4,
-        MuscleGroup.chest: 4,
-        MuscleGroup.biceps: 3,
-        MuscleGroup.triceps: 3,
-      },
-      description: 'Pull-up ve dip hareketinin birleşimidir.',
-    ),
-  ];
+  static final List<Exercise> _fakeExercises = exerciseDatabase.entries
+      .map((entry) => _toDomainExercise(entry.key, entry.value))
+      .toList();
+
+  static Exercise _toDomainExercise(String id, mli.Exercise source) {
+    final ratings = <MuscleGroup, int>{};
+    final targetMuscles = <MuscleGroup>[];
+
+    source.muscles.forEach((key, value) {
+      final group = _muscleFromKey(key);
+      if (group == null) {
+        return;
+      }
+
+      final rating = (value * 5).round().clamp(0, 5);
+      ratings[group] = rating;
+      if (!targetMuscles.contains(group)) {
+        targetMuscles.add(group);
+      }
+    });
+
+    return Exercise(
+      id: id,
+      name: source.name,
+      level: _levelFromCoefficient(source.difficulty),
+      difficulty: _difficultyFromCoefficient(source.difficulty),
+      targetMuscleGroups: targetMuscles,
+      muscleRatings: ratings,
+      description: '${source.name} hareketi icin kas aktivasyon dagilimi.',
+    );
+  }
+
+  static MuscleGroup? _muscleFromKey(String key) {
+    switch (key) {
+      case 'chest':
+        return MuscleGroup.chest;
+      case 'back':
+        return MuscleGroup.back;
+      case 'shoulders':
+        return MuscleGroup.shoulders;
+      case 'rear_shoulders':
+        return MuscleGroup.shoulders;
+      case 'biceps':
+        return MuscleGroup.biceps;
+      case 'triceps':
+        return MuscleGroup.triceps;
+      case 'core':
+        return MuscleGroup.core;
+      case 'quads':
+        return MuscleGroup.quads;
+      case 'hamstrings':
+        return MuscleGroup.hamstrings;
+      case 'glutes':
+        return MuscleGroup.glutes;
+      case 'calves':
+        return MuscleGroup.calves;
+      default:
+        return null;
+    }
+  }
+
+  static DifficultyLevel _difficultyFromCoefficient(double coefficient) {
+    if (coefficient < 1.0) {
+      return DifficultyLevel.easy;
+    }
+    if (coefficient < 2.0) {
+      return DifficultyLevel.medium;
+    }
+    return DifficultyLevel.hard;
+  }
+
+  static ExerciseLevel _levelFromCoefficient(double coefficient) {
+    if (coefficient < 1.0) {
+      return ExerciseLevel.beginner;
+    }
+    if (coefficient < 2.5) {
+      return ExerciseLevel.intermediate;
+    }
+    return ExerciseLevel.advanced;
+  }
 
   /// Simulates a network delay.
   Future<void> _simulateNetworkDelay() {
@@ -189,7 +114,9 @@ class FakeExerciseRepository implements ExerciseRepository {
   }
 
   @override
-  Future<List<Exercise>> getExercisesByMuscleGroup(MuscleGroup muscleGroup) async {
+  Future<List<Exercise>> getExercisesByMuscleGroup(
+    MuscleGroup muscleGroup,
+  ) async {
     await _simulateNetworkDelay();
     return _fakeExercises
         .where((ex) => ex.targetMuscleGroups.contains(muscleGroup))
@@ -197,8 +124,10 @@ class FakeExerciseRepository implements ExerciseRepository {
   }
 
   @override
-  Future<List<Exercise>> getFilteredExercises(
-      {ExerciseLevel? level, MuscleGroup? muscleGroup}) async {
+  Future<List<Exercise>> getFilteredExercises({
+    ExerciseLevel? level,
+    MuscleGroup? muscleGroup,
+  }) async {
     await _simulateNetworkDelay();
     var exercises = _fakeExercises;
 
