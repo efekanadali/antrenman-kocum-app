@@ -5,8 +5,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calisthenics_app/core/utils/enum_label.dart';
+import 'package:calisthenics_app/domain/enums/difficulty_level.dart';
 import 'package:calisthenics_app/domain/models/custom_program.dart';
-import 'package:calisthenics_app/domain/models/exercise.dart';
+import 'package:calisthenics_app/domain/models/exercise.dart' as domain;
+import 'package:calisthenics_app/domain/models/mli_models.dart' as mli;
+import 'package:calisthenics_app/domain/services/mli_calculator.dart';
 import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
 
 const Color _bgTop = Color(0xFF151028);
@@ -41,9 +44,14 @@ class CustomProgramDaySessionScreen extends ConsumerStatefulWidget {
 class _CustomProgramDaySessionScreenState
     extends ConsumerState<CustomProgramDaySessionScreen> {
   late final List<List<int?>> _actualValues;
-  final Map<String, Exercise> _exerciseById = <String, Exercise>{};
-  final Map<String, Exercise> _exerciseByName = <String, Exercise>{};
+  late final List<List<int?>> _actualRirs;
+  final Map<String, domain.Exercise> _exerciseById =
+      <String, domain.Exercise>{};
+  final Map<String, domain.Exercise> _exerciseByName =
+      <String, domain.Exercise>{};
   bool _exerciseDetailsLoaded = false;
+  Map<String, double> _workoutLoadByMuscle = <String, double>{};
+  static const int _defaultRir = 2;
   Timer? _workTimer;
   Duration _workElapsed = Duration.zero;
   bool _workPaused = false;
@@ -55,6 +63,9 @@ class _CustomProgramDaySessionScreenState
   void initState() {
     super.initState();
     _actualValues = widget.args.day.exercises
+        .map((exercise) => List<int?>.filled(exercise.sets, null))
+        .toList();
+    _actualRirs = widget.args.day.exercises
         .map((exercise) => List<int?>.filled(exercise.sets, null))
         .toList();
     _loadExerciseDetails();
@@ -77,11 +88,109 @@ class _CustomProgramDaySessionScreenState
         ..addEntries(allExercises.map((item) => MapEntry(item.name, item)));
       _exerciseDetailsLoaded = true;
     });
+
+    _recalculateWorkoutLoad(widget.args.day);
   }
 
-  Exercise? _resolveExerciseDetail(CustomProgramExercise exercise) {
+  domain.Exercise? _resolveExerciseDetail(CustomProgramExercise exercise) {
     return _exerciseById[exercise.exerciseId] ??
         _exerciseByName[exercise.exerciseName];
+  }
+
+  double _difficultyCoefficient(domain.Exercise? exerciseDetail) {
+    if (exerciseDetail == null) {
+      return 1.0;
+    }
+
+    switch (exerciseDetail.difficulty) {
+      case DifficultyLevel.easy:
+        return 1.0;
+      case DifficultyLevel.medium:
+        return 1.25;
+      case DifficultyLevel.hard:
+        return 1.5;
+    }
+  }
+
+  mli.Exercise _toMliExercise(
+    CustomProgramExercise source,
+    domain.Exercise? exerciseDetail,
+  ) {
+    final muscles = <String, double>{};
+
+    if (exerciseDetail != null && exerciseDetail.muscleRatings.isNotEmpty) {
+      final total = exerciseDetail.muscleRatings.values
+          .fold<int>(0, (sum, value) => sum + value)
+          .toDouble();
+
+      exerciseDetail.muscleRatings.forEach((group, rating) {
+        muscles[group.label] = total == 0 ? 0 : rating / total;
+      });
+    } else if (exerciseDetail != null &&
+        exerciseDetail.targetMuscleGroups.isNotEmpty) {
+      final weight = 1 / exerciseDetail.targetMuscleGroups.length;
+      for (final group in exerciseDetail.targetMuscleGroups) {
+        muscles[group.label] = weight;
+      }
+    } else {
+      muscles['Genel'] = 1.0;
+    }
+
+    return mli.Exercise(
+      name: source.exerciseName,
+      difficulty: _difficultyCoefficient(exerciseDetail),
+      muscles: muscles,
+    );
+  }
+
+  void _recalculateWorkoutLoad(CustomProgramDay day) {
+    final entries = <mli.ExerciseWorkoutEntry>[];
+
+    for (
+      var exerciseIndex = 0;
+      exerciseIndex < day.exercises.length;
+      exerciseIndex++
+    ) {
+      final customExercise = day.exercises[exerciseIndex];
+      final sets = <mli.WorkoutSet>[];
+
+      for (var setIndex = 0; setIndex < customExercise.sets; setIndex++) {
+        final reps = _actualValues[exerciseIndex][setIndex];
+        if (reps == null) {
+          continue;
+        }
+
+        final rir = _actualRirs[exerciseIndex][setIndex] ?? _defaultRir;
+        sets.add(mli.WorkoutSet(reps: reps, rir: rir));
+      }
+
+      if (sets.isEmpty) {
+        continue;
+      }
+
+      final exerciseDetail = _resolveExerciseDetail(customExercise);
+      entries.add(
+        mli.ExerciseWorkoutEntry(
+          exercise: _toMliExercise(customExercise, exerciseDetail),
+          sets: sets,
+        ),
+      );
+    }
+
+    final totals = calculateWorkoutLoad(entries);
+    setState(() {
+      _workoutLoadByMuscle = totals;
+    });
+  }
+
+  String _feedbackForLoad(double score) {
+    if (score < 200) {
+      return 'Low ⚠️';
+    }
+    if (score <= 600) {
+      return 'Good 💪';
+    }
+    return 'High 🔥';
   }
 
   @override
@@ -119,8 +228,11 @@ class _CustomProgramDaySessionScreenState
     setState(() {
       for (var i = 0; i < _actualValues[index].length; i++) {
         _actualValues[index][i] ??= exercise.value;
+        _actualRirs[index][i] ??= _defaultRir;
       }
     });
+
+    _recalculateWorkoutLoad(day);
   }
 
   int _currentExerciseIndex(CustomProgramDay day) {
@@ -175,11 +287,14 @@ class _CustomProgramDaySessionScreenState
 
     setState(() {
       _actualValues[index][setIndex] = targetValue;
+      _actualRirs[index][setIndex] = _defaultRir;
     });
 
     if (!_isWorkoutComplete(day)) {
       _startRestTimer();
     }
+
+    _recalculateWorkoutLoad(day);
   }
 
   void _applyQuickAdjust(CustomProgramDay day, int delta) {
@@ -205,25 +320,40 @@ class _CustomProgramDaySessionScreenState
 
   Future<void> _openSetEditor({
     required CustomProgramExercise exercise,
+    required CustomProgramDay day,
     required int exerciseIndex,
     required int setIndex,
   }) async {
-    final controller = TextEditingController(
+    final repsController = TextEditingController(
       text: (_actualValues[exerciseIndex][setIndex] ?? exercise.value)
           .toString(),
     );
+    final rirController = TextEditingController(
+      text: (_actualRirs[exerciseIndex][setIndex] ?? _defaultRir).toString(),
+    );
 
-    final result = await showDialog<int?>(
+    final result = await showDialog<_SetEditorResult?>(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('Set duzenle'),
-          content: TextField(
-            controller: controller,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              labelText: exercise.isTimed ? 'Saniye' : 'Tekrar',
-            ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: repsController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: exercise.isTimed ? 'Saniye' : 'Tekrar',
+                ),
+              ),
+              const SizedBox(height: 10.0),
+              TextField(
+                controller: rirController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'RIR'),
+              ),
+            ],
           ),
           actions: [
             TextButton(
@@ -231,17 +361,21 @@ class _CustomProgramDaySessionScreenState
               child: const Text('Iptal'),
             ),
             TextButton(
-              onPressed: () => Navigator.pop(context, -1),
+              onPressed: () =>
+                  Navigator.pop(context, const _SetEditorResult.delete()),
               child: const Text('Sil'),
             ),
             FilledButton(
               onPressed: () {
-                final value = int.tryParse(controller.text.trim());
-                if (value == null || value <= 0) {
+                final reps = int.tryParse(repsController.text.trim());
+                final rir = int.tryParse(rirController.text.trim());
+
+                if (reps == null || reps <= 0 || rir == null || rir < 0) {
                   Navigator.pop(context, null);
                   return;
                 }
-                Navigator.pop(context, value);
+
+                Navigator.pop(context, _SetEditorResult(reps: reps, rir: rir));
               },
               child: const Text('Kaydet'),
             ),
@@ -255,12 +389,16 @@ class _CustomProgramDaySessionScreenState
     }
 
     setState(() {
-      if (result == -1) {
+      if (result.delete) {
         _actualValues[exerciseIndex][setIndex] = null;
+        _actualRirs[exerciseIndex][setIndex] = null;
       } else {
-        _actualValues[exerciseIndex][setIndex] = result;
+        _actualValues[exerciseIndex][setIndex] = result.reps;
+        _actualRirs[exerciseIndex][setIndex] = result.rir;
       }
     });
+
+    _recalculateWorkoutLoad(day);
   }
 
   void _startRestTimer() {
@@ -650,6 +788,13 @@ class _CustomProgramDaySessionScreenState
                     onStop: _stopRestTimer,
                   ),
                 ],
+                if (_workoutLoadByMuscle.isNotEmpty) ...[
+                  const SizedBox(height: 14.0),
+                  _WorkoutLoadCard(
+                    loads: _workoutLoadByMuscle,
+                    feedbackForLoad: _feedbackForLoad,
+                  ),
+                ],
               ],
             ),
           ),
@@ -820,6 +965,76 @@ class _ExerciseInsightCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class _WorkoutLoadCard extends StatelessWidget {
+  const _WorkoutLoadCard({required this.loads, required this.feedbackForLoad});
+
+  final Map<String, double> loads;
+  final String Function(double) feedbackForLoad;
+
+  @override
+  Widget build(BuildContext context) {
+    final sorted = loads.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
+    return Container(
+      padding: const EdgeInsets.all(14.0),
+      decoration: BoxDecoration(
+        color: _cardSurface,
+        borderRadius: BorderRadius.circular(16.0),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Kas Yuk Sonucu',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: _textHigh,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 10.0),
+          for (final entry in sorted)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      entry.key,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: _textHigh,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    '${entry.value.round()} • ${feedbackForLoad(entry.value)}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: _accentBlue,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SetEditorResult {
+  const _SetEditorResult({required this.reps, required this.rir})
+    : delete = false;
+
+  const _SetEditorResult.delete() : reps = 0, rir = 0, delete = true;
+
+  final int reps;
+  final int rir;
+  final bool delete;
 }
 
 class _ProgressHeader extends StatelessWidget {
