@@ -269,7 +269,85 @@ class _CustomProgramDaySessionScreenState
     return _actualValues[index].where((value) => value != null).length;
   }
 
-  void _completeSet(CustomProgramDay day) {
+  Future<int> _askRirValue() async {
+    final selected = await showModalBottomSheet<int>(
+      context: context,
+      backgroundColor: _cardSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+      ),
+      builder: (context) {
+        var tempRir = _defaultRir;
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 20.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Kac tekrar daha cikarabilirdin?',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: _textHigh,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 12.0),
+                  Wrap(
+                    spacing: 8.0,
+                    children: List.generate(5, (rir) {
+                      return ChoiceChip(
+                        label: Text('$rir'),
+                        selected: tempRir == rir,
+                        onSelected: (_) {
+                          setModalState(() {
+                            tempRir = rir;
+                          });
+                        },
+                        selectedColor: _accentPurple.withOpacity(0.35),
+                        backgroundColor: _cardSurfaceSoft,
+                        labelStyle: TextStyle(
+                          color: tempRir == rir ? _textHigh : _textMid,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 12.0),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Atla (2)'),
+                        ),
+                      ),
+                      const SizedBox(width: 8.0),
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: () => Navigator.pop(context, tempRir),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: _accentPurple,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text('Kaydet'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+
+    return selected ?? _defaultRir;
+  }
+
+  Future<void> _completeSet(CustomProgramDay day) async {
     if (day.exercises.isEmpty) {
       return;
     }
@@ -284,10 +362,14 @@ class _CustomProgramDaySessionScreenState
       return;
     }
     final targetValue = day.exercises[index].value;
+    final selectedRir = await _askRirValue();
+    if (!mounted) {
+      return;
+    }
 
     setState(() {
       _actualValues[index][setIndex] = targetValue;
-      _actualRirs[index][setIndex] = _defaultRir;
+      _actualRirs[index][setIndex] = selectedRir;
     });
 
     if (!_isWorkoutComplete(day)) {
