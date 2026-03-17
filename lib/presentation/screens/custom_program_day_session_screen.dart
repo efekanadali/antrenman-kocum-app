@@ -50,6 +50,7 @@ class _CustomProgramDaySessionScreenState
   final Map<String, domain.Exercise> _exerciseByName =
       <String, domain.Exercise>{};
   bool _exerciseDetailsLoaded = false;
+  Map<String, double> _lastSetLoadByMuscle = <String, double>{};
   Map<String, double> _workoutLoadByMuscle = <String, double>{};
   static const int _defaultRir = 2;
   Timer? _workTimer;
@@ -191,6 +192,16 @@ class _CustomProgramDaySessionScreenState
       return 'Good 💪';
     }
     return 'High 🔥';
+  }
+
+  String _lastSetIndicator(double score) {
+    if (score < 80) {
+      return 'low';
+    }
+    if (score <= 180) {
+      return 'medium';
+    }
+    return 'high';
   }
 
   @override
@@ -367,9 +378,17 @@ class _CustomProgramDaySessionScreenState
       return;
     }
 
+    final activeExercise = day.exercises[index];
+    final exerciseDetail = _resolveExerciseDetail(activeExercise);
+    final setLoad = calculateMuscleLoad(
+      exercise: _toMliExercise(activeExercise, exerciseDetail),
+      set: mli.WorkoutSet(reps: targetValue, rir: selectedRir),
+    );
+
     setState(() {
       _actualValues[index][setIndex] = targetValue;
       _actualRirs[index][setIndex] = selectedRir;
+      _lastSetLoadByMuscle = setLoad;
     });
 
     if (!_isWorkoutComplete(day)) {
@@ -870,6 +889,13 @@ class _CustomProgramDaySessionScreenState
                     onStop: _stopRestTimer,
                   ),
                 ],
+                if (_lastSetLoadByMuscle.isNotEmpty) ...[
+                  const SizedBox(height: 14.0),
+                  _LastSetLoadCard(
+                    loads: _lastSetLoadByMuscle,
+                    indicatorForLoad: _lastSetIndicator,
+                  ),
+                ],
                 if (_workoutLoadByMuscle.isNotEmpty) ...[
                   const SizedBox(height: 14.0),
                   _WorkoutLoadCard(
@@ -1094,6 +1120,65 @@ class _WorkoutLoadCard extends StatelessWidget {
                   ),
                   Text(
                     '${entry.value.round()} • ${feedbackForLoad(entry.value)}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: _accentBlue,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LastSetLoadCard extends StatelessWidget {
+  const _LastSetLoadCard({required this.loads, required this.indicatorForLoad});
+
+  final Map<String, double> loads;
+  final String Function(double) indicatorForLoad;
+
+  @override
+  Widget build(BuildContext context) {
+    final sorted = loads.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
+    return Container(
+      padding: const EdgeInsets.all(14.0),
+      decoration: BoxDecoration(
+        color: _cardSurface,
+        borderRadius: BorderRadius.circular(16.0),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Last Set Impact',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: _textHigh,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 10.0),
+          for (final entry in sorted)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      entry.key,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: _textHigh,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    '+${entry.value.round()} (${indicatorForLoad(entry.value)})',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: _accentBlue,
                       fontWeight: FontWeight.w700,
