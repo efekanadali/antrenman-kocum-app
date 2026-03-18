@@ -1,25 +1,6 @@
 import 'package:calisthenics_app/domain/models/mli_models.dart';
 
-double _rirMultiplier(int rir) {
-  if (rir <= 0) {
-    return 1.05;
-  }
-  if (rir == 1) {
-    return 1.0;
-  }
-  if (rir == 2) {
-    return 0.9;
-  }
-  if (rir == 3) {
-    return 0.8;
-  }
-  if (rir == 4) {
-    return 0.6;
-  }
-  return 0.3;
-}
-
-/// MLI = volume x difficulty x RIR_multiplier
+/// MLI = reps x C x (1 + (10 - RIR) / 10)
 ///
 /// Backward compatibility icin reps parametresi de desteklenir.
 double calculateMLI({
@@ -33,7 +14,8 @@ double calculateMLI({
     throw ArgumentError('Either volume or reps must be provided.');
   }
 
-  return resolvedVolume * difficulty * _rirMultiplier(rir);
+  final rirFactor = 1 + (10 - rir) / 10;
+  return resolvedVolume * difficulty * rirFactor;
 }
 
 /// Tek bir setin kas bazli dagilimini hesaplar.

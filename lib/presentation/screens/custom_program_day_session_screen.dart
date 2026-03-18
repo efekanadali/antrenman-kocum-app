@@ -2,12 +2,15 @@
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calisthenics_app/core/utils/enum_label.dart';
 import 'package:calisthenics_app/domain/enums/difficulty_level.dart';
 import 'package:calisthenics_app/domain/models/custom_program.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart' as domain;
+import 'package:calisthenics_app/domain/models/exercise_database.dart'
+  as library_data;
 import 'package:calisthenics_app/domain/models/mli_models.dart' as mli;
 import 'package:calisthenics_app/domain/services/mli_calculator.dart';
 import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
@@ -49,6 +52,11 @@ class _CustomProgramDaySessionScreenState
       <String, domain.Exercise>{};
   final Map<String, domain.Exercise> _exerciseByName =
       <String, domain.Exercise>{};
+  final Map<String, domain.Exercise> _exerciseByNormalizedName =
+      <String, domain.Exercise>{};
+  final Map<String, mli.Exercise> _libraryExerciseByNormalizedName =
+      <String, mli.Exercise>{};
+  final Set<String> _loggedFallbackExercises = <String>{};
   bool _exerciseDetailsLoaded = false;
   Map<String, double> _lastSetLoadByMuscle = <String, double>{};
   Map<String, double> _workoutLoadByMuscle = <String, double>{};
@@ -69,6 +77,13 @@ class _CustomProgramDaySessionScreenState
     _actualRirs = widget.args.day.exercises
         .map((exercise) => List<int?>.filled(exercise.sets, null))
         .toList();
+    for (final entry in library_data.exerciseDatabase.entries) {
+      final exercise = entry.value;
+      _libraryExerciseByNormalizedName[_normalizeExerciseName(entry.key)] =
+        exercise;
+      _libraryExerciseByNormalizedName[_normalizeExerciseName(exercise.name)] =
+        exercise;
+    }
     _loadExerciseDetails();
     _startWorkTimer();
   }
@@ -87,15 +102,139 @@ class _CustomProgramDaySessionScreenState
       _exerciseByName
         ..clear()
         ..addEntries(allExercises.map((item) => MapEntry(item.name, item)));
+      _exerciseByNormalizedName
+        ..clear()
+        ..addEntries(
+          allExercises.map(
+            (item) => MapEntry(_normalizeExerciseName(item.name), item),
+          ),
+        );
       _exerciseDetailsLoaded = true;
     });
 
     _recalculateWorkoutLoad(widget.args.day);
   }
 
+  String _normalizeExerciseName(String value) {
+    return value
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z0-9]+'), ' ')
+        .trim()
+        .replaceAll(RegExp(r'\s+'), ' ');
+  }
+
   domain.Exercise? _resolveExerciseDetail(CustomProgramExercise exercise) {
     return _exerciseById[exercise.exerciseId] ??
-        _exerciseByName[exercise.exerciseName];
+        _exerciseByName[exercise.exerciseName] ??
+        _exerciseByNormalizedName[_normalizeExerciseName(exercise.exerciseName)];
+  }
+
+  mli.Exercise? _resolveLibraryExercise(CustomProgramExercise exercise) {
+    return library_data.exerciseDatabase[exercise.exerciseId] ??
+        _libraryExerciseByNormalizedName[
+          _normalizeExerciseName(exercise.exerciseId)
+        ] ??
+        _libraryExerciseByNormalizedName[
+          _normalizeExerciseName(exercise.exerciseName)
+        ];
+  }
+
+  void _logFallbackOnce(CustomProgramExercise source, String strategy) {
+    if (!kDebugMode) {
+      return;
+    }
+
+    final key = '${source.exerciseId}|${source.exerciseName}|$strategy';
+    if (_loggedFallbackExercises.add(key)) {
+      debugPrint(
+        '[MLI-Fallback] strategy=$strategy id=${source.exerciseId} name=${source.exerciseName}',
+      );
+    }
+  }
+
+  mli.Exercise _inferExerciseFromName(CustomProgramExercise source) {
+    final normalized = _normalizeExerciseName(source.exerciseName);
+
+    if (normalized.contains('push') || normalized.contains('dip')) {
+      return mli.Exercise(
+        name: source.exerciseName,
+        difficulty: 1.0,
+        muscles: {
+          'chest': 0.45,
+          'shoulders': 0.25,
+          'triceps': 0.25,
+          'core': 0.05,
+        },
+      );
+    }
+
+    if (normalized.contains('pull') ||
+        normalized.contains('row') ||
+        normalized.contains('chin') ||
+        normalized.contains('lever')) {
+      return mli.Exercise(
+        name: source.exerciseName,
+        difficulty: 1.0,
+        muscles: {
+          'back': 0.5,
+          'biceps': 0.25,
+          'shoulders': 0.15,
+          'core': 0.1,
+        },
+      );
+    }
+
+    if (normalized.contains('squat') ||
+        normalized.contains('lunge') ||
+        normalized.contains('pistol') ||
+        normalized.contains('shrimp') ||
+        normalized.contains('jump') ||
+        normalized.contains('calf') ||
+        normalized.contains('bridge') ||
+        normalized.contains('curl')) {
+      return mli.Exercise(
+        name: source.exerciseName,
+        difficulty: 1.0,
+        muscles: {
+          'quads': 0.35,
+          'hamstrings': 0.2,
+          'glutes': 0.3,
+          'calves': 0.15,
+        },
+      );
+    }
+
+    return mli.Exercise(
+      name: source.exerciseName,
+      difficulty: 1.0,
+      muscles: {
+        'core': 0.7,
+        'shoulders': 0.2,
+        'back': 0.1,
+      },
+    );
+  }
+
+  mli.Exercise _buildMliExercise(
+    CustomProgramExercise source,
+    domain.Exercise? exerciseDetail,
+  ) {
+    if (exerciseDetail != null) {
+      return _toMliExercise(source, exerciseDetail);
+    }
+
+    final libraryExercise = _resolveLibraryExercise(source);
+    if (libraryExercise != null) {
+      _logFallbackOnce(source, 'library-match');
+      return mli.Exercise(
+        name: source.exerciseName,
+        difficulty: libraryExercise.difficulty,
+        muscles: libraryExercise.muscles,
+      );
+    }
+
+    _logFallbackOnce(source, 'name-inference');
+    return _inferExerciseFromName(source);
   }
 
   double _difficultyCoefficient(domain.Exercise? exerciseDetail) {
@@ -133,8 +272,6 @@ class _CustomProgramDaySessionScreenState
       for (final group in exerciseDetail.targetMuscleGroups) {
         muscles[group.label] = weight;
       }
-    } else {
-      muscles['Genel'] = 1.0;
     }
 
     return mli.Exercise(
@@ -161,7 +298,10 @@ class _CustomProgramDaySessionScreenState
           continue;
         }
 
-        final rir = _actualRirs[exerciseIndex][setIndex] ?? _defaultRir;
+        final rir = _actualRirs[exerciseIndex][setIndex];
+        if (rir == null) {
+          continue;
+        }
         sets.add(mli.WorkoutSet(reps: reps, rir: rir));
       }
 
@@ -170,9 +310,10 @@ class _CustomProgramDaySessionScreenState
       }
 
       final exerciseDetail = _resolveExerciseDetail(customExercise);
+      final mliExercise = _buildMliExercise(customExercise, exerciseDetail);
       entries.add(
         mli.ExerciseWorkoutEntry(
-          exercise: _toMliExercise(customExercise, exerciseDetail),
+          exercise: mliExercise,
           sets: sets,
         ),
       );
@@ -186,22 +327,22 @@ class _CustomProgramDaySessionScreenState
 
   String _feedbackForLoad(double score) {
     if (score < 200) {
-      return 'Low ⚠️';
+      return 'Low';
     }
     if (score <= 600) {
-      return 'Good 💪';
+      return 'Good';
     }
-    return 'High 🔥';
+    return 'High';
   }
 
   String _lastSetIndicator(double score) {
     if (score < 80) {
-      return 'low';
+      return 'Low';
     }
     if (score <= 180) {
-      return 'medium';
+      return 'Good';
     }
-    return 'high';
+    return 'High';
   }
 
   @override
@@ -228,8 +369,13 @@ class _CustomProgramDaySessionScreenState
     });
   }
 
-  void _skipCurrentExercise(CustomProgramDay day) {
+  Future<void> _skipCurrentExercise(CustomProgramDay day) async {
     if (day.exercises.isEmpty || _isWorkoutComplete(day)) {
+      return;
+    }
+
+    final selectedRir = await _askRirValue();
+    if (!mounted || selectedRir == null) {
       return;
     }
 
@@ -239,7 +385,7 @@ class _CustomProgramDaySessionScreenState
     setState(() {
       for (var i = 0; i < _actualValues[index].length; i++) {
         _actualValues[index][i] ??= exercise.value;
-        _actualRirs[index][i] ??= _defaultRir;
+        _actualRirs[index][i] ??= selectedRir;
       }
     });
 
@@ -280,7 +426,7 @@ class _CustomProgramDaySessionScreenState
     return _actualValues[index].where((value) => value != null).length;
   }
 
-  Future<int> _askRirValue() async {
+  Future<int?> _askRirValue() async {
     final selected = await showModalBottomSheet<int>(
       context: context,
       backgroundColor: _cardSurface,
@@ -331,7 +477,7 @@ class _CustomProgramDaySessionScreenState
                       Expanded(
                         child: TextButton(
                           onPressed: () => Navigator.pop(context),
-                          child: const Text('Atla (2)'),
+                          child: const Text('Vazgec'),
                         ),
                       ),
                       const SizedBox(width: 8.0),
@@ -355,7 +501,7 @@ class _CustomProgramDaySessionScreenState
       },
     );
 
-    return selected ?? _defaultRir;
+    return selected;
   }
 
   Future<void> _completeSet(CustomProgramDay day) async {
@@ -374,14 +520,15 @@ class _CustomProgramDaySessionScreenState
     }
     final targetValue = day.exercises[index].value;
     final selectedRir = await _askRirValue();
-    if (!mounted) {
+    if (!mounted || selectedRir == null) {
       return;
     }
 
     final activeExercise = day.exercises[index];
     final exerciseDetail = _resolveExerciseDetail(activeExercise);
+    final mliExercise = _buildMliExercise(activeExercise, exerciseDetail);
     final setLoad = calculateMuscleLoad(
-      exercise: _toMliExercise(activeExercise, exerciseDetail),
+      exercise: mliExercise,
       set: mli.WorkoutSet(reps: targetValue, rir: selectedRir),
     );
 
