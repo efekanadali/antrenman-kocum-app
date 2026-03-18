@@ -144,7 +144,47 @@ final Map<String, Exercise> exerciseDatabase = {
   'plank': const Exercise(
     name: 'Plank',
     difficulty: 0.5,
-    muscles: {'core': 1.0, 'shoulders': 0.3, 'back': 0.1, 'triceps': 0.1},
+    muscles: {'core': 1.0, 'shoulders': 0.5, 'glutes': 0.5, 'back': 0.2},
+  ),
+  'side_plank': const Exercise(
+    name: 'Side Plank',
+    difficulty: 0.6,
+    muscles: {'core': 1.0, 'shoulders': 0.5, 'glutes': 0.2},
+  ),
+  'support_hold_parallel_bar': const Exercise(
+    name: 'Support Hold (Parallel Bar)',
+    difficulty: 0.8,
+    muscles: {'triceps': 1.0, 'shoulders': 1.0, 'chest': 0.5, 'core': 0.2},
+  ),
+  'chin_up_hold_top': const Exercise(
+    name: 'Chin-up Hold (Top)',
+    difficulty: 1.2,
+    muscles: {'biceps': 1.0, 'back': 1.0, 'rear_shoulders': 0.5, 'core': 0.2},
+  ),
+  'pull_up_hold_top': const Exercise(
+    name: 'Pull-up Hold (Top)',
+    difficulty: 1.3,
+    muscles: {'back': 1.0, 'biceps': 0.5, 'shoulders': 0.5, 'core': 0.2},
+  ),
+  'l_sit_hold': const Exercise(
+    name: 'L-Sit Hold',
+    difficulty: 2.0,
+    muscles: {'core': 1.0, 'quads': 1.0, 'triceps': 0.5, 'shoulders': 0.5, 'back': 0.2},
+  ),
+  'tuck_front_lever': const Exercise(
+    name: 'Tuck Front Lever',
+    difficulty: 2.5,
+    muscles: {'back': 1.0, 'core': 0.5, 'shoulders': 0.5, 'biceps': 0.2},
+  ),
+  'tuck_planche': const Exercise(
+    name: 'Tuck Planche',
+    difficulty: 3.0,
+    muscles: {'shoulders': 1.0, 'chest': 1.0, 'triceps': 0.5, 'core': 0.2},
+  ),
+  'wall_sit': const Exercise(
+    name: 'Wall Sit',
+    difficulty: 0.7,
+    muscles: {'quads': 1.0, 'glutes': 1.0, 'calves': 0.5, 'core': 0.2},
   ),
   'hollow_body_hold': const Exercise(
     name: 'Hollow Body Hold',

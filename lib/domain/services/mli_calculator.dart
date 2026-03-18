@@ -1,5 +1,22 @@
 import 'package:calisthenics_app/domain/models/mli_models.dart';
 
+double _dynamicRirFactor(int rir) {
+  return 1 + (10 - rir) / 10;
+}
+
+double _staticMsirFactor(int secondsInReserve) {
+  if (secondsInReserve <= 0) {
+    return 1.05;
+  }
+  if (secondsInReserve <= 3) {
+    return 1.0;
+  }
+  if (secondsInReserve <= 6) {
+    return 0.8;
+  }
+  return 0.6;
+}
+
 /// MLI = reps x C x (1 + (10 - RIR) / 10)
 ///
 /// Backward compatibility icin reps parametresi de desteklenir.
@@ -14,8 +31,17 @@ double calculateMLI({
     throw ArgumentError('Either volume or reps must be provided.');
   }
 
-  final rirFactor = 1 + (10 - rir) / 10;
-  return resolvedVolume * difficulty * rirFactor;
+  return resolvedVolume * difficulty * _dynamicRirFactor(rir);
+}
+
+/// Statik model: (sure / 3) x C x M_SIR
+double calculateStaticMLI({
+  required int durationInSeconds,
+  required double difficulty,
+  required int secondsInReserve,
+}) {
+  final volume = durationInSeconds / 3.0;
+  return volume * difficulty * _staticMsirFactor(secondsInReserve);
 }
 
 /// Tek bir setin kas bazli dagilimini hesaplar.
@@ -23,11 +49,17 @@ Map<String, double> calculateMuscleLoad({
   required Exercise exercise,
   required WorkoutSet set,
 }) {
-  final mli = calculateMLI(
-    volume: set.volume,
-    difficulty: exercise.difficulty,
-    rir: set.rir,
-  );
+  final mli = set.durationInSeconds != null
+      ? calculateStaticMLI(
+          durationInSeconds: set.durationInSeconds!,
+          difficulty: exercise.difficulty,
+          secondsInReserve: set.rir,
+        )
+      : calculateMLI(
+          volume: set.volume,
+          difficulty: exercise.difficulty,
+          rir: set.rir,
+        );
 
   final result = <String, double>{};
   exercise.muscles.forEach((muscleName, weight) {

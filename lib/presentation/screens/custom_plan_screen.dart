@@ -231,12 +231,12 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
           child: StatefulBuilder(
             builder: (context, setDialogState) {
               int minTarget() => isTimed ? 10 : 3;
-              int maxTarget() => isTimed ? 300 : 10;
+              int maxTarget() => isTimed ? 300 : 100;
               if (sets < 1) {
                 sets = 1;
               }
-              if (sets > 10) {
-                sets = 10;
+              if (sets > 6) {
+                sets = 6;
               }
               if (targetValue < minTarget()) {
                 targetValue = minTarget();
@@ -314,7 +314,7 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                               label: 'Set',
                               value: sets,
                               minValue: 1,
-                              maxValue: 10,
+                              maxValue: 6,
                               onChanged: (value) {
                                 setDialogState(() {
                                   sets = value;

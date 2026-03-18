@@ -293,8 +293,8 @@ class _CustomProgramDaySessionScreenState
       final sets = <mli.WorkoutSet>[];
 
       for (var setIndex = 0; setIndex < customExercise.sets; setIndex++) {
-        final reps = _actualValues[exerciseIndex][setIndex];
-        if (reps == null) {
+        final actualValue = _actualValues[exerciseIndex][setIndex];
+        if (actualValue == null) {
           continue;
         }
 
@@ -302,7 +302,15 @@ class _CustomProgramDaySessionScreenState
         if (rir == null) {
           continue;
         }
-        sets.add(mli.WorkoutSet(reps: reps, rir: rir));
+        sets.add(
+          customExercise.isTimed
+              ? mli.WorkoutSet(
+                  reps: 0,
+                  rir: rir,
+                  durationInSeconds: actualValue,
+                )
+              : mli.WorkoutSet(reps: actualValue, rir: rir),
+        );
       }
 
       if (sets.isEmpty) {
@@ -374,13 +382,13 @@ class _CustomProgramDaySessionScreenState
       return;
     }
 
-    final selectedRir = await _askRirValue();
+    final index = _currentExerciseIndex(day);
+    final exercise = day.exercises[index];
+
+    final selectedRir = await _askRirValue(isTimed: exercise.isTimed);
     if (!mounted || selectedRir == null) {
       return;
     }
-
-    final index = _currentExerciseIndex(day);
-    final exercise = day.exercises[index];
 
     setState(() {
       for (var i = 0; i < _actualValues[index].length; i++) {
@@ -426,7 +434,7 @@ class _CustomProgramDaySessionScreenState
     return _actualValues[index].where((value) => value != null).length;
   }
 
-  Future<int?> _askRirValue() async {
+  Future<int?> _askRirValue({required bool isTimed}) async {
     final selected = await showModalBottomSheet<int>(
       context: context,
       backgroundColor: _cardSurface,
@@ -444,7 +452,9 @@ class _CustomProgramDaySessionScreenState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Kac tekrar daha cikarabilirdin?',
+                    isTimed
+                        ? 'Kac saniye daha durabilirdin?'
+                        : 'Kac tekrar daha cikarabilirdin?',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: _textHigh,
                       fontWeight: FontWeight.w700,
@@ -453,7 +463,7 @@ class _CustomProgramDaySessionScreenState
                   const SizedBox(height: 12.0),
                   Wrap(
                     spacing: 8.0,
-                    children: List.generate(5, (rir) {
+                    children: List.generate(isTimed ? 11 : 5, (rir) {
                       return ChoiceChip(
                         label: Text('$rir'),
                         selected: tempRir == rir,
@@ -518,18 +528,24 @@ class _CustomProgramDaySessionScreenState
     if (setIndex == -1) {
       return;
     }
-    final targetValue = day.exercises[index].value;
-    final selectedRir = await _askRirValue();
+    final activeExercise = day.exercises[index];
+    final targetValue = activeExercise.value;
+    final selectedRir = await _askRirValue(isTimed: activeExercise.isTimed);
     if (!mounted || selectedRir == null) {
       return;
     }
 
-    final activeExercise = day.exercises[index];
     final exerciseDetail = _resolveExerciseDetail(activeExercise);
     final mliExercise = _buildMliExercise(activeExercise, exerciseDetail);
     final setLoad = calculateMuscleLoad(
       exercise: mliExercise,
-      set: mli.WorkoutSet(reps: targetValue, rir: selectedRir),
+      set: activeExercise.isTimed
+          ? mli.WorkoutSet(
+              reps: 0,
+              rir: selectedRir,
+              durationInSeconds: targetValue,
+            )
+          : mli.WorkoutSet(reps: targetValue, rir: selectedRir),
     );
 
     setState(() {
