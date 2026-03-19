@@ -14,6 +14,7 @@ class Exercise {
   final List<MuscleGroup> targetMuscleGroups; // Doğru alan adı ve tipi
   final Map<MuscleGroup, int> muscleRatings;
   final String description;
+  final List<String> prerequisiteExercises;
 
   const Exercise({
     required this.id,
@@ -23,5 +24,6 @@ class Exercise {
     required this.targetMuscleGroups,
     required this.muscleRatings,
     required this.description,
+    this.prerequisiteExercises = const <String>[],
   });
 }
