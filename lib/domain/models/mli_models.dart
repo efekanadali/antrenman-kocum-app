@@ -15,11 +15,15 @@ class WorkoutSet {
     required this.reps,
     required this.rir,
     this.durationInSeconds,
+    this.extraWeightKg = 0,
+    this.bodyWeightKg,
   });
 
   final int reps;
   final int rir;
   final int? durationInSeconds;
+  final double extraWeightKg;
+  final double? bodyWeightKg;
 
   // Dynamic hareketlerde reps, statik hareketlerde saniye/3 kullanilir.
   double get volume {
@@ -27,6 +31,18 @@ class WorkoutSet {
       return durationInSeconds! / 3.0;
     }
     return reps.toDouble();
+  }
+
+  /// W_m = 1 + (ekstra agirlik / vucut agirligi)
+  double get weightMultiplier {
+    if (extraWeightKg <= 0) {
+      return 1.0;
+    }
+    final bw = bodyWeightKg;
+    if (bw == null || bw <= 0) {
+      return 1.0;
+    }
+    return 1.0 + (extraWeightKg / bw);
   }
 }
 

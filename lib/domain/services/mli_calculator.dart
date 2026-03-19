@@ -25,13 +25,17 @@ double calculateMLI({
   int? reps,
   required double difficulty,
   required int rir,
+  double weightMultiplier = 1.0,
 }) {
   final resolvedVolume = volume ?? reps?.toDouble();
   if (resolvedVolume == null) {
     throw ArgumentError('Either volume or reps must be provided.');
   }
 
-  return resolvedVolume * difficulty * _dynamicRirFactor(rir);
+  return resolvedVolume *
+      difficulty *
+      _dynamicRirFactor(rir) *
+      weightMultiplier;
 }
 
 /// Statik model: (sure / 3) x C x M_SIR
@@ -39,9 +43,13 @@ double calculateStaticMLI({
   required int durationInSeconds,
   required double difficulty,
   required int secondsInReserve,
+  double weightMultiplier = 1.0,
 }) {
   final volume = durationInSeconds / 3.0;
-  return volume * difficulty * _staticMsirFactor(secondsInReserve);
+  return volume *
+      difficulty *
+      _staticMsirFactor(secondsInReserve) *
+      weightMultiplier;
 }
 
 /// Tek bir setin kas bazli dagilimini hesaplar.
@@ -54,11 +62,13 @@ Map<String, double> calculateMuscleLoad({
           durationInSeconds: set.durationInSeconds!,
           difficulty: exercise.difficulty,
           secondsInReserve: set.rir,
+          weightMultiplier: set.weightMultiplier,
         )
       : calculateMLI(
           volume: set.volume,
           difficulty: exercise.difficulty,
           rir: set.rir,
+          weightMultiplier: set.weightMultiplier,
         );
 
   final result = <String, double>{};

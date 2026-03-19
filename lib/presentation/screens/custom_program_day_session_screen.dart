@@ -10,7 +10,7 @@ import 'package:calisthenics_app/domain/enums/difficulty_level.dart';
 import 'package:calisthenics_app/domain/models/custom_program.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart' as domain;
 import 'package:calisthenics_app/domain/models/exercise_database.dart'
-  as library_data;
+    as library_data;
 import 'package:calisthenics_app/domain/models/mli_models.dart' as mli;
 import 'package:calisthenics_app/domain/services/mli_calculator.dart';
 import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
@@ -48,6 +48,8 @@ class _CustomProgramDaySessionScreenState
     extends ConsumerState<CustomProgramDaySessionScreen> {
   late final List<List<int?>> _actualValues;
   late final List<List<int?>> _actualRirs;
+  late final List<List<double?>> _actualExtraWeights;
+  late final List<List<double?>> _actualBodyWeights;
   final Map<String, domain.Exercise> _exerciseById =
       <String, domain.Exercise>{};
   final Map<String, domain.Exercise> _exerciseByName =
@@ -61,6 +63,8 @@ class _CustomProgramDaySessionScreenState
   Map<String, double> _lastSetLoadByMuscle = <String, double>{};
   Map<String, double> _workoutLoadByMuscle = <String, double>{};
   static const int _defaultRir = 2;
+  static const double _defaultBodyWeightKg = 70.0;
+  double _lastBodyWeightKg = _defaultBodyWeightKg;
   Timer? _workTimer;
   Duration _workElapsed = Duration.zero;
   bool _workPaused = false;
@@ -77,12 +81,18 @@ class _CustomProgramDaySessionScreenState
     _actualRirs = widget.args.day.exercises
         .map((exercise) => List<int?>.filled(exercise.sets, null))
         .toList();
+    _actualExtraWeights = widget.args.day.exercises
+        .map((exercise) => List<double?>.filled(exercise.sets, null))
+        .toList();
+    _actualBodyWeights = widget.args.day.exercises
+        .map((exercise) => List<double?>.filled(exercise.sets, null))
+        .toList();
     for (final entry in library_data.exerciseDatabase.entries) {
       final exercise = entry.value;
       _libraryExerciseByNormalizedName[_normalizeExerciseName(entry.key)] =
-        exercise;
+          exercise;
       _libraryExerciseByNormalizedName[_normalizeExerciseName(exercise.name)] =
-        exercise;
+          exercise;
     }
     _loadExerciseDetails();
     _startWorkTimer();
@@ -126,17 +136,19 @@ class _CustomProgramDaySessionScreenState
   domain.Exercise? _resolveExerciseDetail(CustomProgramExercise exercise) {
     return _exerciseById[exercise.exerciseId] ??
         _exerciseByName[exercise.exerciseName] ??
-        _exerciseByNormalizedName[_normalizeExerciseName(exercise.exerciseName)];
+        _exerciseByNormalizedName[_normalizeExerciseName(
+          exercise.exerciseName,
+        )];
   }
 
   mli.Exercise? _resolveLibraryExercise(CustomProgramExercise exercise) {
     return library_data.exerciseDatabase[exercise.exerciseId] ??
-        _libraryExerciseByNormalizedName[
-          _normalizeExerciseName(exercise.exerciseId)
-        ] ??
-        _libraryExerciseByNormalizedName[
-          _normalizeExerciseName(exercise.exerciseName)
-        ];
+        _libraryExerciseByNormalizedName[_normalizeExerciseName(
+          exercise.exerciseId,
+        )] ??
+        _libraryExerciseByNormalizedName[_normalizeExerciseName(
+          exercise.exerciseName,
+        )];
   }
 
   void _logFallbackOnce(CustomProgramExercise source, String strategy) {
@@ -175,12 +187,7 @@ class _CustomProgramDaySessionScreenState
       return mli.Exercise(
         name: source.exerciseName,
         difficulty: 1.0,
-        muscles: {
-          'back': 0.5,
-          'biceps': 0.25,
-          'shoulders': 0.15,
-          'core': 0.1,
-        },
+        muscles: {'back': 0.5, 'biceps': 0.25, 'shoulders': 0.15, 'core': 0.1},
       );
     }
 
@@ -207,11 +214,7 @@ class _CustomProgramDaySessionScreenState
     return mli.Exercise(
       name: source.exerciseName,
       difficulty: 1.0,
-      muscles: {
-        'core': 0.7,
-        'shoulders': 0.2,
-        'back': 0.1,
-      },
+      muscles: {'core': 0.7, 'shoulders': 0.2, 'back': 0.1},
     );
   }
 
@@ -302,14 +305,24 @@ class _CustomProgramDaySessionScreenState
         if (rir == null) {
           continue;
         }
+        final extraWeightKg =
+            _actualExtraWeights[exerciseIndex][setIndex] ?? 0.0;
+        final bodyWeightKg = _actualBodyWeights[exerciseIndex][setIndex];
         sets.add(
           customExercise.isTimed
               ? mli.WorkoutSet(
                   reps: 0,
                   rir: rir,
                   durationInSeconds: actualValue,
+                  extraWeightKg: extraWeightKg,
+                  bodyWeightKg: bodyWeightKg,
                 )
-              : mli.WorkoutSet(reps: actualValue, rir: rir),
+              : mli.WorkoutSet(
+                  reps: actualValue,
+                  rir: rir,
+                  extraWeightKg: extraWeightKg,
+                  bodyWeightKg: bodyWeightKg,
+                ),
         );
       }
 
@@ -319,12 +332,7 @@ class _CustomProgramDaySessionScreenState
 
       final exerciseDetail = _resolveExerciseDetail(customExercise);
       final mliExercise = _buildMliExercise(customExercise, exerciseDetail);
-      entries.add(
-        mli.ExerciseWorkoutEntry(
-          exercise: mliExercise,
-          sets: sets,
-        ),
-      );
+      entries.add(mli.ExerciseWorkoutEntry(exercise: mliExercise, sets: sets));
     }
 
     final totals = calculateWorkoutLoad(entries);
@@ -385,16 +393,19 @@ class _CustomProgramDaySessionScreenState
     final index = _currentExerciseIndex(day);
     final exercise = day.exercises[index];
 
-    final selectedRir = await _askRirValue(isTimed: exercise.isTimed);
-    if (!mounted || selectedRir == null) {
+    final effort = await _askSetEffort(isTimed: exercise.isTimed);
+    if (!mounted || effort == null) {
       return;
     }
 
     setState(() {
       for (var i = 0; i < _actualValues[index].length; i++) {
         _actualValues[index][i] ??= exercise.value;
-        _actualRirs[index][i] ??= selectedRir;
+        _actualRirs[index][i] ??= effort.rir;
+        _actualExtraWeights[index][i] ??= effort.extraWeightKg;
+        _actualBodyWeights[index][i] ??= effort.bodyWeightKg;
       }
+      _lastBodyWeightKg = effort.bodyWeightKg;
     });
 
     _recalculateWorkoutLoad(day);
@@ -434,8 +445,11 @@ class _CustomProgramDaySessionScreenState
     return _actualValues[index].where((value) => value != null).length;
   }
 
-  Future<int?> _askRirValue({required bool isTimed}) async {
-    final selected = await showModalBottomSheet<int>(
+  Future<_SetEffortResult?> _askSetEffort({required bool isTimed}) async {
+    var extraWeightText = '0';
+    var bodyWeightText = _lastBodyWeightKg.toStringAsFixed(1);
+
+    final selected = await showModalBottomSheet<_SetEffortResult>(
       context: context,
       backgroundColor: _cardSurface,
       shape: const RoundedRectangleBorder(
@@ -482,6 +496,33 @@ class _CustomProgramDaySessionScreenState
                     }),
                   ),
                   const SizedBox(height: 12.0),
+                  TextFormField(
+                    initialValue: extraWeightText,
+                    onChanged: (value) {
+                      extraWeightText = value;
+                    },
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: const InputDecoration(
+                      labelText: 'Ekstra agirlik (kg)',
+                      hintText: '0',
+                    ),
+                  ),
+                  const SizedBox(height: 10.0),
+                  TextFormField(
+                    initialValue: bodyWeightText,
+                    onChanged: (value) {
+                      bodyWeightText = value;
+                    },
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: const InputDecoration(
+                      labelText: 'Vucut agirligi (kg)',
+                    ),
+                  ),
+                  const SizedBox(height: 12.0),
                   Row(
                     children: [
                       Expanded(
@@ -493,7 +534,32 @@ class _CustomProgramDaySessionScreenState
                       const SizedBox(width: 8.0),
                       Expanded(
                         child: FilledButton(
-                          onPressed: () => Navigator.pop(context, tempRir),
+                          onPressed: () {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                            final extraWeight =
+                                double.tryParse(
+                                  extraWeightText.trim().replaceAll(',', '.'),
+                                ) ??
+                                0.0;
+                            final bodyWeight = double.tryParse(
+                              bodyWeightText.trim().replaceAll(',', '.'),
+                            );
+
+                            if (extraWeight < 0 ||
+                                bodyWeight == null ||
+                                bodyWeight <= 0) {
+                              return;
+                            }
+
+                            Navigator.pop(
+                              context,
+                              _SetEffortResult(
+                                rir: tempRir,
+                                extraWeightKg: extraWeight,
+                                bodyWeightKg: bodyWeight,
+                              ),
+                            );
+                          },
                           style: FilledButton.styleFrom(
                             backgroundColor: _accentPurple,
                             foregroundColor: Colors.white,
@@ -530,8 +596,8 @@ class _CustomProgramDaySessionScreenState
     }
     final activeExercise = day.exercises[index];
     final targetValue = activeExercise.value;
-    final selectedRir = await _askRirValue(isTimed: activeExercise.isTimed);
-    if (!mounted || selectedRir == null) {
+    final effort = await _askSetEffort(isTimed: activeExercise.isTimed);
+    if (!mounted || effort == null) {
       return;
     }
 
@@ -542,15 +608,25 @@ class _CustomProgramDaySessionScreenState
       set: activeExercise.isTimed
           ? mli.WorkoutSet(
               reps: 0,
-              rir: selectedRir,
+              rir: effort.rir,
               durationInSeconds: targetValue,
+              extraWeightKg: effort.extraWeightKg,
+              bodyWeightKg: effort.bodyWeightKg,
             )
-          : mli.WorkoutSet(reps: targetValue, rir: selectedRir),
+          : mli.WorkoutSet(
+              reps: targetValue,
+              rir: effort.rir,
+              extraWeightKg: effort.extraWeightKg,
+              bodyWeightKg: effort.bodyWeightKg,
+            ),
     );
 
     setState(() {
       _actualValues[index][setIndex] = targetValue;
-      _actualRirs[index][setIndex] = selectedRir;
+      _actualRirs[index][setIndex] = effort.rir;
+      _actualExtraWeights[index][setIndex] = effort.extraWeightKg;
+      _actualBodyWeights[index][setIndex] = effort.bodyWeightKg;
+      _lastBodyWeightKg = effort.bodyWeightKg;
       _lastSetLoadByMuscle = setLoad;
     });
 
@@ -595,6 +671,14 @@ class _CustomProgramDaySessionScreenState
     final rirController = TextEditingController(
       text: (_actualRirs[exerciseIndex][setIndex] ?? _defaultRir).toString(),
     );
+    final extraWeightController = TextEditingController(
+      text: (_actualExtraWeights[exerciseIndex][setIndex] ?? 0.0)
+          .toStringAsFixed(1),
+    );
+    final bodyWeightController = TextEditingController(
+      text: (_actualBodyWeights[exerciseIndex][setIndex] ?? _lastBodyWeightKg)
+          .toStringAsFixed(1),
+    );
 
     final result = await showDialog<_SetEditorResult?>(
       context: context,
@@ -617,6 +701,26 @@ class _CustomProgramDaySessionScreenState
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(labelText: 'RIR'),
               ),
+              const SizedBox(height: 10.0),
+              TextField(
+                controller: extraWeightController,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(
+                  labelText: 'Ekstra agirlik (kg)',
+                ),
+              ),
+              const SizedBox(height: 10.0),
+              TextField(
+                controller: bodyWeightController,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(
+                  labelText: 'Vucut agirligi (kg)',
+                ),
+              ),
             ],
           ),
           actions: [
@@ -633,13 +737,35 @@ class _CustomProgramDaySessionScreenState
               onPressed: () {
                 final reps = int.tryParse(repsController.text.trim());
                 final rir = int.tryParse(rirController.text.trim());
+                final extraWeight =
+                    double.tryParse(
+                      extraWeightController.text.trim().replaceAll(',', '.'),
+                    ) ??
+                    0.0;
+                final bodyWeight = double.tryParse(
+                  bodyWeightController.text.trim().replaceAll(',', '.'),
+                );
 
-                if (reps == null || reps <= 0 || rir == null || rir < 0) {
+                if (reps == null ||
+                    reps <= 0 ||
+                    rir == null ||
+                    rir < 0 ||
+                    extraWeight < 0 ||
+                    bodyWeight == null ||
+                    bodyWeight <= 0) {
                   Navigator.pop(context, null);
                   return;
                 }
 
-                Navigator.pop(context, _SetEditorResult(reps: reps, rir: rir));
+                Navigator.pop(
+                  context,
+                  _SetEditorResult(
+                    reps: reps,
+                    rir: rir,
+                    extraWeightKg: extraWeight,
+                    bodyWeightKg: bodyWeight,
+                  ),
+                );
               },
               child: const Text('Kaydet'),
             ),
@@ -647,6 +773,11 @@ class _CustomProgramDaySessionScreenState
         );
       },
     );
+
+    repsController.dispose();
+    rirController.dispose();
+    extraWeightController.dispose();
+    bodyWeightController.dispose();
 
     if (!mounted || result == null) {
       return;
@@ -656,9 +787,14 @@ class _CustomProgramDaySessionScreenState
       if (result.delete) {
         _actualValues[exerciseIndex][setIndex] = null;
         _actualRirs[exerciseIndex][setIndex] = null;
+        _actualExtraWeights[exerciseIndex][setIndex] = null;
+        _actualBodyWeights[exerciseIndex][setIndex] = null;
       } else {
         _actualValues[exerciseIndex][setIndex] = result.reps;
         _actualRirs[exerciseIndex][setIndex] = result.rir;
+        _actualExtraWeights[exerciseIndex][setIndex] = result.extraWeightKg;
+        _actualBodyWeights[exerciseIndex][setIndex] = result.bodyWeightKg;
+        _lastBodyWeightKg = result.bodyWeightKg;
       }
     });
 
@@ -1357,14 +1493,37 @@ class _LastSetLoadCard extends StatelessWidget {
 }
 
 class _SetEditorResult {
-  const _SetEditorResult({required this.reps, required this.rir})
-    : delete = false;
+  const _SetEditorResult({
+    required this.reps,
+    required this.rir,
+    required this.extraWeightKg,
+    required this.bodyWeightKg,
+  }) : delete = false;
 
-  const _SetEditorResult.delete() : reps = 0, rir = 0, delete = true;
+  const _SetEditorResult.delete()
+    : reps = 0,
+      rir = 0,
+      extraWeightKg = 0,
+      bodyWeightKg = 0,
+      delete = true;
 
   final int reps;
   final int rir;
+  final double extraWeightKg;
+  final double bodyWeightKg;
   final bool delete;
+}
+
+class _SetEffortResult {
+  const _SetEffortResult({
+    required this.rir,
+    required this.extraWeightKg,
+    required this.bodyWeightKg,
+  });
+
+  final int rir;
+  final double extraWeightKg;
+  final double bodyWeightKg;
 }
 
 class _ProgressHeader extends StatelessWidget {
