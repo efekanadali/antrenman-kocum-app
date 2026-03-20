@@ -38,6 +38,22 @@ class HomeTodayScreen extends StatelessWidget {
   static const Color _textHigh = Color(0xFFEDE9FF);
   static const Color _textMid = Color(0xFFB4A9D8);
 
+  static const HomeInsightData _mockInsightData = HomeInsightData(
+    hasWorkoutToday: true,
+    workoutTitle: 'Push Day',
+    workoutFocus: 'Chest + Triceps',
+    lastWorkoutLoad: 320,
+    weeklyTrendPercent: 12,
+    recoveryItems: [
+      RecoveryStatusItem(muscle: 'Chest', statusLabel: 'Ready', indicator: '🟢'),
+      RecoveryStatusItem(
+        muscle: 'Back',
+        statusLabel: 'Recovering',
+        indicator: '🟡',
+      ),
+    ],
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,6 +124,17 @@ class HomeTodayScreen extends StatelessWidget {
                     child: const TodayWorkoutCard(progress: 0.65),
                   ),
                 ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      _spaceMd,
+                      _spaceSm,
+                      _spaceMd,
+                      0,
+                    ),
+                    child: const HomeInsightsSection(data: _mockInsightData),
+                  ),
+                ),
                 const SliverToBoxAdapter(
                   child: SizedBox(height: _spaceLg),
                 ),
@@ -129,21 +156,6 @@ class HomeTodayScreen extends StatelessWidget {
                 const SliverToBoxAdapter(
                   child: SizedBox(height: _spaceLg),
                 ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: _spaceMd),
-                    child: const BrowseCategoriesRow(),
-                  ),
-                ),
-                const SliverToBoxAdapter(
-                  child: SizedBox(height: _spaceLg),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: _spaceMd),
-                    child: const RecommendedList(),
-                  ),
-                ),
                 const SliverToBoxAdapter(
                   child: SizedBox(height: 96.0),
                 ),
@@ -156,6 +168,142 @@ class HomeTodayScreen extends StatelessWidget {
           showBottomNav ? const AppBottomNav(selectedIndex: 0) : null,
     );
   }
+}
+
+class HomeInsightsSection extends StatelessWidget {
+  const HomeInsightsSection({super.key, required this.data});
+
+  final HomeInsightData data;
+
+  @override
+  Widget build(BuildContext context) {
+    final trendPrefix = data.weeklyTrendPercent >= 0 ? '+' : '';
+    final trendEmoji = data.weeklyTrendPercent >= 0 ? '📈' : '📉';
+
+    return GlassCard(
+      borderRadius: HomeTodayScreen._radiusLg,
+      child: Padding(
+        padding: const EdgeInsets.all(HomeTodayScreen._spaceMd),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Bugun',
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: HomeTodayScreen._textMid,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+            const SizedBox(height: 4.0),
+            Text(
+              data.hasWorkoutToday
+                  ? 'Today: ${data.workoutTitle} 💪'
+                  : 'No workout planned',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: HomeTodayScreen._textHigh,
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+            const SizedBox(height: 4.0),
+            Text(
+              data.hasWorkoutToday
+                  ? 'Focus: ${data.workoutFocus}'
+                  : 'Start a session',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: HomeTodayScreen._textMid,
+                  ),
+            ),
+            const SizedBox(height: 12.0),
+            SizedBox(
+              height: 38.0,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(AppRoutes.workoutLibrary);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: HomeTodayScreen._accentPurple,
+                  foregroundColor: HomeTodayScreen._textHigh,
+                  textStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14.0),
+                  ),
+                ),
+                child: const Text('Start Workout'),
+              ),
+            ),
+            const SizedBox(height: 12.0),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(10.0),
+              decoration: BoxDecoration(
+                color: HomeTodayScreen._cardSurfaceSoft,
+                borderRadius: BorderRadius.circular(14.0),
+              ),
+              child: Text(
+                'Last workout: ${data.lastWorkoutLoad.toStringAsFixed(0)} load',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: HomeTodayScreen._textHigh,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+            ),
+            const SizedBox(height: 10.0),
+            ...data.recoveryItems.map(
+              (item) => Padding(
+                padding: const EdgeInsets.only(bottom: 4.0),
+                child: Text(
+                  '${item.muscle}: ${item.statusLabel} ${item.indicator}',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: HomeTodayScreen._textMid,
+                      ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 4.0),
+            Text(
+              '$trendPrefix${data.weeklyTrendPercent}% this week $trendEmoji',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: HomeTodayScreen._accentBlue,
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class HomeInsightData {
+  const HomeInsightData({
+    required this.hasWorkoutToday,
+    required this.workoutTitle,
+    required this.workoutFocus,
+    required this.lastWorkoutLoad,
+    required this.weeklyTrendPercent,
+    required this.recoveryItems,
+  });
+
+  final bool hasWorkoutToday;
+  final String workoutTitle;
+  final String workoutFocus;
+  final double lastWorkoutLoad;
+  final int weeklyTrendPercent;
+  final List<RecoveryStatusItem> recoveryItems;
+}
+
+class RecoveryStatusItem {
+  const RecoveryStatusItem({
+    required this.muscle,
+    required this.statusLabel,
+    required this.indicator,
+  });
+
+  final String muscle;
+  final String statusLabel;
+  final String indicator;
 }
 
 class GreetingAppBar extends StatelessWidget {
