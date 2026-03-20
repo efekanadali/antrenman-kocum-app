@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/core/local_storage/workout_history_storage.dart';
+import 'package:calisthenics_app/core/local_storage/workout_summary_storage.dart';
 
 class WorkoutSummaryArgs {
   const WorkoutSummaryArgs({
@@ -10,12 +11,16 @@ class WorkoutSummaryArgs {
     required this.totalTime,
     required this.setsCompleted,
     required this.totalSets,
+    required this.totalLoad,
+    required this.muscleLoad,
   });
 
   final String exerciseName;
   final Duration totalTime;
   final int setsCompleted;
   final int totalSets;
+  final double totalLoad;
+  final Map<String, double> muscleLoad;
 }
 
 class WorkoutSummaryScreen extends StatelessWidget {
@@ -28,6 +33,7 @@ class WorkoutSummaryScreen extends StatelessWidget {
 
   Future<void> _saveSession(BuildContext context) async {
     final storage = WorkoutHistoryStorage();
+    final summaryStorage = WorkoutSummaryStorage();
     final entry = WorkoutSessionEntry(
       exerciseName: args.exerciseName,
       totalTimeSeconds: args.totalTime.inSeconds,
@@ -36,8 +42,16 @@ class WorkoutSummaryScreen extends StatelessWidget {
       completedAt: DateTime.now(),
     );
 
+    final summaryEntry = WorkoutSummaryEntry(
+      date: DateTime.now(),
+      totalLoad: args.totalLoad,
+      muscleLoad: args.muscleLoad,
+      duration: args.totalTime.inSeconds,
+    );
+
     try {
       await storage.saveSession(entry);
+      await summaryStorage.saveSummary(summaryEntry);
       if (!context.mounted) {
         return;
       }

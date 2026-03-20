@@ -1,8 +1,7 @@
-// lib/presentation/screens/user_profile_screen.dart
-
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:calisthenics_app/core/local_storage/workout_summary_storage.dart';
 import 'package:calisthenics_app/presentation/screens/home_screen.dart';
 
 class UserProfileScreen extends StatelessWidget {
@@ -10,15 +9,47 @@ class UserProfileScreen extends StatelessWidget {
 
   final bool showBottomNav;
 
+  @override
+  Widget build(BuildContext context) {
+    return ProfileScreen(showBottomNav: showBottomNav);
+  }
+}
+
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key, this.showBottomNav = true});
+
+  final bool showBottomNav;
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   static const Color _bgTop = Color(0xFF151028);
   static const Color _bgBottom = Color(0xFF0E0A1D);
   static const Color _cardSurface = Color(0xFF201836);
   static const Color _cardSurfaceSoft = Color(0xFF2A2048);
-  static const Color _cardSurfaceTint = Color(0xFF2E2552);
   static const Color _accentPurple = Color(0xFF6D5BFF);
   static const Color _accentBlue = Color(0xFF4FC3F7);
   static const Color _textHigh = Color(0xFFEDE9FF);
   static const Color _textMid = Color(0xFFB4A9D8);
+
+  late final Future<List<WorkoutSummaryEntry>> _summaryFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _summaryFuture = _loadSummaries();
+  }
+
+  Future<List<WorkoutSummaryEntry>> _loadSummaries() async {
+    final storage = WorkoutSummaryStorage();
+    final summaries = await storage.loadSummaries();
+    if (summaries.isNotEmpty) {
+      return summaries;
+    }
+    return buildMockWorkoutSummaries();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,169 +91,205 @@ class UserProfileScreen extends StatelessWidget {
             ),
           ),
           SafeArea(
-            child: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 12.0),
-                    child: _ProfileHeader(),
-                  ),
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  sliver: SliverToBoxAdapter(
-                    child: _StreakCard(),
-                  ),
-                ),
-                const SliverToBoxAdapter(
-                  child: SizedBox(height: 16.0),
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  sliver: SliverToBoxAdapter(
-                    child: _GoalsCard(),
-                  ),
-                ),
-                const SliverToBoxAdapter(
-                  child: SizedBox(height: 16.0),
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  sliver: SliverToBoxAdapter(
-                    child: _RecentSessionsCard(),
-                  ),
-                ),
-                const SliverToBoxAdapter(
-                  child: SizedBox(height: 32.0),
-                ),
-              ],
+            child: FutureBuilder<List<WorkoutSummaryEntry>>(
+              future: _summaryFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final summaries = snapshot.data ?? const <WorkoutSummaryEntry>[];
+                if (summaries.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'Henuz antrenman verisi yok.',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: _textMid,
+                          ),
+                    ),
+                  );
+                }
+
+                final totalWorkouts = calculateTotalWorkouts(summaries);
+                final totalLoad = calculateTotalLoad(summaries);
+                final lastWorkoutDate = calculateLastWorkoutDate(summaries);
+                final muscleDistribution = calculateMuscleDistribution(summaries);
+                final trend = calculateSevenDayTrend(summaries);
+                final balanceText = calculateBalanceText(muscleDistribution);
+
+                return ListView(
+                  padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 24.0),
+                  children: [
+                    const _UserHeader(username: 'Calisthenics Athlete'),
+                    const SizedBox(height: 16.0),
+                    StatsCard(
+                      totalWorkouts: totalWorkouts,
+                      totalLoad: totalLoad,
+                      lastWorkoutDate: formatDate(lastWorkoutDate),
+                    ),
+                    const SizedBox(height: 12.0),
+                    MuscleDistributionCard(distribution: muscleDistribution),
+                    const SizedBox(height: 12.0),
+                    TrendCard(
+                      currentSevenDayLoad: trend.current,
+                      previousSevenDayLoad: trend.previous,
+                    ),
+                    const SizedBox(height: 12.0),
+                    BalanceCard(message: balanceText),
+                    const SizedBox(height: 24.0),
+                  ],
+                );
+              },
             ),
           ),
         ],
       ),
       bottomNavigationBar:
-          showBottomNav ? const AppBottomNav(selectedIndex: 3) : null,
+          widget.showBottomNav ? const AppBottomNav(selectedIndex: 3) : null,
     );
   }
 }
 
-class _ProfileHeader extends StatelessWidget {
+class _UserHeader extends StatelessWidget {
+  const _UserHeader({required this.username});
+
+  final String username;
+
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(
-          width: 64.0,
-          height: 64.0,
-          decoration: BoxDecoration(
-            color: UserProfileScreen._cardSurfaceSoft,
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: Colors.white.withOpacity(0.08),
-            ),
-          ),
+        CircleAvatar(
+          radius: 28,
+          backgroundColor: _ProfileScreenState._cardSurfaceSoft,
           child: const Icon(
             Icons.person,
-            color: UserProfileScreen._textHigh,
-            size: 32.0,
+            size: 30,
+            color: _ProfileScreenState._textHigh,
           ),
         ),
-        const SizedBox(width: 14.0),
+        const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Efekan K.',
+                username,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: UserProfileScreen._textHigh,
+                      color: _ProfileScreenState._textHigh,
                       fontWeight: FontWeight.w800,
                     ),
               ),
               const SizedBox(height: 4.0),
               Text(
-                'Kalisthenik Seviyesi: Orta',
+                'Workout Insights',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: UserProfileScreen._textMid,
+                      color: _ProfileScreenState._textMid,
                       fontWeight: FontWeight.w500,
                     ),
               ),
             ],
           ),
         ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
-          decoration: BoxDecoration(
-            color: UserProfileScreen._accentPurple.withOpacity(0.2),
-            borderRadius: BorderRadius.circular(16.0),
-          ),
-          child: Text(
-            'UZMAN',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: UserProfileScreen._accentPurple,
-                  fontWeight: FontWeight.w700,
-                ),
-          ),
-        ),
       ],
     );
   }
 }
 
-class _StreakCard extends StatelessWidget {
+class StatsCard extends StatelessWidget {
+  const StatsCard({
+    super.key,
+    required this.totalWorkouts,
+    required this.totalLoad,
+    required this.lastWorkoutDate,
+  });
+
+  final int totalWorkouts;
+  final double totalLoad;
+  final String lastWorkoutDate;
+
   @override
   Widget build(BuildContext context) {
     return _GlassCard(
       borderRadius: 22.0,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
+        padding: const EdgeInsets.all(14.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 54.0,
-              height: 54.0,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF6D5BFF), Color(0xFF4FC3F7)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+            Text(
+              'Genel Istatistikler',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(
+                    color: _ProfileScreenState._textHigh,
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+            const SizedBox(height: 10),
+            _StatRow(
+              label: 'Toplam antrenman',
+              value: '$totalWorkouts',
+              labelColor: _ProfileScreenState._textMid,
+              valueColor: _ProfileScreenState._textHigh,
+            ),
+            _StatRow(
+              label: 'Toplam birikmis yuk',
+              value: totalLoad.toStringAsFixed(1),
+              labelColor: _ProfileScreenState._textMid,
+              valueColor: _ProfileScreenState._textHigh,
+            ),
+            _StatRow(
+              label: 'Son antrenman',
+              value: lastWorkoutDate,
+              labelColor: _ProfileScreenState._textMid,
+              valueColor: _ProfileScreenState._textHigh,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class MuscleDistributionCard extends StatelessWidget {
+  const MuscleDistributionCard({super.key, required this.distribution});
+
+  final Map<String, double> distribution;
+
+  @override
+  Widget build(BuildContext context) {
+    final sorted = distribution.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
+    return _GlassCard(
+      child: Padding(
+        padding: const EdgeInsets.all(14.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Kas Dagilimi',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(
+                    color: _ProfileScreenState._textHigh,
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+            const SizedBox(height: 10),
+            ...sorted.map(
+              (item) => Padding(
+                padding: const EdgeInsets.only(bottom: 6.0),
+                child: _StatRow(
+                  label: muscleDisplayName(item.key),
+                  value: item.value.toStringAsFixed(1),
+                  labelColor: _ProfileScreenState._textMid,
+                  valueColor: _ProfileScreenState._textHigh,
                 ),
-                borderRadius: BorderRadius.circular(16.0),
               ),
-              child: const Icon(
-                Icons.local_fire_department,
-                color: Colors.white,
-                size: 28.0,
-              ),
-            ),
-            const SizedBox(width: 12.0),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '7 Günlük Seri',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: UserProfileScreen._textHigh,
-                          fontWeight: FontWeight.w700,
-                        ),
-                  ),
-                  const SizedBox(height: 6.0),
-                  Text(
-                    'İvmeyi koru',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: UserProfileScreen._textMid,
-                        ),
-                  ),
-                ],
-              ),
-            ),
-            Text(
-              '77%',
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: UserProfileScreen._textHigh,
-                    fontWeight: FontWeight.w700,
-                  ),
             ),
           ],
         ),
@@ -231,29 +298,71 @@ class _StreakCard extends StatelessWidget {
   }
 }
 
-class _GoalsCard extends StatelessWidget {
+class TrendCard extends StatelessWidget {
+  const TrendCard({
+    super.key,
+    required this.currentSevenDayLoad,
+    required this.previousSevenDayLoad,
+  });
+
+  final double currentSevenDayLoad;
+  final double previousSevenDayLoad;
+
   @override
   Widget build(BuildContext context) {
+    final trendLabel = currentSevenDayLoad >= previousSevenDayLoad
+        ? 'Increasing'
+        : 'Decreasing';
+    final trendIcon = currentSevenDayLoad >= previousSevenDayLoad
+        ? Icons.trending_up
+        : Icons.trending_down;
+    final trendColor = currentSevenDayLoad >= previousSevenDayLoad
+        ? const Color(0xFF3DDC84)
+        : const Color(0xFFFF7A59);
+
     return _GlassCard(
-      borderRadius: 22.0,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(14.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Haftalık Hedefler',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: UserProfileScreen._textHigh,
+              'Son 7 Gun Trendi',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(
+                    color: _ProfileScreenState._textHigh,
                     fontWeight: FontWeight.w700,
                   ),
             ),
-            const SizedBox(height: 12.0),
-            const _GoalRow(label: 'Antrenmanlar', value: '4 / 5'),
-            const SizedBox(height: 10.0),
-            const _GoalRow(label: 'Toplam Süre', value: '3s 10d / 4s'),
-            const SizedBox(height: 10.0),
-            const _GoalRow(label: 'Mobilite', value: '2 / 3'),
+            const SizedBox(height: 10),
+            _StatRow(
+              label: 'Son 7 gun toplam yuk',
+              value: currentSevenDayLoad.toStringAsFixed(1),
+              labelColor: _ProfileScreenState._textMid,
+              valueColor: _ProfileScreenState._textHigh,
+            ),
+            _StatRow(
+              label: 'Onceki 7 gun toplam yuk',
+              value: previousSevenDayLoad.toStringAsFixed(1),
+              labelColor: _ProfileScreenState._textMid,
+              valueColor: _ProfileScreenState._textHigh,
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Icon(trendIcon, size: 18.0, color: trendColor),
+                const SizedBox(width: 6.0),
+                Text(
+                  trendLabel,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: trendColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -261,37 +370,35 @@ class _GoalsCard extends StatelessWidget {
   }
 }
 
-class _RecentSessionsCard extends StatelessWidget {
+class BalanceCard extends StatelessWidget {
+  const BalanceCard({super.key, required this.message});
+
+  final String message;
+
   @override
   Widget build(BuildContext context) {
     return _GlassCard(
-      borderRadius: 22.0,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(14.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Son Seanslar',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: UserProfileScreen._textHigh,
+              'Denge Analizi',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(
+                    color: _ProfileScreenState._textHigh,
                     fontWeight: FontWeight.w700,
                   ),
             ),
-            const SizedBox(height: 12.0),
-            const _SessionRow(
-              title: 'Üst Vücut Güç',
-              meta: '42 dk - Göğüs + Triseps',
-            ),
-            const SizedBox(height: 10.0),
-            const _SessionRow(
-              title: 'Çekiş Odak',
-              meta: '35 dk - Sırt + Biseps',
-            ),
-            const SizedBox(height: 10.0),
-            const _SessionRow(
-              title: 'Karın Bitirici',
-              meta: '18 dk - Karın + Mobilite',
+            const SizedBox(height: 10),
+            Text(
+              message,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: _ProfileScreenState._textMid,
+                  ),
             ),
           ],
         ),
@@ -300,92 +407,42 @@ class _RecentSessionsCard extends StatelessWidget {
   }
 }
 
-class _GoalRow extends StatelessWidget {
-  const _GoalRow({required this.label, required this.value});
+class _StatRow extends StatelessWidget {
+  const _StatRow({
+    required this.label,
+    required this.value,
+    this.labelColor,
+    this.valueColor,
+  });
 
   final String label;
   final String value;
+  final Color? labelColor;
+  final Color? valueColor;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            label,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: UserProfileScreen._textMid,
-                ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: labelColor,
+                  ),
+            ),
           ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
-          decoration: BoxDecoration(
-            color: UserProfileScreen._cardSurfaceSoft,
-            borderRadius: BorderRadius.circular(14.0),
-          ),
-          child: Text(
+          Text(
             value,
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: UserProfileScreen._textHigh,
-                  fontWeight: FontWeight.w700,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: valueColor,
+                  fontWeight: FontWeight.w600,
                 ),
           ),
-        ),
-      ],
-    );
-  }
-}
-
-class _SessionRow extends StatelessWidget {
-  const _SessionRow({required this.title, required this.meta});
-
-  final String title;
-  final String meta;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 42.0,
-          height: 42.0,
-          decoration: BoxDecoration(
-            color: UserProfileScreen._cardSurfaceSoft,
-            borderRadius: BorderRadius.circular(12.0),
-          ),
-          child: const Icon(
-            Icons.fitness_center,
-            color: UserProfileScreen._textHigh,
-          ),
-        ),
-        const SizedBox(width: 12.0),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: UserProfileScreen._textHigh,
-                      fontWeight: FontWeight.w700,
-                    ),
-              ),
-              const SizedBox(height: 4.0),
-              Text(
-                meta,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: UserProfileScreen._textMid,
-                    ),
-              ),
-            ],
-          ),
-        ),
-        const Icon(
-          Icons.chevron_right,
-          color: UserProfileScreen._textMid,
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -404,7 +461,7 @@ class _GlassCard extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
         child: Container(
           decoration: BoxDecoration(
-            color: UserProfileScreen._cardSurface.withOpacity(0.78),
+            color: _ProfileScreenState._cardSurface.withOpacity(0.78),
             borderRadius: BorderRadius.circular(borderRadius),
             border: Border.all(
               color: Colors.white.withOpacity(0.08),
@@ -422,4 +479,151 @@ class _GlassCard extends StatelessWidget {
       ),
     );
   }
+}
+
+int calculateTotalWorkouts(List<WorkoutSummaryEntry> summaries) {
+  return summaries.length;
+}
+
+double calculateTotalLoad(List<WorkoutSummaryEntry> summaries) {
+  return summaries.fold<double>(0.0, (sum, item) => sum + item.totalLoad);
+}
+
+DateTime calculateLastWorkoutDate(List<WorkoutSummaryEntry> summaries) {
+  final sorted = [...summaries]..sort((a, b) => b.date.compareTo(a.date));
+  return sorted.first.date;
+}
+
+Map<String, double> calculateMuscleDistribution(
+  List<WorkoutSummaryEntry> summaries,
+) {
+  final result = <String, double>{};
+  for (final summary in summaries) {
+    for (final entry in summary.muscleLoad.entries) {
+      result.update(
+        entry.key,
+        (value) => value + entry.value,
+        ifAbsent: () => entry.value,
+      );
+    }
+  }
+  return result;
+}
+
+({double current, double previous}) calculateSevenDayTrend(
+  List<WorkoutSummaryEntry> summaries,
+) {
+  final now = DateTime.now();
+  final startCurrent = now.subtract(const Duration(days: 7));
+  final startPrevious = now.subtract(const Duration(days: 14));
+
+  double current = 0.0;
+  double previous = 0.0;
+
+  for (final summary in summaries) {
+    if (summary.date.isAfter(startCurrent)) {
+      current += summary.totalLoad;
+    } else if (summary.date.isAfter(startPrevious)) {
+      previous += summary.totalLoad;
+    }
+  }
+
+  return (current: current, previous: previous);
+}
+
+String calculateBalanceText(Map<String, double> distribution) {
+  final pushMuscles = {'chest', 'shoulders', 'triceps', 'quads'};
+  final pullMuscles = {'back', 'biceps', 'hamstrings', 'glutes'};
+
+  double push = 0.0;
+  double pull = 0.0;
+
+  for (final entry in distribution.entries) {
+    final key = entry.key.toLowerCase();
+    if (pushMuscles.contains(key)) {
+      push += entry.value;
+    }
+    if (pullMuscles.contains(key)) {
+      pull += entry.value;
+    }
+  }
+
+  if (push > pull * 1.15) {
+    return 'Push muscles are dominant. Pull muscles are lacking.';
+  }
+  if (pull > push * 1.15) {
+    return 'Pull muscles are dominant. Push muscles are lacking.';
+  }
+  return 'Balanced training';
+}
+
+String formatDate(DateTime date) {
+  return '${date.day.toString().padLeft(2, '0')}/'
+      '${date.month.toString().padLeft(2, '0')}/${date.year}';
+}
+
+String muscleDisplayName(String key) {
+  switch (key.toLowerCase()) {
+    case 'chest':
+      return 'Chest';
+    case 'back':
+      return 'Back';
+    case 'shoulders':
+      return 'Shoulders';
+    case 'biceps':
+      return 'Biceps';
+    case 'triceps':
+      return 'Triceps';
+    case 'core':
+      return 'Core';
+    case 'quads':
+      return 'Quads';
+    case 'hamstrings':
+      return 'Hamstrings';
+    case 'glutes':
+      return 'Glutes';
+    case 'calves':
+      return 'Calves';
+    default:
+      return key;
+  }
+}
+
+List<WorkoutSummaryEntry> buildMockWorkoutSummaries() {
+  final now = DateTime.now();
+  return [
+    WorkoutSummaryEntry(
+      date: now.subtract(const Duration(days: 1)),
+      totalLoad: 680,
+      muscleLoad: const {
+        'chest': 210,
+        'triceps': 120,
+        'shoulders': 140,
+        'core': 60,
+      },
+      duration: 2100,
+    ),
+    WorkoutSummaryEntry(
+      date: now.subtract(const Duration(days: 3)),
+      totalLoad: 740,
+      muscleLoad: const {
+        'back': 280,
+        'biceps': 170,
+        'shoulders': 110,
+        'core': 80,
+      },
+      duration: 2400,
+    ),
+    WorkoutSummaryEntry(
+      date: now.subtract(const Duration(days: 9)),
+      totalLoad: 520,
+      muscleLoad: const {
+        'quads': 170,
+        'glutes': 140,
+        'hamstrings': 120,
+        'calves': 90,
+      },
+      duration: 1900,
+    ),
+  ];
 }

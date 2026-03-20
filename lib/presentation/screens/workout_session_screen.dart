@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:calisthenics_app/domain/enums/difficulty_level.dart';
 import 'package:calisthenics_app/domain/enums/exercise_level.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
@@ -139,6 +140,29 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
     _workTimer?.cancel();
     _restTimer?.cancel();
 
+    final durationMinutes = (_workElapsed.inSeconds / 60).clamp(0.0, 1e9);
+    final difficultyFactor = switch (widget.exercise.difficulty) {
+      DifficultyLevel.easy => 1.0,
+      DifficultyLevel.medium => 1.25,
+      DifficultyLevel.hard => 1.5,
+    };
+    final totalLoad = durationMinutes * 100 * difficultyFactor;
+
+    final muscleLoad = <String, double>{};
+    final ratings = widget.exercise.muscleRatings;
+    final ratingSum = ratings.values.fold<int>(0, (sum, item) => sum + item);
+
+    if (ratingSum > 0) {
+      for (final entry in ratings.entries) {
+        muscleLoad[entry.key.name] = totalLoad * (entry.value / ratingSum);
+      }
+    } else if (widget.exercise.targetMuscleGroups.isNotEmpty) {
+      final perMuscle = totalLoad / widget.exercise.targetMuscleGroups.length;
+      for (final muscle in widget.exercise.targetMuscleGroups) {
+        muscleLoad[muscle.name] = perMuscle;
+      }
+    }
+
     Navigator.pushNamedAndRemoveUntil(
       context,
       AppRoutes.workoutSummary,
@@ -148,6 +172,8 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
         totalTime: _workElapsed,
         setsCompleted: _currentSet,
         totalSets: _totalSets,
+        totalLoad: totalLoad,
+        muscleLoad: muscleLoad,
       ),
     );
   }
