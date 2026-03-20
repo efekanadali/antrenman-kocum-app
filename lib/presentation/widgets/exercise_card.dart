@@ -64,7 +64,7 @@ class ExerciseCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 6.0),
                     Text(
-                      exercise.description,
+                      '${exercise.name} hareketi icin kas aktivasyon dagilimi.',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(

@@ -471,7 +471,7 @@ class _WorkoutCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 6.0),
                           Text(
-                            exercise.description,
+                            '${exercise.name} hareketi icin kas aktivasyon dagilimi.',
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall
