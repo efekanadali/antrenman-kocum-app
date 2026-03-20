@@ -138,6 +138,68 @@ class ExerciseDetailScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildFormattedDescription(BuildContext context, String description) {
+    const sectionLabels = <String>[
+      'Kurulum:',
+      'Uygulama:',
+      'Ipucu:',
+      'Sik hata:',
+    ];
+
+    final baseStyle = Theme.of(
+      context,
+    ).textTheme.bodyLarge?.copyWith(color: _textMid);
+
+    final lines = description.split('\n');
+    final spans = <TextSpan>[];
+
+    for (var i = 0; i < lines.length; i++) {
+      final line = lines[i];
+      String? matchedLabel;
+
+      for (final label in sectionLabels) {
+        if (line.startsWith(label)) {
+          matchedLabel = label;
+          break;
+        }
+      }
+
+      if (matchedLabel != null) {
+        final content = line.substring(matchedLabel.length).trimLeft();
+        spans.add(
+          TextSpan(
+            text: '$matchedLabel ',
+            style: baseStyle?.copyWith(
+              color: _textHigh,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        );
+        spans.add(
+          TextSpan(
+            text: content,
+            style: baseStyle,
+          ),
+        );
+      } else {
+        spans.add(
+          TextSpan(
+            text: line,
+            style: baseStyle,
+          ),
+        );
+      }
+
+      if (i != lines.length - 1) {
+        spans.add(TextSpan(text: '\n', style: baseStyle));
+      }
+    }
+
+    return RichText(
+      text: TextSpan(children: spans),
+    );
+  }
+
   Exercise? _findExerciseByName({
     required List<Exercise> allExercises,
     required String name,
@@ -444,11 +506,9 @@ class ExerciseDetailScreen extends ConsumerWidget {
                                 ),
                           ),
                           const SizedBox(height: 8.0),
-                          Text(
+                          _buildFormattedDescription(
+                            context,
                             exercise.description,
-                            style: Theme.of(
-                              context,
-                            ).textTheme.bodyLarge?.copyWith(color: _textMid),
                           ),
                         ],
                       ),
