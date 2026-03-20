@@ -120,12 +120,6 @@ class HomeTodayScreen extends StatelessWidget {
                 ),
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: _spaceMd),
-                    child: const TodayWorkoutCard(progress: 0.65),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
                     padding: const EdgeInsets.fromLTRB(
                       _spaceMd,
                       _spaceSm,
@@ -218,7 +212,7 @@ class HomeInsightsSection extends StatelessWidget {
               height: 38.0,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).pushNamed(AppRoutes.workoutLibrary);
+                  Navigator.of(context).pushNamed(AppRoutes.stats);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: HomeTodayScreen._accentPurple,
