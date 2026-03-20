@@ -92,33 +92,140 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final value = await showDialog<double>(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text(title),
-          content: TextField(
-            controller: controller,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: InputDecoration(
-              hintText: unit,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Iptal'),
-            ),
-            TextButton(
-              onPressed: () {
-                final parsed =
-                    double.tryParse(controller.text.trim().replaceAll(',', '.'));
-                if (parsed == null || parsed <= 0) {
-                  Navigator.of(context).pop();
-                  return;
-                }
-                Navigator.of(context).pop(parsed);
-              },
-              child: const Text('Kaydet'),
-            ),
-          ],
+        String? errorText;
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return Dialog(
+              backgroundColor: Colors.transparent,
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 24.0,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22.0),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+                  child: Container(
+                    padding: const EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: _cardSurface.withOpacity(0.88),
+                      borderRadius: BorderRadius.circular(22.0),
+                      border: Border.all(color: Colors.white.withOpacity(0.08)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.35),
+                          blurRadius: 20.0,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                color: _textHigh,
+                                fontWeight: FontWeight.w700,
+                              ),
+                        ),
+                        const SizedBox(height: 10.0),
+                        TextField(
+                          controller: controller,
+                          autofocus: true,
+                          keyboardType:
+                              const TextInputType.numberWithOptions(decimal: true),
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                color: _textHigh,
+                                fontWeight: FontWeight.w600,
+                              ),
+                          decoration: InputDecoration(
+                            hintText: unit,
+                            hintStyle:
+                                Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      color: _textMid,
+                                    ),
+                            filled: true,
+                            fillColor: _cardSurfaceSoft,
+                            errorText: errorText,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12.0,
+                              vertical: 12.0,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.0),
+                              borderSide:
+                                  BorderSide(color: Colors.white.withOpacity(0.08)),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.0),
+                              borderSide:
+                                  BorderSide(color: Colors.white.withOpacity(0.08)),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.0),
+                              borderSide: const BorderSide(color: _accentBlue),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 14.0),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(
+                                    color: Colors.white.withOpacity(0.18),
+                                  ),
+                                  foregroundColor: _textMid,
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12.0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                ),
+                                child: const Text('Iptal'),
+                              ),
+                            ),
+                            const SizedBox(width: 10.0),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  final parsed = double.tryParse(
+                                    controller.text.trim().replaceAll(',', '.'),
+                                  );
+                                  if (parsed == null || parsed <= 0) {
+                                    setDialogState(() {
+                                      errorText = 'Gecerli bir deger gir.';
+                                    });
+                                    return;
+                                  }
+                                  Navigator.of(context).pop(parsed);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _accentPurple,
+                                  foregroundColor: _textHigh,
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12.0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                ),
+                                child: const Text('Kaydet'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
         );
       },
     );
@@ -193,12 +300,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 }
 
                 final totalWorkouts = calculateTotalWorkouts(summaries);
-                final totalLoad = calculateTotalLoad(summaries);
                 final lastWorkoutDate = calculateLastWorkoutDate(summaries);
                 final muscleDistribution = calculateMuscleDistribution(summaries);
-                final trend = calculateSevenDayTrend(summaries);
-                final balanceText = calculateBalanceText(muscleDistribution);
-
                 return ListView(
                   padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 24.0),
                   children: [
@@ -223,18 +326,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 12.0),
                     StatsCard(
                       totalWorkouts: totalWorkouts,
-                      totalLoad: totalLoad,
                       lastWorkoutDate: formatDate(lastWorkoutDate),
                     ),
                     const SizedBox(height: 12.0),
                     MuscleDistributionCard(distribution: muscleDistribution),
-                    const SizedBox(height: 12.0),
-                    TrendCard(
-                      currentSevenDayLoad: trend.current,
-                      previousSevenDayLoad: trend.previous,
-                    ),
-                    const SizedBox(height: 12.0),
-                    BalanceCard(message: balanceText),
                     const SizedBox(height: 24.0),
                   ],
                 );
@@ -404,12 +499,10 @@ class StatsCard extends StatelessWidget {
   const StatsCard({
     super.key,
     required this.totalWorkouts,
-    required this.totalLoad,
     required this.lastWorkoutDate,
   });
 
   final int totalWorkouts;
-  final double totalLoad;
   final String lastWorkoutDate;
 
   @override
@@ -435,12 +528,6 @@ class StatsCard extends StatelessWidget {
             _StatRow(
               label: 'Toplam antrenman',
               value: '$totalWorkouts',
-              labelColor: _ProfileScreenState._textMid,
-              valueColor: _ProfileScreenState._textHigh,
-            ),
-            _StatRow(
-              label: 'Toplam birikmis yuk',
-              value: totalLoad.toStringAsFixed(1),
               labelColor: _ProfileScreenState._textMid,
               valueColor: _ProfileScreenState._textHigh,
             ),
