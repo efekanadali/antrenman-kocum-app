@@ -1,11 +1,18 @@
 // lib/presentation/screens/exercise_detail_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart';
 import 'package:calisthenics_app/domain/enums/exercise_level.dart';
 import 'package:calisthenics_app/core/utils/enum_label.dart';
+import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
+import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 
-class ExerciseDetailScreen extends StatelessWidget {
+final _allExercisesProvider = FutureProvider<List<Exercise>>((ref) {
+  return ref.watch(exerciseRepositoryProvider).getAllExercises();
+});
+
+class ExerciseDetailScreen extends ConsumerWidget {
   const ExerciseDetailScreen({super.key, required this.exercise});
 
   final Exercise exercise;
@@ -131,13 +138,27 @@ class ExerciseDetailScreen extends StatelessWidget {
     );
   }
 
+  Exercise? _findExerciseByName({
+    required List<Exercise> allExercises,
+    required String name,
+  }) {
+    final normalizedName = name.trim().toLowerCase();
+    for (final item in allExercises) {
+      if (item.name.trim().toLowerCase() == normalizedName) {
+        return item;
+      }
+    }
+    return null;
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final muscleRatings = exercise.targetMuscleGroups
         .map((muscle) => MapEntry(muscle, exercise.muscleRatings[muscle] ?? 1))
         .toList();
     final prerequisiteAccent = _prerequisiteAccent(exercise.level);
     final prerequisiteLevelLabel = _prerequisiteLevelLabel(exercise.level);
+    final allExercisesAsync = ref.watch(_allExercisesProvider);
 
     return Scaffold(
       backgroundColor: _bgBottom,
@@ -270,44 +291,72 @@ class ExerciseDetailScreen extends StatelessWidget {
                               runSpacing: 8.0,
                               children: exercise.prerequisiteExercises
                                   .map(
-                                    (name) => Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10.0,
-                                        vertical: 6.0,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: _cardSurfaceSoft,
-                                        borderRadius: BorderRadius.circular(
-                                          999.0,
-                                        ),
-                                        border: Border.all(
-                                          color: prerequisiteAccent.withOpacity(
-                                            0.28,
-                                          ),
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                            Icons.check_circle_outline,
-                                            size: 14.0,
-                                            color: prerequisiteAccent,
-                                          ),
-                                          const SizedBox(width: 6.0),
-                                          Text(
-                                            name,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .labelSmall
-                                                ?.copyWith(
-                                                  color: _textHigh,
-                                                  fontWeight: FontWeight.w600,
+                                    (name) {
+                                      final matchedExercise =
+                                          allExercisesAsync.maybeWhen(
+                                            data: (allExercises) =>
+                                                _findExerciseByName(
+                                                  allExercises: allExercises,
+                                                  name: name,
                                                 ),
+                                            orElse: () => null,
+                                          );
+
+                                      return Material(
+                                        color: Colors.transparent,
+                                        child: InkWell(
+                                          borderRadius: BorderRadius.circular(
+                                            999.0,
                                           ),
-                                        ],
-                                      ),
-                                    ),
+                                          onTap: matchedExercise == null
+                                              ? null
+                                              : () {
+                                                  Navigator.pushNamed(
+                                                    context,
+                                                    AppRoutes.detail,
+                                                    arguments: matchedExercise,
+                                                  );
+                                                },
+                                          child: Ink(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 10.0,
+                                              vertical: 6.0,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: _cardSurfaceSoft,
+                                              borderRadius:
+                                                  BorderRadius.circular(999.0),
+                                              border: Border.all(
+                                                color: prerequisiteAccent
+                                                    .withOpacity(0.28),
+                                              ),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(
+                                                  Icons.check_circle_outline,
+                                                  size: 14.0,
+                                                  color: prerequisiteAccent,
+                                                ),
+                                                const SizedBox(width: 6.0),
+                                                Text(
+                                                  name,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .labelSmall
+                                                      ?.copyWith(
+                                                        color: _textHigh,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   )
                                   .toList(),
                             ),
