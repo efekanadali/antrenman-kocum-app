@@ -39,12 +39,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   static const String _weightKey = 'profile_weight_kg';
   static const String _goalWeightKey = 'profile_goal_weight_kg';
   static const String _targetWorkoutsKey = 'profile_target_workouts_weekly';
+  static const String _genderKey = 'profile_gender';
+  static const String _birthDateKey = 'profile_birth_date';
 
   late final Future<List<WorkoutSummaryEntry>> _summaryFuture;
   double _heightCm = 175.0;
   double _weightKg = 70.0;
   double _goalWeightKg = 68.0;
   int _targetWorkoutsPerWeek = 4;
+  String _gender = 'Belirtilmedi';
+  DateTime? _birthDate;
 
   @override
   void initState() {
@@ -68,6 +72,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final savedWeight = prefs.getDouble(_weightKey);
     final savedGoalWeight = prefs.getDouble(_goalWeightKey);
     final savedTargetWorkouts = prefs.getInt(_targetWorkoutsKey);
+    final savedGender = prefs.getString(_genderKey);
+    final savedBirthDateIso = prefs.getString(_birthDateKey);
+    final parsedBirthDate = savedBirthDateIso != null
+        ? DateTime.tryParse(savedBirthDateIso)
+        : null;
 
     if (!mounted) {
       return;
@@ -78,6 +87,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _weightKg = savedWeight ?? _weightKg;
       _goalWeightKg = savedGoalWeight ?? _goalWeightKg;
       _targetWorkoutsPerWeek = savedTargetWorkouts ?? _targetWorkoutsPerWeek;
+      _gender = savedGender ?? _gender;
+      _birthDate = parsedBirthDate ?? _birthDate;
     });
   }
 
@@ -87,6 +98,161 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await prefs.setDouble(_weightKey, _weightKg);
     await prefs.setDouble(_goalWeightKey, _goalWeightKg);
     await prefs.setInt(_targetWorkoutsKey, _targetWorkoutsPerWeek);
+    await prefs.setString(_genderKey, _gender);
+    if (_birthDate != null) {
+      await prefs.setString(_birthDateKey, _birthDate!.toIso8601String());
+    } else {
+      await prefs.remove(_birthDateKey);
+    }
+  }
+
+  Future<void> _editGender() async {
+    const genders = <String>['Kadin', 'Erkek', 'Belirtmek istemiyorum'];
+
+    final selected = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 24.0,
+            vertical: 24.0,
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(22.0),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+              child: Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: _cardSurface.withOpacity(0.88),
+                  borderRadius: BorderRadius.circular(22.0),
+                  border: Border.all(color: Colors.white.withOpacity(0.08)),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Cinsiyet',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: _textHigh,
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                    const SizedBox(height: 10.0),
+                    ...genders.map(
+                      (item) => RadioListTile<String>(
+                        value: item,
+                        groupValue: _gender,
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                        activeColor: _accentBlue,
+                        title: Text(
+                          item,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: _textHigh,
+                              ),
+                        ),
+                        onChanged: (value) => Navigator.of(context).pop(value),
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('Iptal'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    if (selected == null) {
+      return;
+    }
+
+    setState(() {
+      _gender = selected;
+    });
+    await _saveBodyMetrics();
+  }
+
+  Future<void> _editBirthDate() async {
+    final now = DateTime.now();
+    final initialDate = _birthDate ?? DateTime(now.year - 25, now.month, now.day);
+    final selected = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(1950, 1, 1),
+      lastDate: now,
+      helpText: 'Dogum tarihi sec',
+      cancelText: 'Iptal',
+      confirmText: 'Kaydet',
+      builder: (context, child) {
+        final baseTheme = Theme.of(context);
+        final themed = baseTheme.copyWith(
+          colorScheme: const ColorScheme.dark(
+            primary: _accentBlue,
+            onPrimary: _textHigh,
+            surface: _cardSurface,
+            onSurface: _textHigh,
+          ),
+          dialogTheme: DialogThemeData(
+            backgroundColor: _cardSurface.withOpacity(0.94),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(22.0),
+            ),
+          ),
+          textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(foregroundColor: _accentBlue),
+          ),
+          datePickerTheme: DatePickerThemeData(
+            backgroundColor: _cardSurface,
+            headerBackgroundColor: _cardSurfaceSoft,
+            headerForegroundColor: _textHigh,
+            weekdayStyle: const TextStyle(color: _textMid),
+            dayStyle: const TextStyle(color: _textHigh),
+            yearStyle: const TextStyle(color: _textHigh),
+            dividerColor: Colors.white12,
+            dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return _textHigh;
+              }
+              return _textHigh;
+            }),
+            dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return _accentPurple;
+              }
+              return Colors.transparent;
+            }),
+            todayForegroundColor:
+                const WidgetStatePropertyAll<Color>(_accentBlue),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(22.0),
+            ),
+          ),
+        );
+
+        return Theme(data: themed, child: child ?? const SizedBox.shrink());
+      },
+    );
+
+    if (selected == null) {
+      return;
+    }
+
+    setState(() {
+      _birthDate = selected;
+    });
+    await _saveBodyMetrics();
   }
 
   Future<void> _editMetric({
@@ -479,6 +645,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     BodyMetricsCard(
                       heightCm: _heightCm,
                       weightKg: _weightKg,
+                      gender: _gender,
+                      birthDateLabel: _birthDate == null
+                          ? 'Secilmedi'
+                          : '${formatDate(_birthDate!)} (${calculateAge(_birthDate!)} yas)',
                       onEditHeight: () => _editMetric(
                         title: 'Boy (cm)',
                         unit: 'cm',
@@ -491,6 +661,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         currentValue: _weightKg,
                         onApply: (value) => _weightKg = value,
                       ),
+                      onEditGender: _editGender,
+                      onEditBirthDate: _editBirthDate,
                     ),
                     const SizedBox(height: 12.0),
                     GoalsCard(
@@ -536,14 +708,22 @@ class BodyMetricsCard extends StatelessWidget {
     super.key,
     required this.heightCm,
     required this.weightKg,
+    required this.gender,
+    required this.birthDateLabel,
     required this.onEditHeight,
     required this.onEditWeight,
+    required this.onEditGender,
+    required this.onEditBirthDate,
   });
 
   final double heightCm;
   final double weightKg;
+  final String gender;
+  final String birthDateLabel;
   final VoidCallback onEditHeight;
   final VoidCallback onEditWeight;
+  final VoidCallback onEditGender;
+  final VoidCallback onEditBirthDate;
 
   @override
   Widget build(BuildContext context) {
@@ -572,6 +752,18 @@ class BodyMetricsCard extends StatelessWidget {
               label: 'Kilo',
               value: '${weightKg.toStringAsFixed(1)} kg',
               onTap: onEditWeight,
+            ),
+            const SizedBox(height: 8.0),
+            _MetricEditRow(
+              label: 'Cinsiyet',
+              value: gender,
+              onTap: onEditGender,
+            ),
+            const SizedBox(height: 8.0),
+            _MetricEditRow(
+              label: 'Dogum Tarihi',
+              value: birthDateLabel,
+              onTap: onEditBirthDate,
             ),
           ],
         ),
@@ -1089,6 +1281,18 @@ String calculateBalanceText(Map<String, double> distribution) {
 String formatDate(DateTime date) {
   return '${date.day.toString().padLeft(2, '0')}/'
       '${date.month.toString().padLeft(2, '0')}/${date.year}';
+}
+
+int calculateAge(DateTime birthDate) {
+  final now = DateTime.now();
+  var age = now.year - birthDate.year;
+  final hasBirthdayPassed =
+      now.month > birthDate.month ||
+      (now.month == birthDate.month && now.day >= birthDate.day);
+  if (!hasBirthdayPassed) {
+    age -= 1;
+  }
+  return age;
 }
 
 String relativeDayLabel(DateTime date) {
