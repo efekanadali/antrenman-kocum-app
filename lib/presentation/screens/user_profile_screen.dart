@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:calisthenics_app/core/local_storage/workout_summary_storage.dart';
 import 'package:calisthenics_app/presentation/screens/home_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProfileScreen extends StatelessWidget {
   const UserProfileScreen({super.key, this.showBottomNav = true});
@@ -34,12 +35,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   static const Color _textHigh = Color(0xFFEDE9FF);
   static const Color _textMid = Color(0xFFB4A9D8);
 
+  static const String _heightKey = 'profile_height_cm';
+  static const String _weightKey = 'profile_weight_kg';
+
   late final Future<List<WorkoutSummaryEntry>> _summaryFuture;
+  double _heightCm = 175.0;
+  double _weightKg = 70.0;
 
   @override
   void initState() {
     super.initState();
     _summaryFuture = _loadSummaries();
+    _loadBodyMetrics();
   }
 
   Future<List<WorkoutSummaryEntry>> _loadSummaries() async {
@@ -49,6 +56,81 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return summaries;
     }
     return buildMockWorkoutSummaries();
+  }
+
+  Future<void> _loadBodyMetrics() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedHeight = prefs.getDouble(_heightKey);
+    final savedWeight = prefs.getDouble(_weightKey);
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _heightCm = savedHeight ?? _heightCm;
+      _weightKg = savedWeight ?? _weightKg;
+    });
+  }
+
+  Future<void> _saveBodyMetrics() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(_heightKey, _heightCm);
+    await prefs.setDouble(_weightKey, _weightKg);
+  }
+
+  Future<void> _editMetric({
+    required String title,
+    required String unit,
+    required double currentValue,
+    required ValueChanged<double> onApply,
+  }) async {
+    final controller = TextEditingController(
+      text: currentValue.toStringAsFixed(1),
+    );
+
+    final value = await showDialog<double>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(title),
+          content: TextField(
+            controller: controller,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            decoration: InputDecoration(
+              hintText: unit,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Iptal'),
+            ),
+            TextButton(
+              onPressed: () {
+                final parsed =
+                    double.tryParse(controller.text.trim().replaceAll(',', '.'));
+                if (parsed == null || parsed <= 0) {
+                  Navigator.of(context).pop();
+                  return;
+                }
+                Navigator.of(context).pop(parsed);
+              },
+              child: const Text('Kaydet'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (value == null) {
+      return;
+    }
+
+    setState(() {
+      onApply(value);
+    });
+    await _saveBodyMetrics();
   }
 
   @override
@@ -122,6 +204,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     const _UserHeader(username: 'Calisthenics Athlete'),
                     const SizedBox(height: 16.0),
+                    BodyMetricsCard(
+                      heightCm: _heightCm,
+                      weightKg: _weightKg,
+                      onEditHeight: () => _editMetric(
+                        title: 'Boy (cm)',
+                        unit: 'cm',
+                        currentValue: _heightCm,
+                        onApply: (value) => _heightCm = value,
+                      ),
+                      onEditWeight: () => _editMetric(
+                        title: 'Kilo (kg)',
+                        unit: 'kg',
+                        currentValue: _weightKg,
+                        onApply: (value) => _weightKg = value,
+                      ),
+                    ),
+                    const SizedBox(height: 12.0),
                     StatsCard(
                       totalWorkouts: totalWorkouts,
                       totalLoad: totalLoad,
@@ -146,6 +245,111 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       bottomNavigationBar:
           widget.showBottomNav ? const AppBottomNav(selectedIndex: 3) : null,
+    );
+  }
+}
+
+class BodyMetricsCard extends StatelessWidget {
+  const BodyMetricsCard({
+    super.key,
+    required this.heightCm,
+    required this.weightKg,
+    required this.onEditHeight,
+    required this.onEditWeight,
+  });
+
+  final double heightCm;
+  final double weightKg;
+  final VoidCallback onEditHeight;
+  final VoidCallback onEditWeight;
+
+  @override
+  Widget build(BuildContext context) {
+    return _GlassCard(
+      borderRadius: 22.0,
+      child: Padding(
+        padding: const EdgeInsets.all(14.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Vucut Olculeri',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: _ProfileScreenState._textHigh,
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+            const SizedBox(height: 10.0),
+            _MetricEditRow(
+              label: 'Boy',
+              value: '${heightCm.toStringAsFixed(1)} cm',
+              onTap: onEditHeight,
+            ),
+            const SizedBox(height: 8.0),
+            _MetricEditRow(
+              label: 'Kilo',
+              value: '${weightKg.toStringAsFixed(1)} kg',
+              onTap: onEditWeight,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MetricEditRow extends StatelessWidget {
+  const _MetricEditRow({
+    required this.label,
+    required this.value,
+    required this.onTap,
+  });
+
+  final String label;
+  final String value;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14.0),
+        onTap: onTap,
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+          decoration: BoxDecoration(
+            color: _ProfileScreenState._cardSurfaceSoft,
+            borderRadius: BorderRadius.circular(14.0),
+            border: Border.all(color: Colors.white.withOpacity(0.08)),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  label,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: _ProfileScreenState._textMid,
+                      ),
+                ),
+              ),
+              Text(
+                value,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: _ProfileScreenState._textHigh,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+              const SizedBox(width: 6.0),
+              const Icon(
+                Icons.edit_rounded,
+                size: 16.0,
+                color: _ProfileScreenState._textMid,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
