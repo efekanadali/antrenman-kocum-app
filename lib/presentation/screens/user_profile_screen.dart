@@ -37,10 +37,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   static const String _heightKey = 'profile_height_cm';
   static const String _weightKey = 'profile_weight_kg';
+  static const String _goalWeightKey = 'profile_goal_weight_kg';
+  static const String _targetWorkoutsKey = 'profile_target_workouts_weekly';
 
   late final Future<List<WorkoutSummaryEntry>> _summaryFuture;
   double _heightCm = 175.0;
   double _weightKg = 70.0;
+  double _goalWeightKg = 68.0;
+  int _targetWorkoutsPerWeek = 4;
 
   @override
   void initState() {
@@ -62,6 +66,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final prefs = await SharedPreferences.getInstance();
     final savedHeight = prefs.getDouble(_heightKey);
     final savedWeight = prefs.getDouble(_weightKey);
+    final savedGoalWeight = prefs.getDouble(_goalWeightKey);
+    final savedTargetWorkouts = prefs.getInt(_targetWorkoutsKey);
 
     if (!mounted) {
       return;
@@ -70,6 +76,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       _heightCm = savedHeight ?? _heightCm;
       _weightKg = savedWeight ?? _weightKg;
+      _goalWeightKg = savedGoalWeight ?? _goalWeightKg;
+      _targetWorkoutsPerWeek = savedTargetWorkouts ?? _targetWorkoutsPerWeek;
     });
   }
 
@@ -77,6 +85,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble(_heightKey, _heightCm);
     await prefs.setDouble(_weightKey, _weightKg);
+    await prefs.setDouble(_goalWeightKey, _goalWeightKg);
+    await prefs.setInt(_targetWorkoutsKey, _targetWorkoutsPerWeek);
   }
 
   Future<void> _editMetric({
@@ -240,6 +250,164 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await _saveBodyMetrics();
   }
 
+  Future<void> _editIntMetric({
+    required String title,
+    required String unit,
+    required int currentValue,
+    required ValueChanged<int> onApply,
+  }) async {
+    final controller = TextEditingController(text: currentValue.toString());
+
+    final value = await showDialog<int>(
+      context: context,
+      builder: (context) {
+        String? errorText;
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return Dialog(
+              backgroundColor: Colors.transparent,
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 24.0,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22.0),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+                  child: Container(
+                    padding: const EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: _cardSurface.withOpacity(0.88),
+                      borderRadius: BorderRadius.circular(22.0),
+                      border: Border.all(color: Colors.white.withOpacity(0.08)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.35),
+                          blurRadius: 20.0,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                color: _textHigh,
+                                fontWeight: FontWeight.w700,
+                              ),
+                        ),
+                        const SizedBox(height: 10.0),
+                        TextField(
+                          controller: controller,
+                          autofocus: true,
+                          keyboardType: TextInputType.number,
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                color: _textHigh,
+                                fontWeight: FontWeight.w600,
+                              ),
+                          decoration: InputDecoration(
+                            hintText: unit,
+                            hintStyle:
+                                Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      color: _textMid,
+                                    ),
+                            filled: true,
+                            fillColor: _cardSurfaceSoft,
+                            errorText: errorText,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12.0,
+                              vertical: 12.0,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.0),
+                              borderSide:
+                                  BorderSide(color: Colors.white.withOpacity(0.08)),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.0),
+                              borderSide:
+                                  BorderSide(color: Colors.white.withOpacity(0.08)),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.0),
+                              borderSide: const BorderSide(color: _accentBlue),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 14.0),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(
+                                    color: Colors.white.withOpacity(0.18),
+                                  ),
+                                  foregroundColor: _textMid,
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12.0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                ),
+                                child: const Text('Iptal'),
+                              ),
+                            ),
+                            const SizedBox(width: 10.0),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  final parsed = int.tryParse(
+                                    controller.text.trim(),
+                                  );
+                                  if (parsed == null || parsed <= 0) {
+                                    setDialogState(() {
+                                      errorText = 'Gecerli bir deger gir.';
+                                    });
+                                    return;
+                                  }
+                                  Navigator.of(context).pop(parsed);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _accentPurple,
+                                  foregroundColor: _textHigh,
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12.0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                ),
+                                child: const Text('Kaydet'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+
+    if (value == null) {
+      return;
+    }
+
+    setState(() {
+      onApply(value);
+    });
+    await _saveBodyMetrics();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -301,6 +469,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 final totalWorkouts = calculateTotalWorkouts(summaries);
                 final lastWorkoutDate = calculateLastWorkoutDate(summaries);
+                final lastWorkoutRelativeLabel = relativeDayLabel(lastWorkoutDate);
                 final muscleDistribution = calculateMuscleDistribution(summaries);
                 return ListView(
                   padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 24.0),
@@ -324,9 +493,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     const SizedBox(height: 12.0),
+                    GoalsCard(
+                      goalWeightKg: _goalWeightKg,
+                      targetWorkoutsPerWeek: _targetWorkoutsPerWeek,
+                      onEditGoalWeight: () => _editMetric(
+                        title: 'Hedef Kilo (kg)',
+                        unit: 'kg',
+                        currentValue: _goalWeightKg,
+                        onApply: (value) => _goalWeightKg = value,
+                      ),
+                      onEditTargetWorkouts: () => _editIntMetric(
+                        title: 'Haftalik Hedef Antrenman',
+                        unit: 'adet',
+                        currentValue: _targetWorkoutsPerWeek,
+                        onApply: (value) => _targetWorkoutsPerWeek = value,
+                      ),
+                    ),
+                    const SizedBox(height: 12.0),
                     StatsCard(
                       totalWorkouts: totalWorkouts,
                       lastWorkoutDate: formatDate(lastWorkoutDate),
+                      lastWorkoutRelativeLabel: lastWorkoutRelativeLabel,
                     ),
                     const SizedBox(height: 12.0),
                     MuscleDistributionCard(distribution: muscleDistribution),
@@ -500,10 +687,12 @@ class StatsCard extends StatelessWidget {
     super.key,
     required this.totalWorkouts,
     required this.lastWorkoutDate,
+    required this.lastWorkoutRelativeLabel,
   });
 
   final int totalWorkouts;
   final String lastWorkoutDate;
+  final String lastWorkoutRelativeLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -533,9 +722,58 @@ class StatsCard extends StatelessWidget {
             ),
             _StatRow(
               label: 'Son antrenman',
-              value: lastWorkoutDate,
+              value: '$lastWorkoutDate ($lastWorkoutRelativeLabel)',
               labelColor: _ProfileScreenState._textMid,
               valueColor: _ProfileScreenState._textHigh,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class GoalsCard extends StatelessWidget {
+  const GoalsCard({
+    super.key,
+    required this.goalWeightKg,
+    required this.targetWorkoutsPerWeek,
+    required this.onEditGoalWeight,
+    required this.onEditTargetWorkouts,
+  });
+
+  final double goalWeightKg;
+  final int targetWorkoutsPerWeek;
+  final VoidCallback onEditGoalWeight;
+  final VoidCallback onEditTargetWorkouts;
+
+  @override
+  Widget build(BuildContext context) {
+    return _GlassCard(
+      borderRadius: 22.0,
+      child: Padding(
+        padding: const EdgeInsets.all(14.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Hedefler',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: _ProfileScreenState._textHigh,
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+            const SizedBox(height: 10.0),
+            _MetricEditRow(
+              label: 'Hedef Kilo',
+              value: '${goalWeightKg.toStringAsFixed(1)} kg',
+              onTap: onEditGoalWeight,
+            ),
+            const SizedBox(height: 8.0),
+            _MetricEditRow(
+              label: 'Haftalik Hedef',
+              value: '$targetWorkoutsPerWeek antrenman',
+              onTap: onEditTargetWorkouts,
             ),
           ],
         ),
@@ -851,6 +1089,21 @@ String calculateBalanceText(Map<String, double> distribution) {
 String formatDate(DateTime date) {
   return '${date.day.toString().padLeft(2, '0')}/'
       '${date.month.toString().padLeft(2, '0')}/${date.year}';
+}
+
+String relativeDayLabel(DateTime date) {
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  final target = DateTime(date.year, date.month, date.day);
+  final diff = today.difference(target).inDays;
+
+  if (diff <= 0) {
+    return 'Bugun';
+  }
+  if (diff == 1) {
+    return 'Dun';
+  }
+  return '$diff gun once';
 }
 
 String muscleDisplayName(String key) {
