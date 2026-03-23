@@ -124,6 +124,17 @@ class HomeTodayScreen extends StatelessWidget {
                       _spaceMd,
                       _spaceSm,
                       _spaceMd,
+                      _spaceSm,
+                    ),
+                    child: const WeeklyActivityCard(),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      _spaceMd,
+                      _spaceSm,
+                      _spaceMd,
                       0,
                     ),
                     child: const HomeInsightsSection(data: _mockInsightData),
@@ -141,18 +152,7 @@ class HomeTodayScreen extends StatelessWidget {
                 const SliverToBoxAdapter(
                   child: SizedBox(height: _spaceLg),
                 ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: _spaceMd),
-                    child: const WeeklyActivityCard(),
-                  ),
-                ),
-                const SliverToBoxAdapter(
-                  child: SizedBox(height: _spaceLg),
-                ),
-                const SliverToBoxAdapter(
-                  child: SizedBox(height: 96.0),
-                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 96.0)),
               ],
             ),
           ),
@@ -554,6 +554,40 @@ class WeeklyActivityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const weekData = [
+      _WeekDayChip(
+        label: 'Pzt',
+        dayOfMonth: '18',
+        isDone: true,
+      ),
+      _WeekDayChip(
+        label: 'Sal',
+        dayOfMonth: '19',
+        isDone: true,
+      ),
+      _WeekDayChip(
+        label: 'Car',
+        dayOfMonth: '20',
+        isActive: true,
+      ),
+      _WeekDayChip(
+        label: 'Per',
+        dayOfMonth: '21',
+      ),
+      _WeekDayChip(
+        label: 'Cum',
+        dayOfMonth: '22',
+      ),
+      _WeekDayChip(
+        label: 'Cmt',
+        dayOfMonth: '23',
+      ),
+      _WeekDayChip(
+        label: 'Paz',
+        dayOfMonth: '24',
+      ),
+    ];
+
     return GlassCard(
       borderRadius: HomeTodayScreen._radiusLg,
       child: Padding(
@@ -564,43 +598,62 @@ class WeeklyActivityCard extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  'Haftalık Aktivite',
+                  'Antrenman Takvimi',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: HomeTodayScreen._textHigh,
                         fontWeight: FontWeight.w700,
                       ),
                 ),
                 const Spacer(),
-                Text(
-                  'Tümünü gör',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: HomeTodayScreen._accentPurple,
-                        fontWeight: FontWeight.w600,
-                      ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10.0,
+                    vertical: 6.0,
+                  ),
+                  decoration: BoxDecoration(
+                    color: HomeTodayScreen._accentPurple.withOpacity(0.16),
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  child: Text(
+                    '7 gun seri',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: HomeTodayScreen._accentPurple,
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
                 ),
               ],
+            ),
+            const SizedBox(height: 6.0),
+            Text(
+              'Mart 2026 • Bu hafta 3/5 antrenman',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: HomeTodayScreen._textMid,
+                    fontWeight: FontWeight.w500,
+                  ),
             ),
             const SizedBox(height: 12.0),
             Container(
               padding: const EdgeInsets.symmetric(
-                horizontal: HomeTodayScreen._spaceSm,
+                horizontal: 10.0,
                 vertical: 12.0,
               ),
               decoration: BoxDecoration(
                 color: HomeTodayScreen._cardSurfaceTint,
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.06),
+                ),
                 borderRadius: BorderRadius.circular(HomeTodayScreen._radiusMd),
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  _WeekDayChip(label: 'Pzt'),
-                  _WeekDayChip(label: 'Sal'),
-                  _WeekDayChip(label: 'Çar', isActive: true),
-                  _WeekDayChip(label: 'Per'),
-                  _WeekDayChip(label: 'Cum'),
-                  _WeekDayChip(label: 'Cmt'),
-                  _WeekDayChip(label: 'Paz'),
-                ],
+                children: weekData
+                    .map((day) => Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                            child: day,
+                          ),
+                        ))
+                    .toList(),
               ),
             ),
           ],
@@ -1149,29 +1202,59 @@ class _AvatarStack extends StatelessWidget {
 }
 
 class _WeekDayChip extends StatelessWidget {
-  const _WeekDayChip({required this.label, this.isActive = false});
+  const _WeekDayChip({
+    required this.label,
+    required this.dayOfMonth,
+    this.isActive = false,
+    this.isDone = false,
+  });
 
   final String label;
+  final String dayOfMonth;
   final bool isActive;
+  final bool isDone;
 
   @override
   Widget build(BuildContext context) {
-    final bgColor =
-        isActive ? HomeTodayScreen._accentPurple : HomeTodayScreen._cardSurface;
+    final bgColor = isActive
+        ? HomeTodayScreen._accentPurple
+        : (isDone
+            ? HomeTodayScreen._accentBlue.withOpacity(0.2)
+            : HomeTodayScreen._cardSurface);
+
+    final borderColor = isActive
+        ? HomeTodayScreen._accentPurple.withOpacity(0.85)
+        : (isDone
+            ? HomeTodayScreen._accentBlue.withOpacity(0.6)
+            : Colors.white.withOpacity(0.08));
+
     return Container(
-      width: 28.0,
-      height: 28.0,
-      alignment: Alignment.center,
+      height: 62.0,
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(12.0),
+        border: Border.all(color: borderColor),
       ),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: HomeTodayScreen._textHigh,
-              fontWeight: FontWeight.w600,
-            ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: HomeTodayScreen._textMid,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+          const SizedBox(height: 4.0),
+          Text(
+            dayOfMonth,
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  color: HomeTodayScreen._textHigh,
+                  fontWeight: FontWeight.w700,
+                ),
+          ),
+        ],
       ),
     );
   }
