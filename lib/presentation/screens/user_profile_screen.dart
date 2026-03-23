@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:calisthenics_app/core/local_storage/workout_summary_storage.dart';
 import 'package:calisthenics_app/presentation/screens/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -43,6 +44,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   static const String _genderKey = 'profile_gender';
   static const String _birthDateKey = 'profile_birth_date';
   static const String _personalRecordsKey = 'profile_personal_records_v1';
+  static const int _minRecordValue = 1;
+  static const int _maxRecordValue = 300;
+  static const double _minExtraWeightKg = 0.5;
+  static const double _maxExtraWeightKg = 200.0;
 
   static const List<String> _recordExerciseOptions = [
     'Pull-up',
@@ -205,6 +210,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           keyboardType: const TextInputType.numberWithOptions(
                             decimal: false,
                           ),
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(3),
+                          ],
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                 color: _textHigh,
                               ),
@@ -239,6 +248,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             keyboardType: const TextInputType.numberWithOptions(
                               decimal: true,
                             ),
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(5),
+                              FilteringTextInputFormatter.allow(
+                                RegExp(r'^\d{0,3}([\.,]\d{0,1})?$'),
+                              ),
+                            ],
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium
@@ -277,21 +292,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Expanded(
                               child: ElevatedButton(
                                 onPressed: () {
-                                  final reps = int.tryParse(repsController.text.trim());
-                                  final extraWeight = double.tryParse(
-                                    extraWeightController.text.trim(),
-                                  );
+                                  final repsText = repsController.text.trim();
+                                  final extraWeightText = extraWeightController.text
+                                      .trim()
+                                      .replaceAll(',', '.');
+                                  final reps = int.tryParse(repsText);
+                                  final extraWeight =
+                                      hasExtraWeight && extraWeightText.isNotEmpty
+                                      ? double.tryParse(extraWeightText)
+                                      : null;
 
-                                  if (reps == null || reps <= 0) {
+                                  if (reps == null) {
                                     setDialogState(() {
-                                      errorText = 'Rekor degeri 1 veya daha buyuk olmali.';
+                                      errorText = 'Rekor degerini sadece sayi olarak gir.';
                                     });
                                     return;
                                   }
 
-                                  if (hasExtraWeight && (extraWeight == null || extraWeight < 0)) {
+                                  if (reps < _minRecordValue || reps > _maxRecordValue) {
                                     setDialogState(() {
-                                      errorText = 'Ekstra agirlik 0 veya daha buyuk olmali.';
+                                      errorText =
+                                          'Rekor degeri $_minRecordValue-$_maxRecordValue araliginda olmali.';
+                                    });
+                                    return;
+                                  }
+
+                                  if (hasExtraWeight && extraWeight == null) {
+                                    setDialogState(() {
+                                      errorText =
+                                          'Ekstra agirlik degerini girmelisin (ornek: 12.5).';
+                                    });
+                                    return;
+                                  }
+
+                                  if (hasExtraWeight &&
+                                      (extraWeight! < _minExtraWeightKg ||
+                                          extraWeight > _maxExtraWeightKg)) {
+                                    setDialogState(() {
+                                      errorText =
+                                          'Ekstra agirlik $_minExtraWeightKg-$_maxExtraWeightKg kg araliginda olmali.';
                                     });
                                     return;
                                   }
@@ -302,7 +341,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       recordValue: reps,
                                       hasExtraWeight: hasExtraWeight,
                                       extraWeightKg: hasExtraWeight
-                                          ? (extraWeight ?? 0)
+                                          ? double.parse(
+                                              extraWeight!.toStringAsFixed(1),
+                                            )
                                           : null,
                                     ),
                                   );
@@ -393,12 +434,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final records = decoded
           .whereType<Map<String, dynamic>>()
           .map(PersonalRecordEntry.fromJson)
+          .where(_isValidPersonalRecord)
           .toList();
       records.sort((a, b) => a.exerciseName.compareTo(b.exerciseName));
       return records;
     } catch (_) {
       return const <PersonalRecordEntry>[];
     }
+  }
+
+  bool _isValidPersonalRecord(PersonalRecordEntry record) {
+    if (record.exerciseName.trim().isEmpty) {
+      return false;
+    }
+
+    if (record.recordValue < _minRecordValue || record.recordValue > _maxRecordValue) {
+      return false;
+    }
+
+    if (!record.hasExtraWeight) {
+      return true;
+    }
+
+    final weight = record.extraWeightKg;
+    if (weight == null) {
+      return false;
+    }
+
+    return weight >= _minExtraWeightKg && weight <= _maxExtraWeightKg;
   }
 
   Future<void> _editGender() async {
