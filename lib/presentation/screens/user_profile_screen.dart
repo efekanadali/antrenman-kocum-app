@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:calisthenics_app/core/local_storage/workout_summary_storage.dart';
@@ -41,6 +42,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   static const String _targetWorkoutsKey = 'profile_target_workouts_weekly';
   static const String _genderKey = 'profile_gender';
   static const String _birthDateKey = 'profile_birth_date';
+  static const String _personalRecordsKey = 'profile_personal_records_v1';
+
+  static const List<String> _recordExerciseOptions = [
+    'Pull-up',
+    'Push-up',
+    'Dip',
+    'Muscle-up',
+    'Pistol Squat',
+    'Handstand Push-up',
+    'L-sit Hold',
+    'Front Lever Hold',
+  ];
 
   late final Future<List<WorkoutSummaryEntry>> _summaryFuture;
   double _heightCm = 175.0;
@@ -49,6 +62,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   int _targetWorkoutsPerWeek = 4;
   String _gender = 'Belirtilmedi';
   DateTime? _birthDate;
+  List<PersonalRecordEntry> _personalRecords = const [];
 
   @override
   void initState() {
@@ -89,6 +103,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _targetWorkoutsPerWeek = savedTargetWorkouts ?? _targetWorkoutsPerWeek;
       _gender = savedGender ?? _gender;
       _birthDate = parsedBirthDate ?? _birthDate;
+      _personalRecords = _decodePersonalRecords(
+        prefs.getString(_personalRecordsKey),
+      );
     });
   }
 
@@ -103,6 +120,284 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await prefs.setString(_birthDateKey, _birthDate!.toIso8601String());
     } else {
       await prefs.remove(_birthDateKey);
+    }
+  }
+
+  Future<void> _savePersonalRecords() async {
+    final prefs = await SharedPreferences.getInstance();
+    final encoded = jsonEncode(
+      _personalRecords.map((item) => item.toJson()).toList(),
+    );
+    await prefs.setString(_personalRecordsKey, encoded);
+  }
+
+  Future<void> _showAddPersonalRecordDialog() async {
+    final repsController = TextEditingController();
+    final extraWeightController = TextEditingController();
+
+    String selectedExercise = _recordExerciseOptions.first;
+    bool hasExtraWeight = false;
+    String? errorText;
+
+    final result = await showDialog<PersonalRecordEntry>(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return Dialog(
+              backgroundColor: Colors.transparent,
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 24.0,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22.0),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+                  child: Container(
+                    padding: const EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: _cardSurface.withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(22.0),
+                      border: Border.all(color: Colors.white.withOpacity(0.08)),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Kisisel Rekor Ekle',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                color: _textHigh,
+                                fontWeight: FontWeight.w700,
+                              ),
+                        ),
+                        const SizedBox(height: 12.0),
+                        DropdownButtonFormField<String>(
+                          value: selectedExercise,
+                          dropdownColor: _cardSurfaceSoft,
+                          decoration: _dialogInputDecoration(
+                            label: 'Hareket',
+                          ),
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: _textHigh,
+                              ),
+                          items: _recordExerciseOptions
+                              .map(
+                                (exercise) => DropdownMenuItem<String>(
+                                  value: exercise,
+                                  child: Text(exercise),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (value) {
+                            if (value == null) {
+                              return;
+                            }
+                            setDialogState(() {
+                              selectedExercise = value;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 10.0),
+                        TextField(
+                          controller: repsController,
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: false,
+                          ),
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: _textHigh,
+                              ),
+                          decoration: _dialogInputDecoration(
+                            label: 'Rekor (tekrar/sure sayisi)',
+                          ),
+                        ),
+                        const SizedBox(height: 8.0),
+                        SwitchListTile.adaptive(
+                          value: hasExtraWeight,
+                          activeColor: _accentBlue,
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(
+                            'Ekstra agirlik var',
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: _textHigh,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
+                          onChanged: (value) {
+                            setDialogState(() {
+                              hasExtraWeight = value;
+                              if (!hasExtraWeight) {
+                                extraWeightController.clear();
+                              }
+                            });
+                          },
+                        ),
+                        if (hasExtraWeight) ...[
+                          TextField(
+                            controller: extraWeightController,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(color: _textHigh),
+                            decoration: _dialogInputDecoration(
+                              label: 'Ekstra agirlik (kg)',
+                            ),
+                          ),
+                        ],
+                        if (errorText != null) ...[
+                          const SizedBox(height: 8.0),
+                          Text(
+                            errorText!,
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: const Color(0xFFFF8E8E),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
+                        ],
+                        const SizedBox(height: 12.0),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: _textMid,
+                                  side: BorderSide(
+                                    color: Colors.white.withOpacity(0.12),
+                                  ),
+                                ),
+                                child: const Text('Iptal'),
+                              ),
+                            ),
+                            const SizedBox(width: 10.0),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  final reps = int.tryParse(repsController.text.trim());
+                                  final extraWeight = double.tryParse(
+                                    extraWeightController.text.trim(),
+                                  );
+
+                                  if (reps == null || reps <= 0) {
+                                    setDialogState(() {
+                                      errorText = 'Rekor degeri 1 veya daha buyuk olmali.';
+                                    });
+                                    return;
+                                  }
+
+                                  if (hasExtraWeight && (extraWeight == null || extraWeight < 0)) {
+                                    setDialogState(() {
+                                      errorText = 'Ekstra agirlik 0 veya daha buyuk olmali.';
+                                    });
+                                    return;
+                                  }
+
+                                  Navigator.of(context).pop(
+                                    PersonalRecordEntry(
+                                      exerciseName: selectedExercise,
+                                      recordValue: reps,
+                                      hasExtraWeight: hasExtraWeight,
+                                      extraWeightKg: hasExtraWeight
+                                          ? (extraWeight ?? 0)
+                                          : null,
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _accentPurple,
+                                  foregroundColor: _textHigh,
+                                ),
+                                child: const Text('Kaydet'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+
+    if (result == null) {
+      return;
+    }
+
+    setState(() {
+      final updated = [..._personalRecords];
+      final existingIndex = updated.indexWhere(
+        (item) => item.exerciseName == result.exerciseName,
+      );
+
+      if (existingIndex >= 0) {
+        updated[existingIndex] = result;
+      } else {
+        updated.add(result);
+      }
+
+      updated.sort((a, b) => a.exerciseName.compareTo(b.exerciseName));
+      _personalRecords = updated;
+    });
+
+    await _savePersonalRecords();
+  }
+
+  Future<void> _deletePersonalRecord(int index) async {
+    setState(() {
+      final updated = [..._personalRecords]..removeAt(index);
+      _personalRecords = updated;
+    });
+    await _savePersonalRecords();
+  }
+
+  InputDecoration _dialogInputDecoration({required String label}) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: const TextStyle(color: _textMid),
+      filled: true,
+      fillColor: _cardSurfaceSoft,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12.0),
+        borderSide: BorderSide(color: Colors.white.withOpacity(0.08)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12.0),
+        borderSide: BorderSide(color: Colors.white.withOpacity(0.08)),
+      ),
+      focusedBorder: const OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(12.0)),
+        borderSide: BorderSide(color: _accentBlue),
+      ),
+    );
+  }
+
+  List<PersonalRecordEntry> _decodePersonalRecords(String? raw) {
+    if (raw == null || raw.isEmpty) {
+      return const <PersonalRecordEntry>[];
+    }
+
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! List) {
+        return const <PersonalRecordEntry>[];
+      }
+
+      final records = decoded
+          .whereType<Map<String, dynamic>>()
+          .map(PersonalRecordEntry.fromJson)
+          .toList();
+      records.sort((a, b) => a.exerciseName.compareTo(b.exerciseName));
+      return records;
+    } catch (_) {
+      return const <PersonalRecordEntry>[];
     }
   }
 
@@ -636,7 +931,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 final totalWorkouts = calculateTotalWorkouts(summaries);
                 final lastWorkoutDate = calculateLastWorkoutDate(summaries);
                 final lastWorkoutRelativeLabel = relativeDayLabel(lastWorkoutDate);
-                final muscleDistribution = calculateMuscleDistribution(summaries);
                 return ListView(
                   padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 24.0),
                   children: [
@@ -688,7 +982,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       lastWorkoutRelativeLabel: lastWorkoutRelativeLabel,
                     ),
                     const SizedBox(height: 12.0),
-                    MuscleDistributionCard(distribution: muscleDistribution),
+                    PersonalRecordsCard(
+                      records: _personalRecords,
+                      onAddRecord: _showAddPersonalRecordDialog,
+                      onDeleteRecord: _deletePersonalRecord,
+                    ),
                     const SizedBox(height: 24.0),
                   ],
                 );
@@ -1012,6 +1310,169 @@ class MuscleDistributionCard extends StatelessWidget {
                 ),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class PersonalRecordEntry {
+  const PersonalRecordEntry({
+    required this.exerciseName,
+    required this.recordValue,
+    required this.hasExtraWeight,
+    required this.extraWeightKg,
+  });
+
+  final String exerciseName;
+  final int recordValue;
+  final bool hasExtraWeight;
+  final double? extraWeightKg;
+
+  factory PersonalRecordEntry.fromJson(Map<String, dynamic> json) {
+    return PersonalRecordEntry(
+      exerciseName: json['exerciseName'] as String? ?? 'Unknown',
+      recordValue: (json['recordValue'] as num?)?.toInt() ?? 0,
+      hasExtraWeight: json['hasExtraWeight'] as bool? ?? false,
+      extraWeightKg: (json['extraWeightKg'] as num?)?.toDouble(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'exerciseName': exerciseName,
+      'recordValue': recordValue,
+      'hasExtraWeight': hasExtraWeight,
+      'extraWeightKg': extraWeightKg,
+    };
+  }
+}
+
+class PersonalRecordsCard extends StatelessWidget {
+  const PersonalRecordsCard({
+    super.key,
+    required this.records,
+    required this.onAddRecord,
+    required this.onDeleteRecord,
+  });
+
+  final List<PersonalRecordEntry> records;
+  final VoidCallback onAddRecord;
+  final ValueChanged<int> onDeleteRecord;
+
+  @override
+  Widget build(BuildContext context) {
+    return _GlassCard(
+      borderRadius: 22.0,
+      child: Padding(
+        padding: const EdgeInsets.all(14.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Kisisel Rekorlar',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: _ProfileScreenState._textHigh,
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: onAddRecord,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _ProfileScreenState._accentPurple,
+                    foregroundColor: _ProfileScreenState._textHigh,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                      vertical: 8.0,
+                    ),
+                    textStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                  icon: const Icon(Icons.add, size: 16.0),
+                  label: const Text('Ekle'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10.0),
+            if (records.isEmpty)
+              Text(
+                'Henuz rekor eklenmedi. Hareket secip rekorunu kaydet.',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: _ProfileScreenState._textMid,
+                    ),
+              )
+            else
+              ...records.asMap().entries.map(
+                (entry) {
+                  final index = entry.key;
+                  final record = entry.value;
+                  final extraWeightLabel =
+                      record.hasExtraWeight && record.extraWeightKg != null
+                      ? ' + ${record.extraWeightKg!.toStringAsFixed(1)} kg'
+                      : '';
+
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10.0,
+                        vertical: 10.0,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _ProfileScreenState._cardSurfaceSoft,
+                        borderRadius: BorderRadius.circular(14.0),
+                        border: Border.all(color: Colors.white.withOpacity(0.08)),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  record.exerciseName,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.copyWith(
+                                        color: _ProfileScreenState._textHigh,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                ),
+                                const SizedBox(height: 2.0),
+                                Text(
+                                  '${record.recordValue} tekrar$extraWeightLabel',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        color: _ProfileScreenState._textMid,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => onDeleteRecord(index),
+                            icon: const Icon(
+                              Icons.delete_outline_rounded,
+                              color: Color(0xFFFF8E8E),
+                            ),
+                            tooltip: 'Sil',
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
           ],
         ),
       ),
