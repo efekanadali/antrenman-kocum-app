@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:calisthenics_app/core/utils/exercise_unit.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart';
 import 'package:calisthenics_app/domain/models/custom_program.dart';
 import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
@@ -161,8 +162,6 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
       return;
     }
 
-    final chosen = selected;
-
     setState(() {
       _daysCount = selected;
       _days
@@ -200,7 +199,12 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
 
     await Future<void>.delayed(const Duration(milliseconds: 150));
 
-    final config = await _promptSetRep();
+    final isTimed = isTimedExercise(
+      exerciseId: chosen.id,
+      exerciseName: chosen.name,
+    );
+
+    final config = await _promptSetRep(isTimed: isTimed);
     if (config == null) {
       return;
     }
@@ -219,13 +223,12 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
     });
   }
 
-  Future<_SetRepConfig?> _promptSetRep() async {
+  Future<_SetRepConfig?> _promptSetRep({required bool isTimed}) async {
     final result = await showDialog<_SetRepConfig>(
       context: context,
       builder: (context) {
         int sets = 3;
-        int targetValue = 10;
-        bool isTimed = false;
+        int targetValue = isTimed ? 30 : 10;
         return Dialog(
           backgroundColor: Colors.transparent,
           child: StatefulBuilder(
@@ -261,50 +264,12 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                       ),
                       const SizedBox(height: 6.0),
                       Text(
-                        'Tekrar ya da saniye hedefini seç.',
+                        isTimed
+                            ? 'Bu hareket sure bazli. Hedef saniyeyi belirle.'
+                            : 'Bu hareket tekrar bazli. Hedef tekrari belirle.',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: CustomPlanScreen._textMid,
                             ),
-                      ),
-                      const SizedBox(height: 14.0),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _ToggleChip(
-                              label: 'Tekrar',
-                              selected: !isTimed,
-                              onTap: () {
-                                setDialogState(() {
-                                  isTimed = false;
-                                  if (targetValue < minTarget()) {
-                                    targetValue = minTarget();
-                                  }
-                                  if (targetValue > maxTarget()) {
-                                    targetValue = maxTarget();
-                                  }
-                                });
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 12.0),
-                          Expanded(
-                            child: _ToggleChip(
-                              label: 'Saniye',
-                              selected: isTimed,
-                              onTap: () {
-                                setDialogState(() {
-                                  isTimed = true;
-                                  if (targetValue < minTarget()) {
-                                    targetValue = minTarget();
-                                  }
-                                  if (targetValue > maxTarget()) {
-                                    targetValue = maxTarget();
-                                  }
-                                });
-                              },
-                            ),
-                          ),
-                        ],
                       ),
                       const SizedBox(height: 12.0),
                       Row(
@@ -1260,51 +1225,6 @@ class _SetRepConfig {
   final int sets;
   final int value;
   final bool isTimed;
-}
-
-class _ToggleChip extends StatelessWidget {
-  const _ToggleChip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14.0),
-      child: Ink(
-        padding: const EdgeInsets.symmetric(vertical: 10.0),
-        decoration: BoxDecoration(
-          color: selected
-              ? CustomPlanScreen._accentPurple.withOpacity(0.28)
-              : CustomPlanScreen._cardSurface.withOpacity(0.6),
-          borderRadius: BorderRadius.circular(14.0),
-          border: Border.all(
-            color: selected
-                ? CustomPlanScreen._accentPurple
-                : Colors.white.withOpacity(0.1),
-          ),
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: selected
-                      ? CustomPlanScreen._textHigh
-                      : CustomPlanScreen._textMid,
-                  fontWeight: FontWeight.w600,
-                ),
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 class _GlassCard extends StatelessWidget {

@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:calisthenics_app/core/utils/exercise_unit.dart';
 import 'package:calisthenics_app/core/local_storage/workout_summary_storage.dart';
 import 'package:calisthenics_app/presentation/screens/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -141,6 +142,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final extraWeightController = TextEditingController();
 
     String selectedExercise = _recordExerciseOptions.first;
+    bool selectedIsTimed = isTimedExercise(exerciseName: selectedExercise);
     bool hasExtraWeight = false;
     String? errorText;
 
@@ -201,6 +203,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             }
                             setDialogState(() {
                               selectedExercise = value;
+                              selectedIsTimed = isTimedExercise(
+                                exerciseName: selectedExercise,
+                              );
                             });
                           },
                         ),
@@ -218,7 +223,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 color: _textHigh,
                               ),
                           decoration: _dialogInputDecoration(
-                            label: 'Rekor (tekrar/sure sayisi)',
+                            label: selectedIsTimed
+                                ? 'Rekor (saniye)'
+                                : 'Rekor (tekrar)',
                           ),
                         ),
                         const SizedBox(height: 8.0),
@@ -304,15 +311,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                                   if (reps == null) {
                                     setDialogState(() {
-                                      errorText = 'Rekor degerini sadece sayi olarak gir.';
+                                      errorText = selectedIsTimed
+                                          ? 'Rekor suresini sadece sayi olarak gir.'
+                                          : 'Rekor tekrarini sadece sayi olarak gir.';
                                     });
                                     return;
                                   }
 
                                   if (reps < _minRecordValue || reps > _maxRecordValue) {
                                     setDialogState(() {
-                                      errorText =
-                                          'Rekor degeri $_minRecordValue-$_maxRecordValue araliginda olmali.';
+                                      errorText = selectedIsTimed
+                                          ? 'Rekor suresi $_minRecordValue-$_maxRecordValue saniye araliginda olmali.'
+                                          : 'Rekor tekrari $_minRecordValue-$_maxRecordValue araliginda olmali.';
                                     });
                                     return;
                                   }
@@ -339,6 +349,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     PersonalRecordEntry(
                                       exerciseName: selectedExercise,
                                       recordValue: reps,
+                                      isTimed: selectedIsTimed,
                                       hasExtraWeight: hasExtraWeight,
                                       extraWeightKg: hasExtraWeight
                                           ? double.parse(
@@ -1384,12 +1395,14 @@ class PersonalRecordEntry {
   const PersonalRecordEntry({
     required this.exerciseName,
     required this.recordValue,
+    required this.isTimed,
     required this.hasExtraWeight,
     required this.extraWeightKg,
   });
 
   final String exerciseName;
   final int recordValue;
+  final bool isTimed;
   final bool hasExtraWeight;
   final double? extraWeightKg;
 
@@ -1397,6 +1410,9 @@ class PersonalRecordEntry {
     return PersonalRecordEntry(
       exerciseName: json['exerciseName'] as String? ?? 'Unknown',
       recordValue: (json['recordValue'] as num?)?.toInt() ?? 0,
+      isTimed:
+          (json['isTimed'] as bool?) ??
+          isTimedExercise(exerciseName: json['exerciseName'] as String? ?? ''),
       hasExtraWeight: json['hasExtraWeight'] as bool? ?? false,
       extraWeightKg: (json['extraWeightKg'] as num?)?.toDouble(),
     );
@@ -1406,6 +1422,7 @@ class PersonalRecordEntry {
     return {
       'exerciseName': exerciseName,
       'recordValue': recordValue,
+      'isTimed': isTimed,
       'hasExtraWeight': hasExtraWeight,
       'extraWeightKg': extraWeightKg,
     };
@@ -1510,7 +1527,7 @@ class PersonalRecordsCard extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 2.0),
                                 Text(
-                                  '${record.recordValue} tekrar$extraWeightLabel',
+                                  '${record.recordValue} ${record.isTimed ? 'sn' : 'tekrar'}$extraWeightLabel',
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodySmall
