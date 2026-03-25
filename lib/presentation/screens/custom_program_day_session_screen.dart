@@ -23,10 +23,10 @@ const Color _accentPurple = Color(0xFFC2F13A);
 const Color _accentBlue = Color(0xFF4FC3F7);
 const Color _textHigh = Color(0xFFEDE9FF);
 const Color _textMid = Color(0xFFC1B8E0);
-const Color _sessionPageBg = Color(0xFFF2F3EE);
-const Color _sessionInk = Color(0xFF1A132E);
-const Color _sessionSoft = Color(0xFFE4E6E0);
-const Color _sessionMuted = Color(0xFF72756D);
+const Color _sessionPageBg = _bgBottom;
+const Color _sessionInk = _textHigh;
+const Color _sessionSoft = _cardSurfaceSoft;
+const Color _sessionMuted = _textMid;
 
 class CustomProgramDaySessionArgs {
   const CustomProgramDaySessionArgs({
@@ -1000,9 +1000,9 @@ class _CustomProgramDaySessionScreenState
                       vertical: 6.0,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: _cardSurface,
                       borderRadius: BorderRadius.circular(999.0),
-                      border: Border.all(color: const Color(0xFFE4E7DE)),
+                      border: Border.all(color: Colors.white.withOpacity(0.12)),
                     ),
                     child: Row(
                       children: [
@@ -1098,22 +1098,22 @@ class _CustomProgramDaySessionScreenState
                           vertical: 14.0,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: _cardSurface,
                           borderRadius: BorderRadius.circular(20.0),
-                          border: Border.all(color: const Color(0xFFE7E9E1)),
+                          border: Border.all(color: Colors.white.withOpacity(0.12)),
                         ),
                         child: Row(
                           children: [
                             Container(
                               width: 42.0,
                               height: 42.0,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF11151F),
+                              decoration: BoxDecoration(
+                                color: _cardSurfaceSoft,
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(
                                 Icons.fitness_center_rounded,
-                                color: Colors.white,
+                                color: _accentBlue,
                                 size: 20.0,
                               ),
                             ),
@@ -1158,11 +1158,25 @@ class _CustomProgramDaySessionScreenState
                             const Icon(
                               Icons.arrow_forward_ios_rounded,
                               size: 16.0,
-                              color: Color(0xFF8B8E86),
+                              color: _textMid,
                             ),
                           ],
                         ),
                       ),
+                      if (_lastSetLoadByMuscle.isNotEmpty) ...[
+                        const SizedBox(height: 14.0),
+                        _LastSetLoadCard(
+                          loads: _lastSetLoadByMuscle,
+                          indicatorForLoad: _lastSetIndicator,
+                        ),
+                      ],
+                      if (_workoutLoadByMuscle.isNotEmpty) ...[
+                        const SizedBox(height: 14.0),
+                        _WorkoutLoadCard(
+                          loads: _workoutLoadByMuscle,
+                          feedbackForLoad: _feedbackForLoad,
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -1174,7 +1188,7 @@ class _CustomProgramDaySessionScreenState
                   child: LinearProgressIndicator(
                     value: restProgress,
                     minHeight: 8.0,
-                    backgroundColor: const Color(0xFFD8DBD3),
+                    backgroundColor: _cardSurfaceSoft,
                     valueColor: const AlwaysStoppedAnimation<Color>(_accentPurple),
                   ),
                 ),
@@ -1214,7 +1228,7 @@ class _CustomProgramDaySessionScreenState
                       child: Text(
                         'Dinlenmeyi bitir',
                         style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                              color: _sessionInk,
+                              color: _accentBlue,
                               fontWeight: FontWeight.w700,
                             ),
                       ),
@@ -1225,7 +1239,7 @@ class _CustomProgramDaySessionScreenState
                       child: Text(
                         '+30 saniye',
                         style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                              color: _sessionInk,
+                              color: _accentBlue,
                               fontWeight: FontWeight.w700,
                             ),
                       ),
@@ -1255,9 +1269,9 @@ class _SessionTopIconButton extends StatelessWidget {
         width: 38.0,
         height: 38.0,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: _cardSurface,
           shape: BoxShape.circle,
-          border: Border.all(color: const Color(0xFFE4E7DE)),
+          border: Border.all(color: Colors.white.withOpacity(0.12)),
         ),
         child: Icon(icon, color: _sessionInk, size: 19.0),
       ),
