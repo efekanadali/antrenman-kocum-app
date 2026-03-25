@@ -833,6 +833,15 @@ class _CustomProgramDaySessionScreenState
     });
   }
 
+  void _addRestSeconds(int seconds) {
+    if (_restRemainingSeconds <= 0) {
+      return;
+    }
+    setState(() {
+      _restRemainingSeconds += seconds;
+    });
+  }
+
   String _formatSeconds(int totalSeconds) {
     final minutes = totalSeconds ~/ 60;
     final seconds = totalSeconds % 60;
@@ -1197,15 +1206,31 @@ class _CustomProgramDaySessionScreenState
                 ],
               ),
               if (_restRemainingSeconds > 0)
-                TextButton(
-                  onPressed: _stopRestTimer,
-                  child: Text(
-                    'Dinlenmeyi bitir',
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                          color: _sessionInk,
-                          fontWeight: FontWeight.w700,
-                        ),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                      onPressed: _stopRestTimer,
+                      child: Text(
+                        'Dinlenmeyi bitir',
+                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                              color: _sessionInk,
+                              fontWeight: FontWeight.w700,
+                            ),
+                      ),
+                    ),
+                    const SizedBox(width: 6.0),
+                    TextButton(
+                      onPressed: () => _addRestSeconds(30),
+                      child: Text(
+                        '+30 saniye',
+                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                              color: _sessionInk,
+                              fontWeight: FontWeight.w700,
+                            ),
+                      ),
+                    ),
+                  ],
                 ),
             ],
           ),
