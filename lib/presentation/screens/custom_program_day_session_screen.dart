@@ -27,6 +27,7 @@ const Color _sessionPageBg = _bgBottom;
 const Color _sessionInk = _textHigh;
 const Color _sessionSoft = _cardSurfaceSoft;
 const Color _sessionMuted = _textMid;
+const String _sessionHeroImageAsset = 'assets/images/Incline-pushup.png';
 
 class CustomProgramDaySessionArgs {
   const CustomProgramDaySessionArgs({
@@ -1296,19 +1297,22 @@ class _SessionHeroCard extends StatelessWidget {
           end: Alignment.bottomCenter,
         ),
       ),
-      child: Column(
-        children: const [
-          Expanded(child: _SessionHeroFrame()),
-          SizedBox(height: 8.0),
-          Expanded(child: _SessionHeroFrame()),
-        ],
+      child: const _SessionHeroFrame(
+        imageFit: BoxFit.contain,
+        imageAlignment: Alignment.center,
       ),
     );
   }
 }
 
 class _SessionHeroFrame extends StatelessWidget {
-  const _SessionHeroFrame();
+  const _SessionHeroFrame({
+    required this.imageFit,
+    required this.imageAlignment,
+  });
+
+  final BoxFit imageFit;
+  final Alignment imageAlignment;
 
   @override
   Widget build(BuildContext context) {
@@ -1321,11 +1325,21 @@ class _SessionHeroFrame extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
       ),
-      child: Center(
-        child: Icon(
-          Icons.accessibility_new_rounded,
-          size: 64.0,
-          color: Colors.white.withOpacity(0.9),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(18.0),
+        child: Image.asset(
+          _sessionHeroImageAsset,
+          fit: imageFit,
+          alignment: imageAlignment,
+          errorBuilder: (context, error, stackTrace) {
+            return Center(
+              child: Icon(
+                Icons.accessibility_new_rounded,
+                size: 64.0,
+                color: Colors.white.withOpacity(0.9),
+              ),
+            );
+          },
         ),
       ),
     );
