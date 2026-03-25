@@ -15,14 +15,18 @@ import 'package:calisthenics_app/domain/models/mli_models.dart' as mli;
 import 'package:calisthenics_app/domain/services/mli_calculator.dart';
 import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
 
-const Color _bgTop = Color(0xFF151028);
-const Color _bgBottom = Color(0xFF0E0A1D);
-const Color _cardSurface = Color(0xFF201836);
+const Color _bgTop = Color(0xFF1A1230);
+const Color _bgBottom = Color(0xFF120A22);
+const Color _cardSurface = Color(0xFF231A3B);
 const Color _cardSurfaceSoft = Color(0xFF2A2048);
-const Color _accentPurple = Color(0xFF6D5BFF);
+const Color _accentPurple = Color(0xFFC2F13A);
 const Color _accentBlue = Color(0xFF4FC3F7);
 const Color _textHigh = Color(0xFFEDE9FF);
-const Color _textMid = Color(0xFFB4A9D8);
+const Color _textMid = Color(0xFFC1B8E0);
+const Color _sessionPageBg = Color(0xFFF2F3EE);
+const Color _sessionInk = Color(0xFF1A132E);
+const Color _sessionSoft = Color(0xFFE4E6E0);
+const Color _sessionMuted = Color(0xFF72756D);
 
 class CustomProgramDaySessionArgs {
   const CustomProgramDaySessionArgs({
@@ -837,6 +841,12 @@ class _CustomProgramDaySessionScreenState
     return '$minuteLabel:$secondLabel';
   }
 
+  String _formatDuration(Duration duration) {
+    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
+  }
+
   int _timePart(Duration duration, String unit) {
     switch (unit) {
       case 'hour':
@@ -902,7 +912,7 @@ class _CustomProgramDaySessionScreenState
                       },
                       style: FilledButton.styleFrom(
                         backgroundColor: _accentPurple,
-                        foregroundColor: Colors.white,
+                        foregroundColor: const Color(0xFF1A132E),
                         padding: const EdgeInsets.symmetric(vertical: 12.0),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14.0),
@@ -932,9 +942,6 @@ class _CustomProgramDaySessionScreenState
   @override
   Widget build(BuildContext context) {
     final day = widget.args.day;
-    final totalSets = _totalSets(day);
-    final completedSets = _completedSetCount();
-    final progress = totalSets == 0 ? 0.0 : completedSets / totalSets;
     final activeIndex = _currentExerciseIndex(day);
     final activeExercise = day.exercises.isEmpty
         ? null
@@ -945,267 +952,406 @@ class _CustomProgramDaySessionScreenState
             1,
             activeExercise.sets,
           );
-    final progressPercent = (progress * 100).round();
-    final actionLabel = _isWorkoutComplete(day)
-        ? 'Antrenmani Tamamla'
-        : 'Next Set';
+    final isWorkoutDone = _isWorkoutComplete(day);
+    final actionLabel = isWorkoutDone ? 'ANTRENMANI TAMAMLA' : 'COMPLETE SET';
+    final targetLabel = activeExercise == null
+        ? '-'
+        : '${activeExercise.value} ${activeExercise.isTimed ? 'sn' : 'Reps'}';
+    final nextLabel = activeExercise == null
+        ? 'Egzersiz bulunamadi'
+        : isWorkoutDone
+            ? 'Antrenman Tamamlandi'
+            : _restRemainingSeconds > 0
+                ? 'Dinlenme ${_formatSeconds(_restRemainingSeconds)}'
+                : activeExercise.exerciseName;
+    final nextDetail = activeExercise == null
+        ? ''
+        : '${activeExercise.sets} set • ${activeExercise.isTimed ? '${activeExercise.value} sn' : '${activeExercise.value} tekrar'}';
+    final restProgress = _restDurationSeconds == 0
+        ? 0.0
+        : (_restRemainingSeconds / _restDurationSeconds).clamp(0.0, 1.0);
 
     return Scaffold(
-      backgroundColor: _bgBottom,
-      appBar: AppBar(
-        backgroundColor: _bgBottom,
-        foregroundColor: _textHigh,
-        title: const Text('Active Workout'),
-        actions: [
-          IconButton(
-            onPressed: _openRestSheet,
-            icon: const Icon(Icons.settings),
-            tooltip: 'Dinlenme ayari',
-          ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [_bgTop, _bgBottom],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+      backgroundColor: _sessionPageBg,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  _SessionTopIconButton(
+                    icon: Icons.close_rounded,
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                      vertical: 6.0,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(999.0),
+                      border: Border.all(color: const Color(0xFFE4E7DE)),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 10.0,
+                          height: 10.0,
+                          decoration: const BoxDecoration(
+                            color: _accentPurple,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 6.0),
+                        Text(
+                          _formatDuration(_workElapsed),
+                          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                                color: _sessionInk,
+                                fontWeight: FontWeight.w800,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Spacer(),
+                  _SessionTopIconButton(
+                    icon: Icons.settings,
+                    onTap: _openRestSheet,
+                  ),
+                ],
               ),
-            ),
-          ),
-          SafeArea(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 24.0),
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Overall Progress',
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: _textMid,
-                          fontWeight: FontWeight.w700,
+              const SizedBox(height: 14.0),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const _SessionHeroCard(),
+                      const SizedBox(height: 24.0),
+                      Text(
+                        activeExercise?.exerciseName ?? 'Workout',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                              color: _sessionInk,
+                              fontWeight: FontWeight.w900,
+                            ),
+                      ),
+                      const SizedBox(height: 10.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _SessionTagChip(
+                            text: activeExercise == null
+                                ? 'Set -'
+                                : 'Set $activeSet of ${activeExercise.sets}',
+                            background: _sessionSoft,
+                            textColor: _sessionInk,
+                          ),
+                          const SizedBox(width: 8.0),
+                          _SessionTagChip(
+                            text: 'Target: $targetLabel',
+                            background: _accentPurple,
+                            textColor: _sessionInk,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 22.0),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.icon(
+                          onPressed: activeExercise == null
+                              ? null
+                              : isWorkoutDone
+                                  ? () => Navigator.pop(context)
+                                  : () => _completeSet(day),
+                          icon: const Icon(Icons.check_circle_rounded),
+                          label: Text(
+                            actionLabel,
+                            style: const TextStyle(fontWeight: FontWeight.w900),
+                          ),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: _accentPurple,
+                            foregroundColor: _sessionInk,
+                            padding: const EdgeInsets.symmetric(vertical: 18.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(22.0),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                    Text(
-                      '$progressPercent%',
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: _accentBlue,
-                        fontWeight: FontWeight.w800,
+                      const SizedBox(height: 18.0),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 14.0,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20.0),
+                          border: Border.all(color: const Color(0xFFE7E9E1)),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 42.0,
+                              height: 42.0,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFF11151F),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.fitness_center_rounded,
+                                color: Colors.white,
+                                size: 20.0,
+                              ),
+                            ),
+                            const SizedBox(width: 12.0),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'NEXT UP',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall
+                                        ?.copyWith(
+                                          color: _sessionMuted,
+                                          letterSpacing: 1.0,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                  ),
+                                  const SizedBox(height: 2.0),
+                                  Text(
+                                    nextLabel,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall
+                                        ?.copyWith(
+                                          color: _sessionInk,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                  ),
+                                  if (nextDetail.isNotEmpty)
+                                    Text(
+                                      nextDetail,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(color: _sessionMuted),
+                                    ),
+                                ],
+                              ),
+                            ),
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 16.0,
+                              color: Color(0xFF8B8E86),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 8.0),
+              ),
+              if (_restRemainingSeconds > 0) ...[
+                const SizedBox(height: 10.0),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(999.0),
                   child: LinearProgressIndicator(
-                    value: progress,
-                    minHeight: 7.0,
-                    backgroundColor: _cardSurfaceSoft,
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                      _accentBlue,
-                    ),
+                    value: restProgress,
+                    minHeight: 8.0,
+                    backgroundColor: const Color(0xFFD8DBD3),
+                    valueColor: const AlwaysStoppedAnimation<Color>(_accentPurple),
                   ),
                 ),
-                const SizedBox(height: 18.0),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _TimeUnitCard(
-                        value: _timePart(
-                          _workElapsed,
-                          'hour',
-                        ).toString().padLeft(2, '0'),
-                        label: 'HOURS',
-                      ),
-                    ),
-                    const SizedBox(width: 10.0),
-                    Expanded(
-                      child: _TimeUnitCard(
-                        value: _timePart(
-                          _workElapsed,
-                          'minute',
-                        ).toString().padLeft(2, '0'),
-                        label: 'MINUTES',
-                      ),
-                    ),
-                    const SizedBox(width: 10.0),
-                    Expanded(
-                      child: _TimeUnitCard(
-                        value: _timePart(
-                          _workElapsed,
-                          'second',
-                        ).toString().padLeft(2, '0'),
-                        label: 'SECONDS',
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 18.0),
-                if (activeExercise != null) ...[
-                  Text(
-                    activeExercise.exerciseName,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: _textHigh,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 4.0),
-                  Text(
-                    'Set $activeSet of ${activeExercise.sets}',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: _accentPurple,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 14.0),
-                  Builder(
-                    builder: (context) {
-                      if (!_exerciseDetailsLoaded) {
-                        return const _ExerciseInsightCard(
-                          description: 'Hareket aciklamasi yukleniyor...',
-                          muscleLabels: <String>[],
-                        );
-                      }
-
-                      final exerciseDetail = _resolveExerciseDetail(
-                        activeExercise,
-                      );
-                      if (exerciseDetail == null) {
-                        return const _ExerciseInsightCard(
-                          description:
-                              'Bu hareketin aciklama bilgisi henuz eklenmemis.',
-                          muscleLabels: <String>[],
-                        );
-                      }
-
-                      return _ExerciseInsightCard(
-                        description: exerciseDetail.description,
-                        muscleLabels: exerciseDetail.targetMuscleGroups
-                            .map((group) => group.label)
-                            .toList(),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 14.0),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _SessionInfoTile(
-                          title:
-                              'TARGET ${activeExercise.isTimed ? 'TIME' : 'REPS'}',
-                          value:
-                              '${activeExercise.value}${activeExercise.isTimed ? ' sn' : ''}',
-                        ),
-                      ),
-                      const SizedBox(width: 10.0),
-                      Expanded(
-                        child: _SessionInfoTile(
-                          title: 'COMPLETED SETS',
-                          value:
-                              '${_completedForExercise(activeIndex)}/${activeExercise.sets}',
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14.0),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: _isWorkoutComplete(day)
-                          ? () => Navigator.pop(context)
-                          : () => _completeSet(day),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: _accentPurple,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 15.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14.0),
-                        ),
-                      ),
-                      child: Text(
-                        actionLabel,
-                        style: const TextStyle(fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10.0),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: _togglePause,
-                          icon: Icon(
-                            _workPaused ? Icons.play_arrow : Icons.pause,
-                          ),
-                          label: Text(_workPaused ? 'Resume' : 'Pause'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: _textHigh,
-                            side: BorderSide(
-                              color: Colors.white.withOpacity(0.18),
-                            ),
-                            backgroundColor: _cardSurface.withOpacity(0.75),
-                            padding: const EdgeInsets.symmetric(vertical: 12.0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.0),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10.0),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => _skipCurrentExercise(day),
-                          icon: const Icon(Icons.skip_next_rounded),
-                          label: const Text('Skip'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: _textHigh,
-                            side: BorderSide(
-                              color: Colors.white.withOpacity(0.18),
-                            ),
-                            backgroundColor: _cardSurface.withOpacity(0.75),
-                            padding: const EdgeInsets.symmetric(vertical: 12.0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.0),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ] else
-                  _EmptyWorkoutCard(),
-                if (_restRemainingSeconds > 0) ...[
-                  const SizedBox(height: 12.0),
-                  _RestOverlay(
-                    remaining: _formatSeconds(_restRemainingSeconds),
-                    onStop: _stopRestTimer,
-                  ),
-                ],
-                if (_lastSetLoadByMuscle.isNotEmpty) ...[
-                  const SizedBox(height: 14.0),
-                  _LastSetLoadCard(
-                    loads: _lastSetLoadByMuscle,
-                    indicatorForLoad: _lastSetIndicator,
-                  ),
-                ],
-                if (_workoutLoadByMuscle.isNotEmpty) ...[
-                  const SizedBox(height: 14.0),
-                  _WorkoutLoadCard(
-                    loads: _workoutLoadByMuscle,
-                    feedbackForLoad: _feedbackForLoad,
-                  ),
-                ],
               ],
-            ),
+              const SizedBox(height: 12.0),
+              Row(
+                children: [
+                  Expanded(
+                    child: _SessionActionPill(
+                      label: _workPaused ? 'RESUME' : 'PAUSE',
+                      icon: _workPaused
+                          ? Icons.play_circle_fill_rounded
+                          : Icons.pause_circle_filled_rounded,
+                      backgroundColor: _sessionSoft,
+                      foregroundColor: _sessionInk,
+                      onPressed: _togglePause,
+                    ),
+                  ),
+                  const SizedBox(width: 12.0),
+                  Expanded(
+                    child: _SessionActionPill(
+                      label: 'STOP',
+                      icon: Icons.stop_circle_rounded,
+                      backgroundColor: _accentPurple,
+                      foregroundColor: _sessionInk,
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+                ],
+              ),
+              if (_restRemainingSeconds > 0)
+                TextButton(
+                  onPressed: _stopRestTimer,
+                  child: Text(
+                    'Dinlenmeyi bitir',
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          color: _sessionInk,
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                ),
+            ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SessionTopIconButton extends StatelessWidget {
+  const _SessionTopIconButton({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(999.0),
+      onTap: onTap,
+      child: Container(
+        width: 38.0,
+        height: 38.0,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          border: Border.all(color: const Color(0xFFE4E7DE)),
+        ),
+        child: Icon(icon, color: _sessionInk, size: 19.0),
+      ),
+    );
+  }
+}
+
+class _SessionHeroCard extends StatelessWidget {
+  const _SessionHeroCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: 290.0,
+      padding: const EdgeInsets.all(10.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30.0),
+        gradient: const LinearGradient(
+          colors: [_bgTop, _bgBottom],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
+      child: Column(
+        children: const [
+          Expanded(child: _SessionHeroFrame()),
+          SizedBox(height: 8.0),
+          Expanded(child: _SessionHeroFrame()),
         ],
+      ),
+    );
+  }
+}
+
+class _SessionHeroFrame extends StatelessWidget {
+  const _SessionHeroFrame();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18.0),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF2C3144), Color(0xFF181C2A)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Center(
+        child: Icon(
+          Icons.accessibility_new_rounded,
+          size: 64.0,
+          color: Colors.white.withOpacity(0.9),
+        ),
+      ),
+    );
+  }
+}
+
+class _SessionTagChip extends StatelessWidget {
+  const _SessionTagChip({
+    required this.text,
+    required this.background,
+    required this.textColor,
+  });
+
+  final String text;
+  final Color background;
+  final Color textColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(999.0),
+      ),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: textColor,
+              fontWeight: FontWeight.w700,
+            ),
+      ),
+    );
+  }
+}
+
+class _SessionActionPill extends StatelessWidget {
+  const _SessionActionPill({
+    required this.label,
+    required this.icon,
+    required this.backgroundColor,
+    required this.foregroundColor,
+    required this.onPressed,
+  });
+
+  final String label;
+  final IconData icon;
+  final Color backgroundColor;
+  final Color foregroundColor;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return FilledButton.icon(
+      onPressed: onPressed,
+      style: FilledButton.styleFrom(
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
+        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999.0)),
+      ),
+      icon: Icon(icon, size: 18.0),
+      label: Text(
+        label,
+        style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: 0.5),
       ),
     );
   }
