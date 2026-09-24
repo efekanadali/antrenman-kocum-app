@@ -169,6 +169,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
     }
 
     HapticFeedback.mediumImpact();
+    _finishWorkout();
   }
 
   void _openRestSettings() {

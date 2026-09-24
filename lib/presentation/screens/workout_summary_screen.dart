@@ -5,6 +5,16 @@ import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/core/local_storage/workout_history_storage.dart';
 import 'package:calisthenics_app/core/local_storage/workout_summary_storage.dart';
 
+// ─── Design Tokens ───────────────────────────────────────────────────────────
+const Color _bg = Color(0xFF0C101B);
+const Color _surface = Color(0xFF161C2C);
+const Color _card = Color(0xFF1E263B);
+const Color _stroke = Color(0xFF28324C);
+const Color _accent = Color(0xFFC2F13A);
+const Color _textPrimary = Color(0xFFFFFFFF);
+const Color _textMuted = Color(0xFF8E9BAE);
+
+// ─── Model ───────────────────────────────────────────────────────────────────
 class WorkoutSummaryArgs {
   const WorkoutSummaryArgs({
     required this.exerciseName,
@@ -23,14 +33,13 @@ class WorkoutSummaryArgs {
   final Map<String, double> muscleLoad;
 }
 
+// ─── Screen ──────────────────────────────────────────────────────────────────
 class WorkoutSummaryScreen extends StatelessWidget {
-  const WorkoutSummaryScreen({
-    super.key,
-    required this.args,
-  });
+  const WorkoutSummaryScreen({super.key, required this.args});
 
   final WorkoutSummaryArgs args;
 
+  // ── Business Logic (unchanged) ──────────────────────────────────────────
   Future<void> _saveSession(BuildContext context) async {
     final storage = WorkoutHistoryStorage();
     final summaryStorage = WorkoutSummaryStorage();
@@ -52,147 +61,270 @@ class WorkoutSummaryScreen extends StatelessWidget {
     try {
       await storage.saveSession(entry);
       await summaryStorage.saveSummary(summaryEntry);
-      if (!context.mounted) {
-        return;
-      }
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Seans kaydedildi')),
+        SnackBar(
+          content: const Text('Seans kaydedildi'),
+          backgroundColor: _accent.withAlpha(220),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
       );
     } catch (_) {
-      if (!context.mounted) {
-        return;
-      }
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Kaydetme başarısız')),
+        SnackBar(
+          content: const Text('Kaydetme başarısız'),
+          backgroundColor: Colors.red.shade800,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
       );
     }
   }
 
-  String _formatDuration(Duration duration) {
-    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
-    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return '$minutes:$seconds';
+  // ── Helpers ─────────────────────────────────────────────────────────────
+  String _formatDuration(Duration d) {
+    final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final s = d.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '$m:$s';
   }
 
+  // ── Build ────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final sortedMuscles =
+        args.muscleLoad.entries.toList()
+          ..sort((a, b) => b.value.compareTo(a.value));
+    final totalMuscleLoad = args.muscleLoad.values.fold(
+      0.0,
+      (sum, v) => sum + v,
+    );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Seans Özeti'),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 24.0),
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20.0),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  colorScheme.primary.withOpacity(0.16),
-                  colorScheme.surface,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(24.0),
-              border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.4)),
+      backgroundColor: _bg,
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+          children: [
+            // ── Header ────────────────────────────────────────────────────
+            _buildHeader(context),
+            const SizedBox(height: 28),
+
+            // ── Metric Grid ───────────────────────────────────────────────
+            _buildMetricGrid(),
+            const SizedBox(height: 24),
+
+            // ── Muscle Load Card ──────────────────────────────────────────
+            _buildMuscleCard(sortedMuscles, totalMuscleLoad),
+            const SizedBox(height: 32),
+
+            // ── Primary CTA ───────────────────────────────────────────────
+            _SaveButton(
+              onPressed: () async {
+                await _saveSession(context);
+                if (!context.mounted) return;
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  AppRoutes.home,
+                  (route) => false,
+                );
+              },
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            const SizedBox(height: 12),
+
+            // ── Secondary Actions ─────────────────────────────────────────
+            Row(
               children: [
-                Text(
-                  'Tebrikler!',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                Expanded(
+                  child: _OutlineActionButton(
+                    icon: Icons.replay_rounded,
+                    label: 'Tekrar Başlat',
+                    onPressed: () {
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        AppRoutes.home,
+                        (route) => false,
+                      );
+                    },
+                  ),
                 ),
-                const SizedBox(height: 6.0),
-                Text(
-                  args.exerciseName,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                ),
-                const SizedBox(height: 16.0),
-                _SummaryRow(
-                  label: 'Toplam Süre',
-                  value: _formatDuration(args.totalTime),
-                ),
-                const SizedBox(height: 10.0),
-                _SummaryRow(
-                  label: 'Tamamlanan Set',
-                  value: '${args.setsCompleted} / ${args.totalSets}',
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _OutlineActionButton(
+                    icon: Icons.exit_to_app_rounded,
+                    label: 'Kaydetmeden Çık',
+                    onPressed: () {
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        AppRoutes.home,
+                        (route) => false,
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Header ──────────────────────────────────────────────────────────────
+  Widget _buildHeader(BuildContext context) {
+    return Column(
+      children: [
+        // Trophy icon with glow ring
+        Container(
+          width: 88,
+          height: 88,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: _card,
+            border: Border.all(color: _accent, width: 2.5),
+            boxShadow: [
+              BoxShadow(
+                color: _accent.withAlpha(60),
+                blurRadius: 24,
+                spreadRadius: 4,
+              ),
+            ],
           ),
-          const SizedBox(height: 20.0),
+          child: const Icon(
+            Icons.emoji_events_rounded,
+            size: 42,
+            color: _accent,
+          ),
+        ),
+        const SizedBox(height: 18),
+        const Text(
+          'Antrenman Tamamlandı!',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: _textPrimary,
+            fontSize: 24,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.5,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          args.exerciseName,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: _textMuted,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ── Metric Grid ─────────────────────────────────────────────────────────
+  Widget _buildMetricGrid() {
+    return Row(
+      children: [
+        Expanded(
+          child: _MetricCard(
+            icon: Icons.timer_outlined,
+            label: 'Toplam Süre',
+            value: _formatDuration(args.totalTime),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _MetricCard(
+            icon: Icons.fitness_center_rounded,
+            label: 'Setler',
+            value: '${args.setsCompleted} / ${args.totalSets}',
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _MetricCard(
+            icon: Icons.bolt_rounded,
+            label: 'Toplam Yük',
+            value: '${args.totalLoad.round()} MLI',
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ── Muscle Load Card ────────────────────────────────────────────────────
+  Widget _buildMuscleCard(
+    List<MapEntry<String, double>> sortedMuscles,
+    double totalMuscleLoad,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: _card,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: _stroke),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           Row(
             children: [
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      AppRoutes.home,
-                      (route) => false,
-                    );
-                  },
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Tekrar Et'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.0),
-                    ),
-                  ),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: _accent.withAlpha(28),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.analytics_outlined,
+                  color: _accent,
+                  size: 18,
                 ),
               ),
-              const SizedBox(width: 12.0),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Paylaşım yakında')),
-                    );
-                  },
-                  icon: const Icon(Icons.ios_share),
-                  label: const Text('Paylaş'),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.0),
-                    ),
-                  ),
+              const SizedBox(width: 10),
+              const Text(
+                'Kas Grubu Yük Dağılımı',
+                style: TextStyle(
+                  color: _textPrimary,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12.0),
-          OutlinedButton.icon(
-            onPressed: () => _saveSession(context),
-            icon: const Icon(Icons.save_outlined),
-            label: const Text('Seansı Kaydet'),
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 14.0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.0),
+          const SizedBox(height: 16),
+          if (sortedMuscles.isEmpty)
+            _buildEmptyMuscleState()
+          else
+            ...sortedMuscles.map(
+              (entry) => _MuscleLoadRow(
+                muscleName: entry.key,
+                load: entry.value,
+                ratio:
+                    totalMuscleLoad > 0 ? entry.value / totalMuscleLoad : 0.0,
               ),
             ),
-          ),
-          const SizedBox(height: 12.0),
-          TextButton.icon(
-            onPressed: () {
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                AppRoutes.home,
-                (route) => false,
-              );
-            },
-            icon: const Icon(Icons.home),
-            label: const Text('Hareketlere Dön'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyMuscleState() {
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        children: [
+          Icon(Icons.info_outline_rounded, color: _textMuted, size: 18),
+          SizedBox(width: 8),
+          Text(
+            'Kas yükü verisi mevcut değil.',
+            style: TextStyle(color: _textMuted, fontSize: 13),
           ),
         ],
       ),
@@ -200,36 +332,189 @@ class WorkoutSummaryScreen extends StatelessWidget {
   }
 }
 
-class _SummaryRow extends StatelessWidget {
-  const _SummaryRow({
+// ─── Sub-widgets ─────────────────────────────────────────────────────────────
+
+class _MetricCard extends StatelessWidget {
+  const _MetricCard({
+    required this.icon,
     required this.label,
     required this.value,
   });
 
+  final IconData icon;
   final String label;
   final String value;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
+      decoration: BoxDecoration(
+        color: _card,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _stroke),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: _accent, size: 22),
+          const SizedBox(height: 10),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: const TextStyle(
+                color: _textPrimary,
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.3,
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
             label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: _textMuted,
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MuscleLoadRow extends StatelessWidget {
+  const _MuscleLoadRow({
+    required this.muscleName,
+    required this.load,
+    required this.ratio,
+  });
+
+  final String muscleName;
+  final double load;
+  final double ratio;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  muscleName,
+                  style: const TextStyle(
+                    color: _textPrimary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
+              ),
+              Text(
+                '${load.round()} pts',
+                style: const TextStyle(
+                  color: _accent,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: LinearProgressIndicator(
+              value: ratio.clamp(0.0, 1.0),
+              minHeight: 7,
+              backgroundColor: _stroke,
+              valueColor: const AlwaysStoppedAnimation<Color>(_accent),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SaveButton extends StatelessWidget {
+  const _SaveButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 54,
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: const Icon(Icons.save_alt_rounded, size: 20),
+        label: const Text(
+          'Seansı Kaydet & Bitir',
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            fontSize: 15,
+            letterSpacing: 0.2,
           ),
         ),
-        Text(
-          value,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: _accent,
+          foregroundColor: const Color(0xFF0C101B),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
         ),
-      ],
+      ),
+    );
+  }
+}
+
+class _OutlineActionButton extends StatelessWidget {
+  const _OutlineActionButton({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 48,
+      child: OutlinedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon, size: 17),
+        label: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
+        ),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: _textMuted,
+          side: const BorderSide(color: _stroke),
+          backgroundColor: _surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+        ),
+      ),
     );
   }
 }

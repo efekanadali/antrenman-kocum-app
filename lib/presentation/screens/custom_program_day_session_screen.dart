@@ -14,6 +14,8 @@ import 'package:calisthenics_app/domain/models/exercise_database.dart'
 import 'package:calisthenics_app/domain/models/mli_models.dart' as mli;
 import 'package:calisthenics_app/domain/services/mli_calculator.dart';
 import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
+import 'package:calisthenics_app/presentation/routes/app_routes.dart';
+import 'package:calisthenics_app/presentation/screens/workout_summary_screen.dart';
 
 const Color _bgTop = Color(0xFF1A1230);
 const Color _bgBottom = Color(0xFF120A22);
@@ -635,11 +637,53 @@ class _CustomProgramDaySessionScreenState
       _lastSetLoadByMuscle = setLoad;
     });
 
-    if (!_isWorkoutComplete(day)) {
+    _recalculateWorkoutLoad(day);
+
+    if (_isWorkoutComplete(day)) {
+      _finishSession(day);
+    } else {
       _startRestTimer();
     }
+  }
 
-    _recalculateWorkoutLoad(day);
+  void _finishSession(CustomProgramDay day) {
+    _workTimer?.cancel();
+    _restTimer?.cancel();
+
+    final totalSetsCount = _totalSets(day);
+    final completedSetsCount = _completedSetCount();
+
+    double totalLoad = _workoutLoadByMuscle.values.fold(
+      0.0,
+      (sum, val) => sum + val,
+    );
+    if (totalLoad <= 0) {
+      final durationMinutes =
+          _workElapsed.inSeconds > 0 ? _workElapsed.inSeconds / 60.0 : 1.0;
+      totalLoad = durationMinutes * 100 * 1.25;
+    }
+
+    final Map<String, double> muscleLoad = Map<String, double>.from(
+      _workoutLoadByMuscle,
+    );
+    if (muscleLoad.isEmpty) {
+      muscleLoad['Genel'] = totalLoad;
+    }
+
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      AppRoutes.workoutSummary,
+      (route) => false,
+      arguments: WorkoutSummaryArgs(
+        exerciseName:
+            '${widget.args.programName} - ${day.name}',
+        totalTime: _workElapsed,
+        setsCompleted: completedSetsCount,
+        totalSets: totalSetsCount,
+        totalLoad: totalLoad,
+        muscleLoad: muscleLoad,
+      ),
+    );
   }
 
   void _applyQuickAdjust(CustomProgramDay day, int delta) {
@@ -1074,7 +1118,7 @@ class _CustomProgramDaySessionScreenState
                           onPressed: activeExercise == null
                               ? null
                               : isWorkoutDone
-                                  ? () => Navigator.pop(context)
+                                  ? () => _finishSession(day)
                                   : () => _completeSet(day),
                           icon: const Icon(Icons.check_circle_rounded),
                           label: Text(
