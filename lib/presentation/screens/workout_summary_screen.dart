@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/core/local_storage/workout_history_storage.dart';
 import 'package:calisthenics_app/core/local_storage/workout_summary_storage.dart';
+import 'package:calisthenics_app/domain/services/mli_calculator.dart';
 
 // ─── Design Tokens ───────────────────────────────────────────────────────────
 const Color _bg = Color(0xFF0C101B);
@@ -400,6 +401,22 @@ class _MuscleLoadRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final evaluation = evaluateMuscleLoad(load);
+
+    final Color badgeBg;
+    final Color badgeFg;
+    switch (evaluation.level) {
+      case MliStimulusLevel.optimal:
+        badgeBg = const Color(0xFFC2F13A).withAlpha(38);
+        badgeFg = const Color(0xFFC2F13A);
+      case MliStimulusLevel.understimulated:
+        badgeBg = Colors.white10;
+        badgeFg = const Color(0xFF8E9BAE);
+      case MliStimulusLevel.overload:
+        badgeBg = Colors.orange.withAlpha(38);
+        badgeFg = Colors.orangeAccent;
+    }
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: Column(
@@ -417,6 +434,27 @@ class _MuscleLoadRow extends StatelessWidget {
                   ),
                 ),
               ),
+              // Stimulus badge
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 3,
+                ),
+                decoration: BoxDecoration(
+                  color: badgeBg,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  evaluation.label,
+                  style: TextStyle(
+                    color: badgeFg,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
               Text(
                 '${load.round()} pts',
                 style: const TextStyle(
@@ -434,7 +472,7 @@ class _MuscleLoadRow extends StatelessWidget {
               value: ratio.clamp(0.0, 1.0),
               minHeight: 7,
               backgroundColor: _stroke,
-              valueColor: const AlwaysStoppedAnimation<Color>(_accent),
+              valueColor: AlwaysStoppedAnimation<Color>(badgeFg == const Color(0xFFC2F13A) ? _accent : badgeFg),
             ),
           ),
         ],

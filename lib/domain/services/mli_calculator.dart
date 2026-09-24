@@ -93,3 +93,49 @@ Map<String, double> calculateWorkoutLoad(List<ExerciseWorkoutEntry> entries) {
 
   return totals;
 }
+
+// ─── Yük Eşik Değerlendirmesi ─────────────────────────────────────────────────
+
+enum MliStimulusLevel {
+  understimulated,
+  optimal,
+  overload,
+}
+
+class MliEvaluation {
+  const MliEvaluation({
+    required this.level,
+    required this.label,
+    required this.description,
+  });
+
+  final MliStimulusLevel level;
+  final String label;
+  final String description;
+}
+
+/// Tek bir kas grubunun toplam MLI skorunu değerlendirir.
+/// < 80  → Yetersiz (hipertrofi eşiği altı)
+/// 80–220 → Optimal
+/// > 220  → Aşırı Yük
+MliEvaluation evaluateMuscleLoad(double score) {
+  if (score < 80.0) {
+    return const MliEvaluation(
+      level: MliStimulusLevel.understimulated,
+      label: 'Yetersiz',
+      description: 'Hipertrofi eşiğinin altında kalan uyarı.',
+    );
+  } else if (score <= 220.0) {
+    return const MliEvaluation(
+      level: MliStimulusLevel.optimal,
+      label: 'Optimal',
+      description: 'Gelişim için ideal mekanik gerilim aralığı.',
+    );
+  } else {
+    return const MliEvaluation(
+      level: MliStimulusLevel.overload,
+      label: 'Aşırı Yük',
+      description: 'Toparlanmayı zorlaştırabilecek yüksek hacim / aşırı yük.',
+    );
+  }
+}

@@ -61,7 +61,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     'Front Lever Hold',
   ];
 
-  late final Future<List<WorkoutSummaryEntry>> _summaryFuture;
+  late Future<List<WorkoutSummaryEntry>> _summaryFuture;
   double _heightCm = 175.0;
   double _weightKg = 70.0;
   double _goalWeightKg = 68.0;
@@ -84,6 +84,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return summaries;
     }
     return buildMockWorkoutSummaries();
+  }
+
+  Future<void> _refreshSummaries() async {
+    setState(() {
+      _summaryFuture = _loadSummaries();
+    });
   }
 
   Future<void> _loadBodyMetrics() async {
@@ -174,7 +180,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         Text(
                           'Kisisel Rekor Ekle',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
                                 color: _textHigh,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -183,12 +190,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         DropdownButtonFormField<String>(
                           value: selectedExercise,
                           dropdownColor: _cardSurfaceSoft,
-                          decoration: _dialogInputDecoration(
-                            label: 'Hareket',
-                          ),
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: _textHigh,
-                              ),
+                          decoration: _dialogInputDecoration(label: 'Hareket'),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.copyWith(color: _textHigh),
                           items: _recordExerciseOptions
                               .map(
                                 (exercise) => DropdownMenuItem<String>(
@@ -219,9 +224,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             FilteringTextInputFormatter.digitsOnly,
                             LengthLimitingTextInputFormatter(3),
                           ],
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: _textHigh,
-                              ),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.copyWith(color: _textHigh),
                           decoration: _dialogInputDecoration(
                             label: selectedIsTimed
                                 ? 'Rekor (saniye)'
@@ -235,7 +240,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           contentPadding: EdgeInsets.zero,
                           title: Text(
                             'Ekstra agirlik var',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
                                   color: _textHigh,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -261,10 +267,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 RegExp(r'^\d{0,3}([\.,]\d{0,1})?$'),
                               ),
                             ],
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(color: _textHigh),
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodyMedium?.copyWith(color: _textHigh),
                             decoration: _dialogInputDecoration(
                               label: 'Ekstra agirlik (kg)',
                             ),
@@ -274,7 +279,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           const SizedBox(height: 8.0),
                           Text(
                             errorText!,
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
                                   color: const Color(0xFFFF8E8E),
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -300,12 +306,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               child: ElevatedButton(
                                 onPressed: () {
                                   final repsText = repsController.text.trim();
-                                  final extraWeightText = extraWeightController.text
+                                  final extraWeightText = extraWeightController
+                                      .text
                                       .trim()
                                       .replaceAll(',', '.');
                                   final reps = int.tryParse(repsText);
                                   final extraWeight =
-                                      hasExtraWeight && extraWeightText.isNotEmpty
+                                      hasExtraWeight &&
+                                          extraWeightText.isNotEmpty
                                       ? double.tryParse(extraWeightText)
                                       : null;
 
@@ -318,7 +326,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     return;
                                   }
 
-                                  if (reps < _minRecordValue || reps > _maxRecordValue) {
+                                  if (reps < _minRecordValue ||
+                                      reps > _maxRecordValue) {
                                     setDialogState(() {
                                       errorText = selectedIsTimed
                                           ? 'Rekor suresi $_minRecordValue-$_maxRecordValue saniye araliginda olmali.'
@@ -459,7 +468,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return false;
     }
 
-    if (record.recordValue < _minRecordValue || record.recordValue > _maxRecordValue) {
+    if (record.recordValue < _minRecordValue ||
+        record.recordValue > _maxRecordValue) {
       return false;
     }
 
@@ -505,9 +515,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Text(
                       'Cinsiyet',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: _textHigh,
-                            fontWeight: FontWeight.w700,
-                          ),
+                        color: _textHigh,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const SizedBox(height: 10.0),
                     ...genders.map(
@@ -519,9 +529,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         activeColor: _accentBlue,
                         title: Text(
                           item,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: _textHigh,
-                              ),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.copyWith(color: _textHigh),
                         ),
                         onChanged: (value) => Navigator.of(context).pop(value),
                       ),
@@ -555,7 +565,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _editBirthDate() async {
     final now = DateTime.now();
-    final initialDate = _birthDate ?? DateTime(now.year - 25, now.month, now.day);
+    final initialDate =
+        _birthDate ?? DateTime(now.year - 25, now.month, now.day);
     final selected = await showDatePicker(
       context: context,
       initialDate: initialDate,
@@ -602,8 +613,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               }
               return Colors.transparent;
             }),
-            todayForegroundColor:
-                const WidgetStatePropertyAll<Color>(_accentBlue),
+            todayForegroundColor: const WidgetStatePropertyAll<Color>(
+              _accentBlue,
+            ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(22.0),
             ),
@@ -680,18 +692,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         TextField(
                           controller: controller,
                           autofocus: true,
-                          keyboardType:
-                              const TextInputType.numberWithOptions(decimal: true),
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(
                                 color: _textHigh,
                                 fontWeight: FontWeight.w600,
                               ),
                           decoration: InputDecoration(
                             hintText: unit,
-                            hintStyle:
-                                Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: _textMid,
-                                    ),
+                            hintStyle: Theme.of(
+                              context,
+                            ).textTheme.bodyMedium?.copyWith(color: _textMid),
                             filled: true,
                             fillColor: _cardSurfaceSoft,
                             errorText: errorText,
@@ -701,13 +714,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14.0),
-                              borderSide:
-                                  BorderSide(color: Colors.white.withOpacity(0.08)),
+                              borderSide: BorderSide(
+                                color: Colors.white.withOpacity(0.08),
+                              ),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14.0),
-                              borderSide:
-                                  BorderSide(color: Colors.white.withOpacity(0.08)),
+                              borderSide: BorderSide(
+                                color: Colors.white.withOpacity(0.08),
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14.0),
@@ -726,8 +741,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     color: Colors.white.withOpacity(0.18),
                                   ),
                                   foregroundColor: _textMid,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 12.0),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12.0,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12.0),
                                   ),
@@ -753,8 +769,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: _accentPurple,
                                   foregroundColor: _textHigh,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 12.0),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12.0,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12.0),
                                   ),
@@ -840,16 +857,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           controller: controller,
                           autofocus: true,
                           keyboardType: TextInputType.number,
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(
                                 color: _textHigh,
                                 fontWeight: FontWeight.w600,
                               ),
                           decoration: InputDecoration(
                             hintText: unit,
-                            hintStyle:
-                                Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: _textMid,
-                                    ),
+                            hintStyle: Theme.of(
+                              context,
+                            ).textTheme.bodyMedium?.copyWith(color: _textMid),
                             filled: true,
                             fillColor: _cardSurfaceSoft,
                             errorText: errorText,
@@ -859,13 +876,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14.0),
-                              borderSide:
-                                  BorderSide(color: Colors.white.withOpacity(0.08)),
+                              borderSide: BorderSide(
+                                color: Colors.white.withOpacity(0.08),
+                              ),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14.0),
-                              borderSide:
-                                  BorderSide(color: Colors.white.withOpacity(0.08)),
+                              borderSide: BorderSide(
+                                color: Colors.white.withOpacity(0.08),
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14.0),
@@ -884,8 +903,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     color: Colors.white.withOpacity(0.18),
                                   ),
                                   foregroundColor: _textMid,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 12.0),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12.0,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12.0),
                                   ),
@@ -911,8 +931,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: _accentPurple,
                                   foregroundColor: _textHigh,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 12.0),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12.0,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12.0),
                                   ),
@@ -990,87 +1011,112 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                final summaries = snapshot.data ?? const <WorkoutSummaryEntry>[];
+                final summaries =
+                    snapshot.data ?? const <WorkoutSummaryEntry>[];
                 if (summaries.isEmpty) {
                   return Center(
                     child: Text(
                       'Henuz antrenman verisi yok.',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: _textMid,
-                          ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.copyWith(color: _textMid),
                     ),
                   );
                 }
 
                 final totalWorkouts = calculateTotalWorkouts(summaries);
                 final lastWorkoutDate = calculateLastWorkoutDate(summaries);
-                final lastWorkoutRelativeLabel = relativeDayLabel(lastWorkoutDate);
-                return ListView(
-                  padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 24.0),
-                  children: [
-                    const _UserHeader(username: 'Calisthenics Athlete'),
-                    const SizedBox(height: 16.0),
-                    BodyMetricsCard(
-                      heightCm: _heightCm,
-                      weightKg: _weightKg,
-                      gender: _gender,
-                      birthDateLabel: _birthDate == null
-                          ? 'Secilmedi'
-                          : '${formatDate(_birthDate!)} (${calculateAge(_birthDate!)} yas)',
-                      onEditHeight: () => _editMetric(
-                        title: 'Boy (cm)',
-                        unit: 'cm',
-                        currentValue: _heightCm,
-                        onApply: (value) => _heightCm = value,
+                final lastWorkoutRelativeLabel = relativeDayLabel(
+                  lastWorkoutDate,
+                );
+                final trend = calculateSevenDayTrend(summaries);
+                final muscleDistribution = calculateMuscleDistribution(
+                  summaries,
+                );
+                final balanceText = calculateBalanceText(muscleDistribution);
+                return RefreshIndicator(
+                  onRefresh: _refreshSummaries,
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 24.0),
+                    children: [
+                      const _UserHeader(username: 'Calisthenics Athlete'),
+                      const SizedBox(height: 16.0),
+                      BodyMetricsCard(
+                        heightCm: _heightCm,
+                        weightKg: _weightKg,
+                        gender: _gender,
+                        birthDateLabel: _birthDate == null
+                            ? 'Secilmedi'
+                            : '${formatDate(_birthDate!)} (${calculateAge(_birthDate!)} yas)',
+                        onEditHeight: () => _editMetric(
+                          title: 'Boy (cm)',
+                          unit: 'cm',
+                          currentValue: _heightCm,
+                          onApply: (value) => _heightCm = value,
+                        ),
+                        onEditWeight: () => _editMetric(
+                          title: 'Kilo (kg)',
+                          unit: 'kg',
+                          currentValue: _weightKg,
+                          onApply: (value) => _weightKg = value,
+                        ),
+                        onEditGender: _editGender,
+                        onEditBirthDate: _editBirthDate,
                       ),
-                      onEditWeight: () => _editMetric(
-                        title: 'Kilo (kg)',
-                        unit: 'kg',
-                        currentValue: _weightKg,
-                        onApply: (value) => _weightKg = value,
+                      const SizedBox(height: 12.0),
+                      GoalsCard(
+                        goalWeightKg: _goalWeightKg,
+                        targetWorkoutsPerWeek: _targetWorkoutsPerWeek,
+                        onEditGoalWeight: () => _editMetric(
+                          title: 'Hedef Kilo (kg)',
+                          unit: 'kg',
+                          currentValue: _goalWeightKg,
+                          onApply: (value) => _goalWeightKg = value,
+                        ),
+                        onEditTargetWorkouts: () => _editIntMetric(
+                          title: 'Haftalik Hedef Antrenman',
+                          unit: 'adet',
+                          currentValue: _targetWorkoutsPerWeek,
+                          onApply: (value) => _targetWorkoutsPerWeek = value,
+                        ),
                       ),
-                      onEditGender: _editGender,
-                      onEditBirthDate: _editBirthDate,
-                    ),
-                    const SizedBox(height: 12.0),
-                    GoalsCard(
-                      goalWeightKg: _goalWeightKg,
-                      targetWorkoutsPerWeek: _targetWorkoutsPerWeek,
-                      onEditGoalWeight: () => _editMetric(
-                        title: 'Hedef Kilo (kg)',
-                        unit: 'kg',
-                        currentValue: _goalWeightKg,
-                        onApply: (value) => _goalWeightKg = value,
+                      const SizedBox(height: 12.0),
+                      StatsCard(
+                        totalWorkouts: totalWorkouts,
+                        lastWorkoutDate: formatDate(lastWorkoutDate),
+                        lastWorkoutRelativeLabel: lastWorkoutRelativeLabel,
                       ),
-                      onEditTargetWorkouts: () => _editIntMetric(
-                        title: 'Haftalik Hedef Antrenman',
-                        unit: 'adet',
-                        currentValue: _targetWorkoutsPerWeek,
-                        onApply: (value) => _targetWorkoutsPerWeek = value,
+                      const SizedBox(height: 12.0),
+                      TrendCard(
+                        currentSevenDayLoad: trend.current,
+                        previousSevenDayLoad: trend.previous,
                       ),
-                    ),
-                    const SizedBox(height: 12.0),
-                    StatsCard(
-                      totalWorkouts: totalWorkouts,
-                      lastWorkoutDate: formatDate(lastWorkoutDate),
-                      lastWorkoutRelativeLabel: lastWorkoutRelativeLabel,
-                    ),
-                    const SizedBox(height: 12.0),
-                    PersonalRecordsCard(
-                      records: _personalRecords,
-                      onAddRecord: _showAddPersonalRecordDialog,
-                      onDeleteRecord: _deletePersonalRecord,
-                    ),
-                    const SizedBox(height: 24.0),
-                  ],
+                      const SizedBox(height: 12.0),
+                      if (muscleDistribution.isNotEmpty) ...[
+                        MuscleDistributionCard(
+                          distribution: muscleDistribution,
+                        ),
+                        const SizedBox(height: 12.0),
+                      ],
+                      BalanceCard(message: balanceText),
+                      const SizedBox(height: 12.0),
+                      PersonalRecordsCard(
+                        records: _personalRecords,
+                        onAddRecord: _showAddPersonalRecordDialog,
+                        onDeleteRecord: _deletePersonalRecord,
+                      ),
+                      const SizedBox(height: 24.0),
+                    ],
+                  ),
                 );
               },
             ),
           ),
         ],
       ),
-      bottomNavigationBar:
-          widget.showBottomNav ? const AppBottomNav(selectedIndex: 3) : null,
+      bottomNavigationBar: widget.showBottomNav
+          ? const AppBottomNav(selectedIndex: 3)
+          : null,
     );
   }
 }
@@ -1109,9 +1155,9 @@ class BodyMetricsCard extends StatelessWidget {
             Text(
               'Vucut Olculeri',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: _ProfileScreenState._textHigh,
-                    fontWeight: FontWeight.w700,
-                  ),
+                color: _ProfileScreenState._textHigh,
+                fontWeight: FontWeight.w700,
+              ),
             ),
             const SizedBox(height: 10.0),
             _MetricEditRow(
@@ -1175,16 +1221,16 @@ class _MetricEditRow extends StatelessWidget {
                 child: Text(
                   label,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: _ProfileScreenState._textMid,
-                      ),
+                    color: _ProfileScreenState._textMid,
+                  ),
                 ),
               ),
               Text(
                 value,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: _ProfileScreenState._textHigh,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  color: _ProfileScreenState._textHigh,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(width: 6.0),
               const Icon(
@@ -1226,17 +1272,17 @@ class _UserHeader extends StatelessWidget {
               Text(
                 username,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: _ProfileScreenState._textHigh,
-                      fontWeight: FontWeight.w800,
-                    ),
+                  color: _ProfileScreenState._textHigh,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
               const SizedBox(height: 4.0),
               Text(
                 'Workout Insights',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: _ProfileScreenState._textMid,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  color: _ProfileScreenState._textMid,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ],
           ),
@@ -1269,13 +1315,10 @@ class StatsCard extends StatelessWidget {
           children: [
             Text(
               'Genel Istatistikler',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(
-                    color: _ProfileScreenState._textHigh,
-                    fontWeight: FontWeight.w700,
-                  ),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: _ProfileScreenState._textHigh,
+                fontWeight: FontWeight.w700,
+              ),
             ),
             const SizedBox(height: 10),
             _StatRow(
@@ -1323,9 +1366,9 @@ class GoalsCard extends StatelessWidget {
             Text(
               'Hedefler',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: _ProfileScreenState._textHigh,
-                    fontWeight: FontWeight.w700,
-                  ),
+                color: _ProfileScreenState._textHigh,
+                fontWeight: FontWeight.w700,
+              ),
             ),
             const SizedBox(height: 10.0),
             _MetricEditRow(
@@ -1364,13 +1407,10 @@ class MuscleDistributionCard extends StatelessWidget {
           children: [
             Text(
               'Kas Dagilimi',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(
-                    color: _ProfileScreenState._textHigh,
-                    fontWeight: FontWeight.w700,
-                  ),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: _ProfileScreenState._textHigh,
+                fontWeight: FontWeight.w700,
+              ),
             ),
             const SizedBox(height: 10),
             ...sorted.map(
@@ -1456,9 +1496,9 @@ class PersonalRecordsCard extends StatelessWidget {
                   child: Text(
                     'Kisisel Rekorlar',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: _ProfileScreenState._textHigh,
-                          fontWeight: FontWeight.w700,
-                        ),
+                      color: _ProfileScreenState._textHigh,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
                 ElevatedButton.icon(
@@ -1470,9 +1510,8 @@ class PersonalRecordsCard extends StatelessWidget {
                       horizontal: 10.0,
                       vertical: 8.0,
                     ),
-                    textStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
+                    textStyle: Theme.of(context).textTheme.labelMedium
+                        ?.copyWith(fontWeight: FontWeight.w700),
                   ),
                   icon: const Icon(Icons.add, size: 16.0),
                   label: const Text('Ekle'),
@@ -1484,75 +1523,69 @@ class PersonalRecordsCard extends StatelessWidget {
               Text(
                 'Henuz rekor eklenmedi. Hareket secip rekorunu kaydet.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: _ProfileScreenState._textMid,
-                    ),
+                  color: _ProfileScreenState._textMid,
+                ),
               )
             else
-              ...records.asMap().entries.map(
-                (entry) {
-                  final index = entry.key;
-                  final record = entry.value;
-                  final extraWeightLabel =
-                      record.hasExtraWeight && record.extraWeightKg != null
-                      ? ' + ${record.extraWeightKg!.toStringAsFixed(1)} kg'
-                      : '';
+              ...records.asMap().entries.map((entry) {
+                final index = entry.key;
+                final record = entry.value;
+                final extraWeightLabel =
+                    record.hasExtraWeight && record.extraWeightKg != null
+                    ? ' + ${record.extraWeightKg!.toStringAsFixed(1)} kg'
+                    : '';
 
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10.0,
-                        vertical: 10.0,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _ProfileScreenState._cardSurfaceSoft,
-                        borderRadius: BorderRadius.circular(14.0),
-                        border: Border.all(color: Colors.white.withOpacity(0.08)),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  record.exerciseName,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge
-                                      ?.copyWith(
-                                        color: _ProfileScreenState._textHigh,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                ),
-                                const SizedBox(height: 2.0),
-                                Text(
-                                  '${record.recordValue} ${record.isTimed ? 'sn' : 'tekrar'}$extraWeightLabel',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.copyWith(
-                                        color: _ProfileScreenState._textMid,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () => onDeleteRecord(index),
-                            icon: const Icon(
-                              Icons.delete_outline_rounded,
-                              color: Color(0xFFFF8E8E),
-                            ),
-                            tooltip: 'Sil',
-                          ),
-                        ],
-                      ),
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                      vertical: 10.0,
                     ),
-                  );
-                },
-              ),
+                    decoration: BoxDecoration(
+                      color: _ProfileScreenState._cardSurfaceSoft,
+                      borderRadius: BorderRadius.circular(14.0),
+                      border: Border.all(color: Colors.white.withOpacity(0.08)),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                record.exerciseName,
+                                style: Theme.of(context).textTheme.bodyLarge
+                                    ?.copyWith(
+                                      color: _ProfileScreenState._textHigh,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                              ),
+                              const SizedBox(height: 2.0),
+                              Text(
+                                '${record.recordValue} ${record.isTimed ? 'sn' : 'tekrar'}$extraWeightLabel',
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                      color: _ProfileScreenState._textMid,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => onDeleteRecord(index),
+                          icon: const Icon(
+                            Icons.delete_outline_rounded,
+                            color: Color(0xFFFF8E8E),
+                          ),
+                          tooltip: 'Sil',
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
           ],
         ),
       ),
@@ -1590,13 +1623,10 @@ class TrendCard extends StatelessWidget {
           children: [
             Text(
               'Son 7 Gun Trendi',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(
-                    color: _ProfileScreenState._textHigh,
-                    fontWeight: FontWeight.w700,
-                  ),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: _ProfileScreenState._textHigh,
+                fontWeight: FontWeight.w700,
+              ),
             ),
             const SizedBox(height: 10),
             _StatRow(
@@ -1619,9 +1649,9 @@ class TrendCard extends StatelessWidget {
                 Text(
                   trendLabel,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: trendColor,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    color: trendColor,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
@@ -1647,20 +1677,17 @@ class BalanceCard extends StatelessWidget {
           children: [
             Text(
               'Denge Analizi',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(
-                    color: _ProfileScreenState._textHigh,
-                    fontWeight: FontWeight.w700,
-                  ),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: _ProfileScreenState._textHigh,
+                fontWeight: FontWeight.w700,
+              ),
             ),
             const SizedBox(height: 10),
             Text(
               message,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: _ProfileScreenState._textMid,
-                  ),
+                color: _ProfileScreenState._textMid,
+              ),
             ),
           ],
         ),
@@ -1691,17 +1718,17 @@ class _StatRow extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: labelColor,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: labelColor),
             ),
           ),
           Text(
             value,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: valueColor,
-                  fontWeight: FontWeight.w600,
-                ),
+              color: valueColor,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),
@@ -1725,9 +1752,7 @@ class _GlassCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: _ProfileScreenState._cardSurface.withOpacity(0.78),
             borderRadius: BorderRadius.circular(borderRadius),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.08),
-            ),
+            border: Border.all(color: Colors.white.withOpacity(0.08)),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.35),

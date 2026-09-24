@@ -174,15 +174,16 @@ class _CustomProgramDaySessionScreenState
   mli.Exercise _inferExerciseFromName(CustomProgramExercise source) {
     final normalized = _normalizeExerciseName(source.exerciseName);
 
+    // omega: Ana kas=1.0, Yardimci=0.5, Stabilizator=0.2
     if (normalized.contains('push') || normalized.contains('dip')) {
       return mli.Exercise(
         name: source.exerciseName,
         difficulty: 1.0,
         muscles: {
-          'chest': 0.45,
-          'shoulders': 0.25,
-          'triceps': 0.25,
-          'core': 0.05,
+          'chest': 1.0,
+          'triceps': 0.5,
+          'shoulders': 0.5,
+          'core': 0.2,
         },
       );
     }
@@ -194,7 +195,12 @@ class _CustomProgramDaySessionScreenState
       return mli.Exercise(
         name: source.exerciseName,
         difficulty: 1.0,
-        muscles: {'back': 0.5, 'biceps': 0.25, 'shoulders': 0.15, 'core': 0.1},
+        muscles: {
+          'back': 1.0,
+          'biceps': 0.5,
+          'shoulders': 0.5,
+          'core': 0.2,
+        },
       );
     }
 
@@ -210,18 +216,19 @@ class _CustomProgramDaySessionScreenState
         name: source.exerciseName,
         difficulty: 1.0,
         muscles: {
-          'quads': 0.35,
-          'hamstrings': 0.2,
-          'glutes': 0.3,
-          'calves': 0.15,
+          'quads': 1.0,
+          'glutes': 0.5,
+          'hamstrings': 0.5,
+          'calves': 0.2,
         },
       );
     }
 
+    // Genel/core egzersiz
     return mli.Exercise(
       name: source.exerciseName,
       difficulty: 1.0,
-      muscles: {'core': 0.7, 'shoulders': 0.2, 'back': 0.1},
+      muscles: {'core': 1.0, 'shoulders': 0.5, 'back': 0.5},
     );
   }
 
@@ -269,18 +276,29 @@ class _CustomProgramDaySessionScreenState
     final muscles = <String, double>{};
 
     if (exerciseDetail != null && exerciseDetail.muscleRatings.isNotEmpty) {
-      final total = exerciseDetail.muscleRatings.values
-          .fold<int>(0, (sum, value) => sum + value)
-          .toDouble();
+      // omega ataması: maxRating -> 1.0 (Ana kas)
+      //                max/2 ve üstü -> 0.5 (Yardimci kas)
+      //                diğerleri     -> 0.2 (Stabilizatör)
+      final maxRating = exerciseDetail.muscleRatings.values
+          .fold<int>(0, (m, v) => v > m ? v : m);
 
       exerciseDetail.muscleRatings.forEach((group, rating) {
-        muscles[group.label] = total == 0 ? 0 : rating / total;
+        final double omega;
+        if (rating >= maxRating) {
+          omega = 1.0;
+        } else if (rating * 2 >= maxRating) {
+          omega = 0.5;
+        } else {
+          omega = 0.2;
+        }
+        muscles[group.label] = omega;
       });
     } else if (exerciseDetail != null &&
         exerciseDetail.targetMuscleGroups.isNotEmpty) {
-      final weight = 1 / exerciseDetail.targetMuscleGroups.length;
-      for (final group in exerciseDetail.targetMuscleGroups) {
-        muscles[group.label] = weight;
+      // İlk kas birincil (1.0), diğerleri yardimci (0.5)
+      final groups = exerciseDetail.targetMuscleGroups;
+      for (var i = 0; i < groups.length; i++) {
+        muscles[groups[i].label] = i == 0 ? 1.0 : 0.5;
       }
     }
 
