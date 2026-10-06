@@ -8,6 +8,10 @@ import 'package:calisthenics_app/core/local_storage/workout_summary_storage.dart
 import 'package:calisthenics_app/presentation/screens/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:calisthenics_app/data/services/firestore_service.dart';
+import 'package:calisthenics_app/presentation/routes/app_routes.dart';
+
 class UserProfileScreen extends StatelessWidget {
   const UserProfileScreen({super.key, this.showBottomNav = true});
 
@@ -19,16 +23,16 @@ class UserProfileScreen extends StatelessWidget {
   }
 }
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key, this.showBottomNav = true});
 
   final bool showBottomNav;
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   static const Color _bgTop = Color(0xFF151028);
   static const Color _bgBottom = Color(0xFF0E0A1D);
   static const Color _cardSurface = Color(0xFF201836);
@@ -69,12 +73,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _gender = 'Belirtilmedi';
   DateTime? _birthDate;
   List<PersonalRecordEntry> _personalRecords = const [];
+  int _syncedStreak = 0;
+  int _syncedTotalWorkouts = 0;
 
   @override
   void initState() {
     super.initState();
     _summaryFuture = _loadSummaries();
     _loadBodyMetrics();
+    _syncUserStreakAndStats();
+  }
+
+  Future<void> _syncUserStreakAndStats() async {
+    try {
+      final storage = WorkoutSummaryStorage();
+      final summaries = await storage.loadSummaries();
+      final localTotal = summaries.length;
+      final localStreak = calculateWorkoutStreak(summaries);
+      final lastDate = summaries.isNotEmpty
+          ? summaries.map((s) => s.date).reduce((a, b) => a.isAfter(b) ? a : b)
+          : null;
+
+      final result = await ref
+          .read(firestoreServiceProvider)
+          .syncUserStreakAndWorkouts(
+            localTotalWorkouts: localTotal,
+            localStreak: localStreak,
+            localLastWorkoutDate: lastDate,
+          );
+
+      if (!mounted) return;
+      setState(() {
+        _syncedStreak = result['streak'] ?? localStreak;
+        _syncedTotalWorkouts = result['totalWorkouts'] ?? localTotal;
+      });
+    } catch (_) {
+      // Ağ veya Firestore hatasında UI akışını engellemez
+    }
   }
 
   Future<List<WorkoutSummaryEntry>> _loadSummaries() async {
@@ -90,6 +125,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       _summaryFuture = _loadSummaries();
     });
+    await _syncUserStreakAndStats();
   }
 
   Future<void> _loadBodyMetrics() async {
@@ -1082,9 +1118,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const SizedBox(height: 12.0),
                       StatsCard(
-                        totalWorkouts: totalWorkouts,
+                        totalWorkouts: _syncedTotalWorkouts > totalWorkouts
+                            ? _syncedTotalWorkouts
+                            : totalWorkouts,
+                        streak: _syncedStreak > calculateWorkoutStreak(summaries)
+                            ? _syncedStreak
+                            : calculateWorkoutStreak(summaries),
                         lastWorkoutDate: formatDate(lastWorkoutDate),
                         lastWorkoutRelativeLabel: lastWorkoutRelativeLabel,
+                        onStreakTap: () {
+                          Navigator.pushNamed(context, AppRoutes.streakDetails);
+                        },
                       ),
                       const SizedBox(height: 12.0),
                       TrendCard(
@@ -1298,11 +1342,15 @@ class StatsCard extends StatelessWidget {
     required this.totalWorkouts,
     required this.lastWorkoutDate,
     required this.lastWorkoutRelativeLabel,
+    this.streak = 0,
+    this.onStreakTap,
   });
 
   final int totalWorkouts;
   final String lastWorkoutDate;
   final String lastWorkoutRelativeLabel;
+  final int streak;
+  final VoidCallback? onStreakTap;
 
   @override
   Widget build(BuildContext context) {
@@ -1313,14 +1361,50 @@ class StatsCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Genel Istatistikler',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: _ProfileScreenState._textHigh,
-                fontWeight: FontWeight.w700,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Genel Istatistikler',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: _ProfileScreenState._textHigh,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                if (onStreakTap != null)
+                  InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: onStreakTap,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Detaylar',
+                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: _ProfileScreenState._accentBlue,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(width: 2),
+                          const Icon(
+                            Icons.chevron_right_rounded,
+                            size: 16,
+                            color: _ProfileScreenState._accentBlue,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 10),
+            _StatRow(
+              label: 'Mevcut Seri (Streak)',
+              value: '$streak gün 🔥',
+              labelColor: _ProfileScreenState._textMid,
+              valueColor: streak > 0 ? const Color(0xFFFF9800) : _ProfileScreenState._textHigh,
+            ),
             _StatRow(
               label: 'Toplam antrenman',
               value: '$totalWorkouts',

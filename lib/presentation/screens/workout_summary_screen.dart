@@ -1,10 +1,12 @@
 // lib/presentation/screens/workout_summary_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/core/local_storage/workout_history_storage.dart';
 import 'package:calisthenics_app/core/local_storage/workout_summary_storage.dart';
 import 'package:calisthenics_app/domain/services/mli_calculator.dart';
+import 'package:calisthenics_app/data/services/firestore_service.dart';
 
 // ─── Design Tokens ───────────────────────────────────────────────────────────
 const Color _bg = Color(0xFF0C101B);
@@ -35,28 +37,82 @@ class WorkoutSummaryArgs {
 }
 
 // ─── Screen ──────────────────────────────────────────────────────────────────
-class WorkoutSummaryScreen extends StatelessWidget {
+class WorkoutSummaryScreen extends ConsumerStatefulWidget {
   const WorkoutSummaryScreen({super.key, required this.args});
 
   final WorkoutSummaryArgs args;
 
-  // ── Business Logic (unchanged) ──────────────────────────────────────────
+  @override
+  ConsumerState<WorkoutSummaryScreen> createState() =>
+      _WorkoutSummaryScreenState();
+}
+
+class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
+  bool _firestoreSynced = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Antrenman tamamlandığında Firestore senkronizasyonunu arka planda sessizce tetikle
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _syncToFirestore();
+    });
+  }
+
+  void _syncToFirestore() {
+    if (_firestoreSynced) return;
+    _firestoreSynced = true;
+
+    try {
+      final sessionData = <String, dynamic>{
+        'completedAt': DateTime.now().toIso8601String(),
+        'durationSeconds': widget.args.totalTime.inSeconds,
+        'exercisesDone': [widget.args.exerciseName],
+        'totalMliWorkload': widget.args.totalLoad,
+        'muscleWorkloads': widget.args.muscleLoad,
+        'exerciseName': widget.args.exerciseName,
+        'totalDurationSeconds': widget.args.totalTime.inSeconds,
+        'exercises': [
+          {
+            'name': widget.args.exerciseName,
+            'setsCompleted': widget.args.setsCompleted,
+            'totalSets': widget.args.totalSets,
+          },
+        ],
+        'totalLoad': widget.args.totalLoad,
+        'muscleLoad': widget.args.muscleLoad,
+        'setsCompleted': widget.args.setsCompleted,
+        'totalSets': widget.args.totalSets,
+      };
+
+      ref
+          .read(firestoreServiceProvider)
+          .saveWorkoutSession(sessionData)
+          .catchError((_) {});
+    } catch (_) {
+      // Sessiz hata yakalama: UI akışını engellemez
+    }
+  }
+
+  // ── Business Logic ──────────────────────────────────────────────────────────
   Future<void> _saveSession(BuildContext context) async {
+    _syncToFirestore();
+
     final storage = WorkoutHistoryStorage();
     final summaryStorage = WorkoutSummaryStorage();
     final entry = WorkoutSessionEntry(
-      exerciseName: args.exerciseName,
-      totalTimeSeconds: args.totalTime.inSeconds,
-      setsCompleted: args.setsCompleted,
-      totalSets: args.totalSets,
+      exerciseName: widget.args.exerciseName,
+      totalTimeSeconds: widget.args.totalTime.inSeconds,
+      setsCompleted: widget.args.setsCompleted,
+      totalSets: widget.args.totalSets,
       completedAt: DateTime.now(),
     );
 
     final summaryEntry = WorkoutSummaryEntry(
       date: DateTime.now(),
-      totalLoad: args.totalLoad,
-      muscleLoad: args.muscleLoad,
-      duration: args.totalTime.inSeconds,
+      totalLoad: widget.args.totalLoad,
+      muscleLoad: widget.args.muscleLoad,
+      duration: widget.args.totalTime.inSeconds,
     );
 
     try {
@@ -98,10 +154,9 @@ class WorkoutSummaryScreen extends StatelessWidget {
   // ── Build ────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    final sortedMuscles =
-        args.muscleLoad.entries.toList()
-          ..sort((a, b) => b.value.compareTo(a.value));
-    final totalMuscleLoad = args.muscleLoad.values.fold(
+    final sortedMuscles = widget.args.muscleLoad.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    final totalMuscleLoad = widget.args.muscleLoad.values.fold(
       0.0,
       (sum, v) => sum + v,
     );
@@ -215,7 +270,7 @@ class WorkoutSummaryScreen extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          args.exerciseName,
+          widget.args.exerciseName,
           textAlign: TextAlign.center,
           style: const TextStyle(
             color: _textMuted,
@@ -235,7 +290,7 @@ class WorkoutSummaryScreen extends StatelessWidget {
           child: _MetricCard(
             icon: Icons.timer_outlined,
             label: 'Toplam Süre',
-            value: _formatDuration(args.totalTime),
+            value: _formatDuration(widget.args.totalTime),
           ),
         ),
         const SizedBox(width: 12),
@@ -243,7 +298,7 @@ class WorkoutSummaryScreen extends StatelessWidget {
           child: _MetricCard(
             icon: Icons.fitness_center_rounded,
             label: 'Setler',
-            value: '${args.setsCompleted} / ${args.totalSets}',
+            value: '${widget.args.setsCompleted} / ${widget.args.totalSets}',
           ),
         ),
         const SizedBox(width: 12),
@@ -251,7 +306,7 @@ class WorkoutSummaryScreen extends StatelessWidget {
           child: _MetricCard(
             icon: Icons.bolt_rounded,
             label: 'Toplam Yük',
-            value: '${args.totalLoad.round()} MLI',
+            value: '${widget.args.totalLoad.round()} MLI',
           ),
         ),
       ],
@@ -307,8 +362,9 @@ class WorkoutSummaryScreen extends StatelessWidget {
               (entry) => _MuscleLoadRow(
                 muscleName: entry.key,
                 load: entry.value,
-                ratio:
-                    totalMuscleLoad > 0 ? entry.value / totalMuscleLoad : 0.0,
+                ratio: totalMuscleLoad > 0
+                    ? entry.value / totalMuscleLoad
+                    : 0.0,
               ),
             ),
         ],
@@ -436,10 +492,7 @@ class _MuscleLoadRow extends StatelessWidget {
               ),
               // Stimulus badge
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 3,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: badgeBg,
                   borderRadius: BorderRadius.circular(20),
@@ -472,7 +525,9 @@ class _MuscleLoadRow extends StatelessWidget {
               value: ratio.clamp(0.0, 1.0),
               minHeight: 7,
               backgroundColor: _stroke,
-              valueColor: AlwaysStoppedAnimation<Color>(badgeFg == const Color(0xFFC2F13A) ? _accent : badgeFg),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                badgeFg == const Color(0xFFC2F13A) ? _accent : badgeFg,
+              ),
             ),
           ),
         ],
@@ -537,10 +592,7 @@ class _OutlineActionButton extends StatelessWidget {
           fit: BoxFit.scaleDown,
           child: Text(
             label,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 13,
-            ),
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
           ),
         ),
         style: OutlinedButton.styleFrom(

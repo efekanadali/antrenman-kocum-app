@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "374235642198",
+    "project_id": "fitnessapp-2d698",
+    "storage_bucket": "fitnessapp-2d698.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:374235642198:android:bcbbce7ac27c4b105ffef7",
+        "android_client_info": {
+          "package_name": "com.efekan.calisthenicsapp.calisthenics_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCq1EnvnE46kYHa1eSWBrRzQEDLHZYYoQM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:374235642198:android:6e8f663b6984841b5ffef7",
+        "android_client_info": {
+          "package_name": "com.example.fitness_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCq1EnvnE46kYHa1eSWBrRzQEDLHZYYoQM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

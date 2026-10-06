@@ -82,3 +82,41 @@ class WorkoutSummaryStorage {
     await file.writeAsString(encoded);
   }
 }
+
+int calculateStreakFromDates(List<DateTime> dates) {
+  if (dates.isEmpty) return 0;
+  final uniqueDays = dates
+      .map((d) => DateTime(d.year, d.month, d.day))
+      .toSet()
+      .toList()
+    ..sort((a, b) => b.compareTo(a));
+
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  final yesterday = today.subtract(const Duration(days: 1));
+
+  final latest = uniqueDays.first;
+  if (latest.isBefore(yesterday)) {
+    return 0;
+  }
+
+  int streak = 0;
+  DateTime expectedDate = latest;
+
+  for (final day in uniqueDays) {
+    if (day.isAtSameMomentAs(expectedDate)) {
+      streak++;
+      expectedDate = expectedDate.subtract(const Duration(days: 1));
+    } else if (day.isAfter(expectedDate)) {
+      continue;
+    } else {
+      break;
+    }
+  }
+
+  return streak;
+}
+
+int calculateWorkoutStreak(List<WorkoutSummaryEntry> summaries) {
+  return calculateStreakFromDates(summaries.map((s) => s.date).toList());
+}

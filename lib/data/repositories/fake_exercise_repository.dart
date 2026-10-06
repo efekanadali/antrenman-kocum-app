@@ -19,7 +19,7 @@ class FakeExerciseRepository implements ExerciseRepository {
       .map((entry) => _toDomainExercise(entry.key, entry.value))
       .toList();
 
-  static const Map<String, List<String>> _prerequisiteExerciseIds = {
+  static const Map<String, List<String>> prerequisiteExerciseIds = {
     'standard_push_up': ['incline_push_up', 'knee_push_up'],
     'wide_push_up': ['standard_push_up'],
     'diamond_push_up': ['knee_push_up', 'standard_push_up'],
@@ -50,7 +50,7 @@ class FakeExerciseRepository implements ExerciseRepository {
     'tuck_planche': ['support_hold_parallel_bar', 'pike_push_up'],
   };
 
-  static const Map<String, String> _exerciseDescriptions = {
+  static const Map<String, String> exerciseDescriptions = {
     'incline_push_up':
         'Kurulum: Eller yukselti uzerinde omuz genisliginde, govde duz cizgi.\n'
         'Uygulama: Dirsekleri 30-45 derece geriye kirip gogsu yukseltiye yaklastir, iterek basa don.\n'
@@ -246,10 +246,10 @@ class FakeExerciseRepository implements ExerciseRepository {
   static Exercise _toDomainExercise(String id, mli.Exercise source) {
     final ratings = <MuscleGroup, int>{};
     final targetMuscles = <MuscleGroup>[];
-    final level = _levelFromCoefficient(source.difficulty);
+    final level = levelFromCoefficient(source.difficulty);
 
     source.muscles.forEach((key, value) {
-      final group = _muscleFromKey(key);
+      final group = muscleFromKey(key);
       if (group == null) {
         return;
       }
@@ -265,17 +265,17 @@ class FakeExerciseRepository implements ExerciseRepository {
       id: id,
       name: source.name,
       level: level,
-      difficulty: _difficultyFromCoefficient(source.difficulty),
+      difficulty: difficultyFromCoefficient(source.difficulty),
       targetMuscleGroups: targetMuscles,
       muscleRatings: ratings,
       description:
-          _exerciseDescriptions[id] ??
+          exerciseDescriptions[id] ??
           '${source.name} hareketi icin kas aktivasyon dagilimi.',
-      prerequisiteExercises: _buildPrerequisites(id: id, level: level),
+      prerequisiteExercises: buildPrerequisites(id: id, level: level),
     );
   }
 
-  static List<String> _buildPrerequisites({
+  static List<String> buildPrerequisites({
     required String id,
     required ExerciseLevel level,
   }) {
@@ -283,7 +283,7 @@ class FakeExerciseRepository implements ExerciseRepository {
       return const <String>[];
     }
 
-    final prerequisiteNames = (_prerequisiteExerciseIds[id] ?? const <String>[])
+    final prerequisiteNames = (prerequisiteExerciseIds[id] ?? const <String>[])
         .map((exerciseId) => exerciseDatabase[exerciseId]?.name)
         .whereType<String>()
         .toList();
@@ -299,20 +299,21 @@ class FakeExerciseRepository implements ExerciseRepository {
     return prerequisiteNames;
   }
 
-  static MuscleGroup? _muscleFromKey(String key) {
+  static MuscleGroup? muscleFromKey(String key) {
     switch (key) {
       case 'chest':
         return MuscleGroup.chest;
       case 'back':
         return MuscleGroup.back;
       case 'shoulders':
-        return MuscleGroup.shoulders;
       case 'rear_shoulders':
         return MuscleGroup.shoulders;
       case 'biceps':
         return MuscleGroup.biceps;
       case 'triceps':
         return MuscleGroup.triceps;
+      case 'legs':
+        return MuscleGroup.legs;
       case 'core':
         return MuscleGroup.core;
       case 'quads':
@@ -328,7 +329,7 @@ class FakeExerciseRepository implements ExerciseRepository {
     }
   }
 
-  static DifficultyLevel _difficultyFromCoefficient(double coefficient) {
+  static DifficultyLevel difficultyFromCoefficient(double coefficient) {
     if (coefficient < 1.0) {
       return DifficultyLevel.easy;
     }
@@ -338,7 +339,7 @@ class FakeExerciseRepository implements ExerciseRepository {
     return DifficultyLevel.hard;
   }
 
-  static ExerciseLevel _levelFromCoefficient(double coefficient) {
+  static ExerciseLevel levelFromCoefficient(double coefficient) {
     if (coefficient < 1.0) {
       return ExerciseLevel.beginner;
     }
