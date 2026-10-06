@@ -1129,6 +1129,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         onStreakTap: () {
                           Navigator.pushNamed(context, AppRoutes.streakDetails);
                         },
+                        onHistoryTap: () {
+                          Navigator.pushNamed(context, AppRoutes.workoutHistory);
+                        },
+                      ),
+                      const SizedBox(height: 12.0),
+                      _WorkoutHistoryProfileCard(
+                        totalWorkouts: _syncedTotalWorkouts > totalWorkouts
+                            ? _syncedTotalWorkouts
+                            : totalWorkouts,
+                        onTap: () {
+                          Navigator.pushNamed(context, AppRoutes.workoutHistory);
+                        },
                       ),
                       const SizedBox(height: 12.0),
                       TrendCard(
@@ -1344,6 +1356,7 @@ class StatsCard extends StatelessWidget {
     required this.lastWorkoutRelativeLabel,
     this.streak = 0,
     this.onStreakTap,
+    this.onHistoryTap,
   });
 
   final int totalWorkouts;
@@ -1351,6 +1364,7 @@ class StatsCard extends StatelessWidget {
   final String lastWorkoutRelativeLabel;
   final int streak;
   final VoidCallback? onStreakTap;
+  final VoidCallback? onHistoryTap;
 
   @override
   Widget build(BuildContext context) {
@@ -1405,11 +1419,15 @@ class StatsCard extends StatelessWidget {
               labelColor: _ProfileScreenState._textMid,
               valueColor: streak > 0 ? const Color(0xFFFF9800) : _ProfileScreenState._textHigh,
             ),
-            _StatRow(
-              label: 'Toplam antrenman',
-              value: '$totalWorkouts',
-              labelColor: _ProfileScreenState._textMid,
-              valueColor: _ProfileScreenState._textHigh,
+            InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: onHistoryTap,
+              child: _StatRow(
+                label: 'Toplam antrenman',
+                value: '$totalWorkouts ›',
+                labelColor: _ProfileScreenState._textMid,
+                valueColor: _ProfileScreenState._accentBlue,
+              ),
             ),
             _StatRow(
               label: 'Son antrenman',
@@ -1418,6 +1436,79 @@ class StatsCard extends StatelessWidget {
               valueColor: _ProfileScreenState._textHigh,
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _WorkoutHistoryProfileCard extends StatelessWidget {
+  const _WorkoutHistoryProfileCard({
+    required this.totalWorkouts,
+    required this.onTap,
+  });
+
+  final int totalWorkouts;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return _GlassCard(
+      borderRadius: 22.0,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(22.0),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFC2F13A).withAlpha(35),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.history_rounded,
+                    color: Color(0xFFC2F13A),
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Antrenman Geçmişi',
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              color: _ProfileScreenState._textHigh,
+                              fontWeight: FontWeight.w700,
+                            ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        totalWorkouts > 0
+                            ? '$totalWorkouts tamamlanan seans ve MLI puanları'
+                            : 'Tamamlanan seansların dökümü',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: _ProfileScreenState._textMid,
+                              fontSize: 12,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: _ProfileScreenState._textMid,
+                  size: 15,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

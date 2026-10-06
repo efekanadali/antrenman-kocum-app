@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart';
 import 'package:calisthenics_app/domain/models/custom_program.dart';
-import 'package:calisthenics_app/presentation/screens/home_screen.dart';
 import 'package:calisthenics_app/presentation/screens/exercise_detail_screen.dart';
 import 'package:calisthenics_app/presentation/screens/favorites_screen.dart';
 import 'package:calisthenics_app/presentation/screens/training_program_screen.dart';
@@ -21,6 +20,7 @@ import 'package:calisthenics_app/presentation/screens/custom_program_detail_scre
 import 'package:calisthenics_app/presentation/screens/custom_program_day_session_screen.dart';
 import 'package:calisthenics_app/presentation/screens/main_swipe_shell.dart';
 import 'package:calisthenics_app/presentation/screens/training_day_session_screen.dart';
+import 'package:calisthenics_app/presentation/screens/workout_history_screen.dart';
 
 class AppRoutes {
   static const String home = '/';
@@ -40,6 +40,7 @@ class AppRoutes {
   static const String streakDetails = '/profile/streak';
   static const String weeklyGoal = '/profile/weekly-goal';
   static const String totalTime = '/profile/total-time';
+  static const String workoutHistory = '/profile/workout-history';
 
   static const List<String> _tabOrder = [
     home,
@@ -210,6 +211,11 @@ class AppRoutes {
       case totalTime:
         return _buildSlideRoute(
             page: const TotalTimeScreen(),
+          settings: settings,
+        );
+      case workoutHistory:
+        return _buildSlideRoute(
+          page: const WorkoutHistoryScreen(),
           settings: settings,
         );
       default:

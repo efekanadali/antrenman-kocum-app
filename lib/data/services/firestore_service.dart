@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calisthenics_app/domain/models/exercise_database.dart';
 import 'package:calisthenics_app/core/local_storage/workout_summary_storage.dart';
+import 'package:calisthenics_app/domain/models/workout_session_summary.dart';
 
 final firestoreServiceProvider = Provider<FirestoreService>((ref) {
   return FirestoreService(
@@ -224,5 +225,21 @@ class FirestoreService {
     } catch (_) {
       // Sessiz hata yönetimi
     }
+  }
+
+  // 6. Kullanıcının Antrenman Geçmişini Canlı Dinleme (Tarihe Göre Azalan / Descending)
+  Stream<List<WorkoutSessionSummary>> getWorkoutSessionsStream() async* {
+    final uid = await getOrCreateUserId();
+    yield* _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('workout_sessions')
+        .orderBy('completedAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return WorkoutSessionSummary.fromFirestore(doc.id, doc.data());
+      }).toList();
+    });
   }
 }
