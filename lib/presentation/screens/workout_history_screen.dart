@@ -5,17 +5,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calisthenics_app/domain/models/workout_session_summary.dart';
 import 'package:calisthenics_app/presentation/providers/workout_history_provider.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
+import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 
-// ─── Design Tokens ───────────────────────────────────────────────────────────
-const Color _bg = Color(0xFF0C101B);
-const Color _surface = Color(0xFF161C2C);
-const Color _card = Color(0xFF1E263B);
-const Color _cardBorder = Color(0xFF28324C);
-const Color _accent = Color(0xFFC2F13A); // Lime green fitness accent
-const Color _accentBlue = Color(0xFF4FC3F7);
-const Color _textPrimary = Color(0xFFFFFFFF);
-const Color _textSecondary = Color(0xFF8E9BAE);
-const Color _textMuted = Color(0xFF5F6E84);
+// ─── Design Tokens (Nordic & Cyber-Athlete) ──────────────────────────────────
+const Color _bg = AppColors.background; // #0A0C0E
+const Color _surface = AppColors.surface; // #13171C
+const Color _surfaceSoft = AppColors.surfaceSoft; // #181D24
+const Color _border = AppColors.border; // #1E232A
+const Color _volcanic = AppColors.volcanic; // #FF5533
+const Color _emerald = AppColors.emerald; // #10B981
+const Color _nordicIce = AppColors.nordicIce; // #38BDF8
+
+const Color _textPrimary = AppColors.textHigh; // #F1F5F9
+const Color _textSecondary = AppColors.textMid; // #94A3B8
+const Color _textMuted = AppColors.textMuted; // #64748B
 
 class WorkoutHistoryScreen extends ConsumerWidget {
   const WorkoutHistoryScreen({super.key});
@@ -29,26 +32,28 @@ class WorkoutHistoryScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: _bg,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: _textPrimary, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: _textPrimary, size: 18),
           onPressed: () => Navigator.maybePop(context),
         ),
         title: const Text(
           'Antrenman Geçmişi',
           style: TextStyle(
             color: _textPrimary,
-            fontWeight: FontWeight.w700,
-            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            fontSize: 17,
+            letterSpacing: -0.2,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.insights_rounded, color: _accentBlue, size: 22),
+            icon: const Icon(Icons.insights_rounded, color: _volcanic, size: 20),
             tooltip: 'Analitik',
             onPressed: () => Navigator.pushNamed(context, AppRoutes.analytics),
           ),
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: _accent, size: 22),
+            icon: const Icon(Icons.refresh_rounded, color: _textSecondary, size: 20),
             tooltip: 'Yenile',
             onPressed: () => ref.invalidate(workoutHistoryProvider),
           ),
@@ -82,13 +87,13 @@ class _LoadingView extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(_accent),
-            strokeWidth: 3,
+            valueColor: AlwaysStoppedAnimation<Color>(_volcanic),
+            strokeWidth: 2.5,
           ),
           SizedBox(height: 16),
           Text(
             'Antrenman geçmişi yükleniyor...',
-            style: TextStyle(color: _textSecondary, fontSize: 14),
+            style: TextStyle(color: _textSecondary, fontSize: 13),
           ),
         ],
       ),
@@ -115,15 +120,16 @@ class _ErrorView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: Colors.red.withAlpha(30),
+                color: _surface,
                 shape: BoxShape.circle,
+                border: Border.all(color: _border, width: 1),
               ),
               child: const Icon(
                 Icons.wifi_off_rounded,
-                color: Colors.redAccent,
-                size: 40,
+                color: _volcanic,
+                size: 36,
               ),
             ),
             const SizedBox(height: 16),
@@ -131,24 +137,24 @@ class _ErrorView extends StatelessWidget {
               'Geçmiş Yüklenemedi',
               style: TextStyle(
                 color: _textPrimary,
-                fontWeight: FontWeight.w700,
-                fontSize: 17,
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
+            const SizedBox(height: 6),
+            const Text(
               'Ağ bağlantısı kurulamadı veya bir hata oluştu. Lütfen tekrar deneyin.',
               textAlign: TextAlign.center,
-              style: const TextStyle(color: _textSecondary, fontSize: 13),
+              style: TextStyle(color: _textSecondary, fontSize: 13, height: 1.4),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
             ElevatedButton.icon(
               onPressed: onRetry,
-              icon: const Icon(Icons.refresh_rounded, size: 18),
+              icon: const Icon(Icons.refresh_rounded, size: 16),
               label: const Text('Tekrar Dene'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: _accent,
-                foregroundColor: _bg,
+                backgroundColor: _volcanic,
+                foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -176,57 +182,58 @@ class _EmptyHistoryView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 88,
-              height: 88,
+              width: 76,
+              height: 76,
               decoration: BoxDecoration(
                 color: _surface,
                 shape: BoxShape.circle,
-                border: Border.all(color: _cardBorder, width: 1.5),
+                border: Border.all(color: _border, width: 1),
               ),
               child: const Icon(
                 Icons.fitness_center_rounded,
-                size: 40,
-                color: _accent,
+                size: 34,
+                color: _volcanic,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
             const Text(
               'Henüz tamamlanmış antrenman yok',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: _textPrimary,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.2,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             const Text(
               'Tamamladığınız antrenmanların süreleri, egzersiz detayları ve MLI iş yükü puanları burada listelenecektir.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: _textSecondary,
                 fontSize: 13,
-                height: 1.4,
+                height: 1.45,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: () {
                 Navigator.pushNamed(context, AppRoutes.workoutLibrary);
               },
-              icon: const Icon(Icons.play_arrow_rounded, size: 20),
+              icon: const Icon(Icons.play_arrow_rounded, size: 18),
               label: const Text(
                 'Antrenmana Başla',
-                style: TextStyle(fontWeight: FontWeight.w700),
+                style: TextStyle(fontWeight: FontWeight.w600),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: _accent,
-                foregroundColor: _bg,
+                backgroundColor: _volcanic,
+                foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
               ),
             ),
           ],
@@ -244,7 +251,6 @@ class _HistoryListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Toplam istatistikler
     final totalCount = sessions.length;
     final totalSeconds = sessions.fold<int>(0, (sum, s) => sum + s.durationSeconds);
     final totalLoad = sessions.fold<double>(0.0, (sum, s) => sum + s.totalMliWorkload);
@@ -258,7 +264,7 @@ class _HistoryListView extends StatelessWidget {
           totalSeconds: totalSeconds,
           totalLoad: totalLoad,
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -266,21 +272,22 @@ class _HistoryListView extends StatelessWidget {
               'Tüm Seanslar',
               style: TextStyle(
                 color: _textPrimary,
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.2,
               ),
             ),
             Text(
               '$totalCount kayıt',
               style: const TextStyle(
                 color: _textMuted,
-                fontSize: 13,
+                fontSize: 12,
                 fontWeight: FontWeight.w500,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
         // Seans Kartları
         ...sessions.map((session) => _WorkoutSessionCard(session: session)),
       ],
@@ -288,7 +295,7 @@ class _HistoryListView extends StatelessWidget {
   }
 }
 
-// ─── Header Overview Card ─────────────────────────────────────────────────────
+// ─── Header Overview Card (Nordic Mat Özet Bölmesi) ────────────────────────────
 class _HeaderOverviewCard extends StatelessWidget {
   const _HeaderOverviewCard({
     required this.totalCount,
@@ -312,11 +319,11 @@ class _HeaderOverviewCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
       decoration: BoxDecoration(
         color: _surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: _cardBorder),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: _border, width: 1),
       ),
       child: Row(
         children: [
@@ -325,25 +332,25 @@ class _HeaderOverviewCard extends StatelessWidget {
               icon: Icons.check_circle_outline_rounded,
               value: '$totalCount',
               label: 'Toplam Seans',
-              iconColor: _accent,
+              iconColor: _emerald,
             ),
           ),
-          Container(width: 1, height: 40, color: _cardBorder),
+          Container(width: 1, height: 36, color: _border),
           Expanded(
             child: _OverviewStat(
               icon: Icons.timer_outlined,
               value: _formatTotalTime(totalSeconds),
               label: 'Toplam Süre',
-              iconColor: _accentBlue,
+              iconColor: _nordicIce,
             ),
           ),
-          Container(width: 1, height: 40, color: _cardBorder),
+          Container(width: 1, height: 36, color: _border),
           Expanded(
             child: _OverviewStat(
               icon: Icons.bolt_rounded,
               value: '${totalLoad.round()} pts',
               label: 'Toplam Yük',
-              iconColor: const Color(0xFFFFB74D),
+              iconColor: _volcanic,
             ),
           ),
         ],
@@ -370,7 +377,7 @@ class _OverviewStat extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 20, color: iconColor),
+        Icon(icon, size: 18, color: iconColor),
         const SizedBox(height: 6),
         Text(
           value,
@@ -378,6 +385,7 @@ class _OverviewStat extends StatelessWidget {
             color: _textPrimary,
             fontSize: 15,
             fontWeight: FontWeight.w700,
+            letterSpacing: -0.2,
           ),
         ),
         const SizedBox(height: 2),
@@ -394,7 +402,7 @@ class _OverviewStat extends StatelessWidget {
   }
 }
 
-// ─── Workout Session Card ─────────────────────────────────────────────────────
+// ─── Workout Session Card (Sol Şeritli & Mat Kapsüllü) ─────────────────────────
 class _WorkoutSessionCard extends StatelessWidget {
   const _WorkoutSessionCard({required this.session});
 
@@ -410,7 +418,7 @@ class _WorkoutSessionCard extends StatelessWidget {
     final year = dt.year;
     final hour = dt.hour.toString().padLeft(2, '0');
     final minute = dt.minute.toString().padLeft(2, '0');
-    return '$day $month $year, $hour:$minute';
+    return '$day $month $year · $hour:$minute';
   }
 
   String _relativeDayLabel(DateTime dt) {
@@ -422,7 +430,7 @@ class _WorkoutSessionCard extends StatelessWidget {
     if (diff == 0) return 'Bugün';
     if (diff == 1) return 'Dün';
     if (diff > 1 && diff < 7) return '$diff gün önce';
-    return '${diff ~/ 7} hafta önce';
+    return '${diff ~/ 7} hf önce';
   }
 
   String _formatDuration(int seconds) {
@@ -442,175 +450,194 @@ class _WorkoutSessionCard extends StatelessWidget {
         : 'Antrenman Seansı';
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: _card,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _cardBorder),
+        color: _surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: _border, width: 1),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Üst Satır: Tarih & Göreli Etiket
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.calendar_today_rounded, size: 14, color: _textMuted),
-                  const SizedBox(width: 6),
-                  Text(
-                    _formatDate(session.completedAt),
-                    style: const TextStyle(
-                      color: _textSecondary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: _accent.withAlpha(25),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  _relativeDayLabel(session.completedAt),
-                  style: const TextStyle(
-                    color: _accent,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-
-          // Egzersiz Başlığı
-          Text(
-            exerciseTitle,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: _textPrimary,
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              height: 1.25,
+      clipBehavior: Clip.antiAlias,
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Sol Taraf: Çok İnce, Volkanik Turuncu (#FF5533) Renkli Şerit
+            Container(
+              width: 3.5,
+              color: _volcanic,
             ),
-          ),
-          const SizedBox(height: 14),
 
-          // Alt Metrikler Satırı
-          Row(
-            children: [
-              // Süre
-              _MetricPill(
-                icon: Icons.timer_outlined,
-                label: _formatDuration(session.durationSeconds),
-                color: _accentBlue,
-              ),
-              const SizedBox(width: 8),
-
-              // Tamamlanan Egzersiz Sayısı
-              _MetricPill(
-                icon: Icons.fitness_center_rounded,
-                label: '$exerciseCount Egzersiz',
-                color: _textSecondary,
-              ),
-              const Spacer(),
-
-              // MLI İş Yükü Puanı
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF23321D),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: _accent.withAlpha(80)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+            // Kartın Ana Gövdesi
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.bolt_rounded, size: 14, color: _accent),
-                    const SizedBox(width: 4),
+                    // Üst Satır: Tarih & Göreli Durum Rozeti
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.calendar_today_rounded,
+                              size: 13,
+                              color: _textMuted,
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              _formatDate(session.completedAt),
+                              style: const TextStyle(
+                                color: _textSecondary,
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                          decoration: BoxDecoration(
+                            color: _surfaceSoft,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: _border,
+                              width: 1,
+                            ),
+                          ),
+                          child: Text(
+                            _relativeDayLabel(session.completedAt),
+                            style: const TextStyle(
+                              color: _emerald,
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Egzersiz Başlığı
                     Text(
-                      '${session.totalMliWorkload.round()} MLI',
+                      exerciseTitle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        color: _accent,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
+                        color: _textPrimary,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        height: 1.25,
+                        letterSpacing: -0.2,
                       ),
                     ),
+                    const SizedBox(height: 12),
+
+                    // Yan Yana Mat, Küçük Kapsüller (Zaman, Seans, MLI)
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      children: [
+                        // Süre Kapsülü
+                        _NordicCapsule(
+                          icon: Icons.timer_outlined,
+                          label: _formatDuration(session.durationSeconds),
+                          accentColor: _nordicIce,
+                        ),
+
+                        // Seans / Egzersiz Sayısı Kapsülü
+                        _NordicCapsule(
+                          icon: Icons.fitness_center_rounded,
+                          label: '$exerciseCount Egzersiz',
+                          accentColor: _textSecondary,
+                        ),
+
+                        // MLI İş Yükü Kapsülü
+                        _NordicCapsule(
+                          icon: Icons.bolt_rounded,
+                          label: '${session.totalMliWorkload.round()} MLI',
+                          accentColor: _volcanic,
+                          highlight: true,
+                        ),
+                      ],
+                    ),
+
+                    // Kas Grupları Dağılımı (varsa)
+                    if (session.muscleWorkloads.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        children: session.muscleWorkloads.entries.take(4).map((entry) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: _surfaceSoft,
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: _border, width: 1),
+                            ),
+                            child: Text(
+                              '${entry.key}: ${entry.value.round()}p',
+                              style: const TextStyle(
+                                color: _textMuted,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
                   ],
                 ),
               ),
-            ],
-          ),
-
-          // Hedeflenen Kas Grupları (varsa)
-          if (session.muscleWorkloads.isNotEmpty) ...[
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 6,
-              runSpacing: 4,
-              children: session.muscleWorkloads.entries.take(4).map((entry) {
-                return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: _surface,
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: _cardBorder.withAlpha(120)),
-                  ),
-                  child: Text(
-                    '${entry.key}: ${entry.value.round()}p',
-                    style: const TextStyle(
-                      color: _textMuted,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                );
-              }).toList(),
             ),
           ],
-        ],
+        ),
       ),
     );
   }
 }
 
-class _MetricPill extends StatelessWidget {
-  const _MetricPill({
+// ─── Nordic Mat Kapsül Bileşeni ───────────────────────────────────────────────
+class _NordicCapsule extends StatelessWidget {
+  const _NordicCapsule({
     required this.icon,
     required this.label,
-    required this.color,
+    required this.accentColor,
+    this.highlight = false,
   });
 
   final IconData icon;
   final String label;
-  final Color color;
+  final Color accentColor;
+  final bool highlight;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: _surface,
+        color: highlight ? accentColor.withValues(alpha: 0.12) : _surfaceSoft,
         borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: highlight ? accentColor.withValues(alpha: 0.35) : _border,
+          width: 1,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 13, color: color),
-          const SizedBox(width: 5),
+          Icon(icon, size: 12, color: accentColor),
+          const SizedBox(width: 4.5),
           Text(
             label,
             style: TextStyle(
-              color: color,
-              fontSize: 12,
+              color: highlight ? accentColor : _textSecondary,
+              fontSize: 11,
               fontWeight: FontWeight.w600,
+              letterSpacing: -0.1,
             ),
           ),
         ],

@@ -4,18 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calisthenics_app/domain/models/muscle_recovery.dart';
 import 'package:calisthenics_app/presentation/providers/muscle_recovery_provider.dart';
+import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 import 'package:calisthenics_app/presentation/widgets/biomechanics_info_sheet.dart';
 
 /// Kas gruplarının toparlanma durumunu (Hazır %100 / Toparlanıyor %xx) gösterir.
 class MuscleRecoveryCard extends ConsumerWidget {
   const MuscleRecoveryCard({super.key});
 
-  static const Color _surface = Color(0xFF201836);
-  static const Color _purple = Color(0xFF6D5BFF);
-  static const Color _ready = Color(0xFF3DDC97);
-  static const Color _recovering = Color(0xFFFFB84D);
-  static const Color _textHigh = Color(0xFFEDE9FF);
-  static const Color _textMid = Color(0xFFB4A9D8);
+  static const Color _surface = AppColors.surface; // #13171C
+  static const Color _border = AppColors.border; // #1E232A
+  static const Color _ready = AppColors.emerald; // #10B981 Mat Toparlanma Yeşili
+  static const Color _recovering = AppColors.volcanic; // #FF5533 Mat Volkanik Turuncu/Kırmızı
+  static const Color _volcanic = AppColors.volcanic;
+  static const Color _textHigh = AppColors.textHigh; // #F1F5F9
+  static const Color _textMid = AppColors.textMid; // #94A3B8
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,24 +30,25 @@ class MuscleRecoveryCard extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _surface.withValues(alpha: 0.92),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        color: _surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: _border, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.healing_rounded, color: _ready, size: 20),
+              const Icon(Icons.healing_rounded, color: _ready, size: 18),
               const SizedBox(width: 8),
               const Expanded(
                 child: Text(
                   'Kas Toparlanma Durumu',
                   style: TextStyle(
                     color: _textHigh,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: -0.2,
                   ),
                 ),
               ),
@@ -55,18 +58,18 @@ class MuscleRecoveryCard extends ConsumerWidget {
                   height: 14,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: _purple,
+                    color: _volcanic,
                   ),
                 ),
               IconButton(
                 icon: const Icon(
                   Icons.info_outline,
                   color: _textMid,
-                  size: 18,
+                  size: 17,
                 ),
                 tooltip: 'Toparlanma & RIR Bilgisi',
                 padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
                 visualDensity: VisualDensity.compact,
                 onPressed: () => showBiomechanicsInfoSheet(
                   context,
@@ -75,15 +78,15 @@ class MuscleRecoveryCard extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           const Text(
-            'RIR\'e göre kişiselleştirilmiş toparlanma süresi',
-            style: TextStyle(color: _textMid, fontSize: 12),
+            'RIR\'e göre kişiselleştirilmiş biyomekanik toparlanma süresi',
+            style: TextStyle(color: _textMid, fontSize: 11.5),
           ),
           const SizedBox(height: 14),
           for (final muscle in RecoveryMuscle.values) ...[
             _RecoveryRow(record: byMuscle[muscle], muscle: muscle, now: now),
-            const SizedBox(height: 10),
+            const SizedBox(height: 9),
           ],
         ],
       ),
@@ -127,34 +130,38 @@ class _RecoveryRow extends StatelessWidget {
                 style: const TextStyle(
                   color: MuscleRecoveryCard._textHigh,
                   fontSize: 13,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
             Expanded(
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
                   value: progress,
-                  minHeight: 8,
-                  backgroundColor: Colors.white.withValues(alpha: 0.07),
+                  minHeight: 6,
+                  backgroundColor: MuscleRecoveryCard._border,
                   valueColor: AlwaysStoppedAnimation<Color>(color),
                 ),
               ),
             ),
             const SizedBox(width: 10),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.16),
-                borderRadius: BorderRadius.circular(10),
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: color.withValues(alpha: 0.28),
+                  width: 1,
+                ),
               ),
               child: Text(
                 ready ? 'Hazır' : '%$percent',
                 style: TextStyle(
                   color: color,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),

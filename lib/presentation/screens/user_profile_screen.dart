@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -13,6 +12,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:calisthenics_app/data/services/auth_service.dart';
 import 'package:calisthenics_app/data/services/firestore_service.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
+import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 import 'package:calisthenics_app/presentation/widgets/muscle_recovery_card.dart';
 
 class UserProfileScreen extends StatelessWidget {
@@ -36,14 +36,14 @@ class ProfileScreen extends ConsumerStatefulWidget {
 }
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
-  static const Color _bgTop = Color(0xFF151028);
-  static const Color _bgBottom = Color(0xFF0E0A1D);
-  static const Color _cardSurface = Color(0xFF201836);
-  static const Color _cardSurfaceSoft = Color(0xFF2A2048);
-  static const Color _accentPurple = Color(0xFF6D5BFF);
-  static const Color _accentBlue = Color(0xFF4FC3F7);
-  static const Color _textHigh = Color(0xFFEDE9FF);
-  static const Color _textMid = Color(0xFFB4A9D8);
+  static const Color _bgBottom = AppColors.background; // #0A0C0E
+  static const Color _cardSurface = AppColors.surface; // #13171C
+  static const Color _cardSurfaceSoft = AppColors.surfaceSoft; // #181D24
+  static const Color _accentPurple = AppColors.volcanic; // #FF5533
+  static const Color _accentBlue = AppColors.emerald; // #10B981
+  static const Color _textHigh = AppColors.textHigh; // #F1F5F9
+  static const Color _textMid = AppColors.textMid; // #94A3B8
+  static const Color _border = AppColors.border; // #1E232A
 
   static const String _heightKey = 'profile_height_cm';
   static const String _weightKey = 'profile_weight_kg';
@@ -203,17 +203,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 horizontal: 20.0,
                 vertical: 24.0,
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(22.0),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
-                  child: Container(
-                    padding: const EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: _cardSurface.withOpacity(0.9),
-                      borderRadius: BorderRadius.circular(22.0),
-                      border: Border.all(color: Colors.white.withOpacity(0.08)),
-                    ),
+              child: Container(
+                padding: const EdgeInsets.all(18.0),
+                decoration: BoxDecoration(
+                  color: _cardSurface,
+                  borderRadius: BorderRadius.circular(16.0),
+                  border: Border.all(color: _border, width: 1.0),
+                ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -334,11 +330,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 onPressed: () => Navigator.of(context).pop(),
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: _textMid,
-                                  side: BorderSide(
-                                    color: Colors.white.withOpacity(0.12),
-                                  ),
+                                  side: const BorderSide(color: _border),
                                 ),
-                                child: const Text('Iptal'),
+                                child: const Text('İptal'),
                               ),
                             ),
                             const SizedBox(width: 10.0),
@@ -420,13 +414,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ],
                     ),
                   ),
-                ),
-              ),
+                );
+              },
             );
           },
         );
-      },
-    );
 
     if (result == null) {
       return;
@@ -467,15 +459,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       fillColor: _cardSurfaceSoft,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.0),
-        borderSide: BorderSide(color: Colors.white.withOpacity(0.08)),
+        borderSide: const BorderSide(color: _border),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.0),
-        borderSide: BorderSide(color: Colors.white.withOpacity(0.08)),
+        borderSide: const BorderSide(color: _border),
       ),
       focusedBorder: const OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(12.0)),
-        borderSide: BorderSide(color: _accentBlue),
+        borderSide: BorderSide(color: _accentPurple),
       ),
     );
   }
@@ -537,56 +529,51 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             horizontal: 24.0,
             vertical: 24.0,
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(22.0),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
-              child: Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: _cardSurface.withOpacity(0.88),
-                  borderRadius: BorderRadius.circular(22.0),
-                  border: Border.all(color: Colors.white.withOpacity(0.08)),
+          child: Container(
+            padding: const EdgeInsets.all(18.0),
+            decoration: BoxDecoration(
+              color: _cardSurface,
+              borderRadius: BorderRadius.circular(16.0),
+              border: Border.all(color: _border, width: 1.0),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Cinsiyet',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: _textHigh,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Cinsiyet',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: _textHigh,
-                        fontWeight: FontWeight.w700,
-                      ),
+                const SizedBox(height: 10.0),
+                ...genders.map(
+                  (item) => RadioListTile<String>(
+                    value: item,
+                    groupValue: _gender,
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
+                    activeColor: _accentPurple,
+                    title: Text(
+                      item,
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.copyWith(color: _textHigh),
                     ),
-                    const SizedBox(height: 10.0),
-                    ...genders.map(
-                      (item) => RadioListTile<String>(
-                        value: item,
-                        groupValue: _gender,
-                        dense: true,
-                        contentPadding: EdgeInsets.zero,
-                        activeColor: _accentBlue,
-                        title: Text(
-                          item,
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodyMedium?.copyWith(color: _textHigh),
-                        ),
-                        onChanged: (value) => Navigator.of(context).pop(value),
-                      ),
-                    ),
-                    const SizedBox(height: 8.0),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('Iptal'),
-                      ),
-                    ),
-                  ],
+                    onChanged: (value) => Navigator.of(context).pop(value),
+                  ),
                 ),
-              ),
+                const SizedBox(height: 8.0),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: TextButton.styleFrom(foregroundColor: _textMid),
+                    child: const Text('İptal'),
+                  ),
+                ),
+              ],
             ),
           ),
         );
@@ -624,10 +611,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             surface: _cardSurface,
             onSurface: _textHigh,
           ),
-          dialogTheme: DialogThemeData(
-            backgroundColor: _cardSurface.withOpacity(0.94),
+          dialogTheme: const DialogThemeData(
+            backgroundColor: _cardSurface,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(22.0),
+              borderRadius: BorderRadius.all(Radius.circular(16.0)),
+              side: BorderSide(color: _border, width: 1.0),
             ),
           ),
           textButtonTheme: TextButtonThemeData(
@@ -698,99 +686,82 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 horizontal: 24.0,
                 vertical: 24.0,
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(22.0),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
-                  child: Container(
-                    padding: const EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: _cardSurface.withOpacity(0.88),
-                      borderRadius: BorderRadius.circular(22.0),
-                      border: Border.all(color: Colors.white.withOpacity(0.08)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.35),
-                          blurRadius: 20.0,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
+              child: Container(
+                padding: const EdgeInsets.all(18.0),
+                decoration: BoxDecoration(
+                  color: _cardSurface,
+                  borderRadius: BorderRadius.circular(16.0),
+                  border: Border.all(color: _border, width: 1.0),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleMedium
+                          ?.copyWith(
+                            color: _textHigh,
+                            fontWeight: FontWeight.w600,
+                          ),
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    const SizedBox(height: 12.0),
+                    TextField(
+                      controller: controller,
+                      autofocus: true,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      style: Theme.of(context).textTheme.bodyLarge
+                          ?.copyWith(
+                            color: _textHigh,
+                            fontWeight: FontWeight.w600,
+                          ),
+                      decoration: InputDecoration(
+                        hintText: unit,
+                        hintStyle: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(color: _textMid),
+                        filled: true,
+                        fillColor: _cardSurfaceSoft,
+                        errorText: errorText,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14.0,
+                          vertical: 12.0,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide: const BorderSide(color: _border),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide: const BorderSide(color: _border),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide: const BorderSide(color: _accentPurple),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16.0),
+                    Row(
                       children: [
-                        Text(
-                          title,
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(
-                                color: _textHigh,
-                                fontWeight: FontWeight.w700,
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: _border),
+                              foregroundColor: _textMid,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12.0,
                               ),
-                        ),
-                        const SizedBox(height: 10.0),
-                        TextField(
-                          controller: controller,
-                          autofocus: true,
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true,
-                          ),
-                          style: Theme.of(context).textTheme.bodyLarge
-                              ?.copyWith(
-                                color: _textHigh,
-                                fontWeight: FontWeight.w600,
-                              ),
-                          decoration: InputDecoration(
-                            hintText: unit,
-                            hintStyle: Theme.of(
-                              context,
-                            ).textTheme.bodyMedium?.copyWith(color: _textMid),
-                            filled: true,
-                            fillColor: _cardSurfaceSoft,
-                            errorText: errorText,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12.0,
-                              vertical: 12.0,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14.0),
-                              borderSide: BorderSide(
-                                color: Colors.white.withOpacity(0.08),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
                               ),
                             ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14.0),
-                              borderSide: BorderSide(
-                                color: Colors.white.withOpacity(0.08),
-                              ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14.0),
-                              borderSide: const BorderSide(color: _accentBlue),
-                            ),
+                            child: const Text('İptal'),
                           ),
                         ),
-                        const SizedBox(height: 14.0),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                style: OutlinedButton.styleFrom(
-                                  side: BorderSide(
-                                    color: Colors.white.withOpacity(0.18),
-                                  ),
-                                  foregroundColor: _textMid,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12.0,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
-                                ),
-                                child: const Text('Iptal'),
-                              ),
-                            ),
                             const SizedBox(width: 10.0),
                             Expanded(
                               child: ElevatedButton(
@@ -824,13 +795,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ],
                     ),
                   ),
-                ),
-              ),
+                );
+              },
             );
           },
         );
-      },
-    );
 
     if (value == null) {
       return;
@@ -862,97 +831,80 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 horizontal: 24.0,
                 vertical: 24.0,
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(22.0),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
-                  child: Container(
-                    padding: const EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: _cardSurface.withOpacity(0.88),
-                      borderRadius: BorderRadius.circular(22.0),
-                      border: Border.all(color: Colors.white.withOpacity(0.08)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.35),
-                          blurRadius: 20.0,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
+              child: Container(
+                padding: const EdgeInsets.all(18.0),
+                decoration: BoxDecoration(
+                  color: _cardSurface,
+                  borderRadius: BorderRadius.circular(16.0),
+                  border: Border.all(color: _border, width: 1.0),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleMedium
+                          ?.copyWith(
+                            color: _textHigh,
+                            fontWeight: FontWeight.w600,
+                          ),
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(
-                                color: _textHigh,
-                                fontWeight: FontWeight.w700,
-                              ),
+                    const SizedBox(height: 12.0),
+                    TextField(
+                      controller: controller,
+                      autofocus: true,
+                      keyboardType: TextInputType.number,
+                      style: Theme.of(context).textTheme.bodyLarge
+                          ?.copyWith(
+                            color: _textHigh,
+                            fontWeight: FontWeight.w600,
+                          ),
+                      decoration: InputDecoration(
+                        hintText: unit,
+                        hintStyle: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(color: _textMid),
+                        filled: true,
+                        fillColor: _cardSurfaceSoft,
+                        errorText: errorText,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14.0,
+                          vertical: 12.0,
                         ),
-                        const SizedBox(height: 10.0),
-                        TextField(
-                          controller: controller,
-                          autofocus: true,
-                          keyboardType: TextInputType.number,
-                          style: Theme.of(context).textTheme.bodyLarge
-                              ?.copyWith(
-                                color: _textHigh,
-                                fontWeight: FontWeight.w600,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide: const BorderSide(color: _border),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide: const BorderSide(color: _border),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide: const BorderSide(color: _accentPurple),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16.0),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: _border),
+                              foregroundColor: _textMid,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12.0,
                               ),
-                          decoration: InputDecoration(
-                            hintText: unit,
-                            hintStyle: Theme.of(
-                              context,
-                            ).textTheme.bodyMedium?.copyWith(color: _textMid),
-                            filled: true,
-                            fillColor: _cardSurfaceSoft,
-                            errorText: errorText,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12.0,
-                              vertical: 12.0,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14.0),
-                              borderSide: BorderSide(
-                                color: Colors.white.withOpacity(0.08),
-                              ),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14.0),
-                              borderSide: BorderSide(
-                                color: Colors.white.withOpacity(0.08),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
                               ),
                             ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14.0),
-                              borderSide: const BorderSide(color: _accentBlue),
-                            ),
+                            child: const Text('İptal'),
                           ),
                         ),
-                        const SizedBox(height: 14.0),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                style: OutlinedButton.styleFrom(
-                                  side: BorderSide(
-                                    color: Colors.white.withOpacity(0.18),
-                                  ),
-                                  foregroundColor: _textMid,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12.0,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
-                                ),
-                                child: const Text('Iptal'),
-                              ),
-                            ),
                             const SizedBox(width: 10.0),
                             Expanded(
                               child: ElevatedButton(
@@ -986,13 +938,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ],
                     ),
                   ),
-                ),
-              ),
+                );
+              },
             );
           },
         );
-      },
-    );
 
     if (value == null) {
       return;
@@ -1102,43 +1052,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         : 'Calisthenics Athlete';
     return Scaffold(
       backgroundColor: _bgBottom,
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [_bgTop, _bgBottom],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-          ),
-          Positioned(
-            top: -120.0,
-            right: -70.0,
-            child: Container(
-              width: 240.0,
-              height: 240.0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _accentPurple.withOpacity(0.16),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: -120.0,
-            left: -60.0,
-            child: Container(
-              width: 220.0,
-              height: 220.0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _accentBlue.withOpacity(0.12),
-              ),
-            ),
-          ),
-          SafeArea(
-            child: FutureBuilder<List<WorkoutSummaryEntry>>(
+      body: SafeArea(
+        child: FutureBuilder<List<WorkoutSummaryEntry>>(
               future: _summaryFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -1278,8 +1193,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               },
             ),
           ),
-        ],
-      ),
       bottomNavigationBar: widget.showBottomNav
           ? const AppBottomNav(selectedIndex: 3)
           : null,
@@ -1312,20 +1225,22 @@ class BodyMetricsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _GlassCard(
-      borderRadius: 22.0,
+      borderRadius: 14.0,
       child: Padding(
-        padding: const EdgeInsets.all(14.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Vucut Olculeri',
+              'Vücut Ölçüleri',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: _ProfileScreenState._textHigh,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
+                fontSize: 15.0,
+                letterSpacing: -0.2,
               ),
             ),
-            const SizedBox(height: 10.0),
+            const SizedBox(height: 12.0),
             _MetricEditRow(
               label: 'Boy',
               value: '${heightCm.toStringAsFixed(1)} cm',
@@ -1345,7 +1260,7 @@ class BodyMetricsCard extends StatelessWidget {
             ),
             const SizedBox(height: 8.0),
             _MetricEditRow(
-              label: 'Dogum Tarihi',
+              label: 'Doğum Tarihi',
               value: birthDateLabel,
               onTap: onEditBirthDate,
             ),
@@ -1372,14 +1287,14 @@ class _MetricEditRow extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(14.0),
+        borderRadius: BorderRadius.circular(12.0),
         onTap: onTap,
         child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
           decoration: BoxDecoration(
             color: _ProfileScreenState._cardSurfaceSoft,
-            borderRadius: BorderRadius.circular(14.0),
-            border: Border.all(color: Colors.white.withOpacity(0.08)),
+            borderRadius: BorderRadius.circular(12.0),
+            border: Border.all(color: _ProfileScreenState._border, width: 1.0),
           ),
           child: Row(
             children: [
@@ -1388,6 +1303,8 @@ class _MetricEditRow extends StatelessWidget {
                   label,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: _ProfileScreenState._textMid,
+                    fontSize: 13.0,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
@@ -1396,12 +1313,13 @@ class _MetricEditRow extends StatelessWidget {
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: _ProfileScreenState._textHigh,
                   fontWeight: FontWeight.w600,
+                  fontSize: 13.5,
                 ),
               ),
-              const SizedBox(width: 6.0),
+              const SizedBox(width: 8.0),
               const Icon(
                 Icons.edit_rounded,
-                size: 16.0,
+                size: 15.0,
                 color: _ProfileScreenState._textMid,
               ),
             ],
@@ -1427,50 +1345,47 @@ class _GoogleLinkCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final disabled = isLinked || isLoading;
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 200),
       width: double.infinity,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18.0),
-        gradient: isLinked
-            ? null
-            : const LinearGradient(
-                colors: [
-                  _ProfileScreenState._accentPurple,
-                  _ProfileScreenState._accentBlue,
-                ],
-              ),
-        color: isLinked ? const Color(0xFF1F3B33) : null,
-        border: Border.all(color: Colors.white.withOpacity(0.08)),
+        borderRadius: BorderRadius.circular(14.0),
+        color: _ProfileScreenState._cardSurface,
+        border: Border.all(
+          color: isLinked
+              ? _ProfileScreenState._accentBlue.withValues(alpha: 0.35)
+              : _ProfileScreenState._border,
+          width: 1.0,
+        ),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(18.0),
+          borderRadius: BorderRadius.circular(14.0),
           onTap: disabled ? null : onPressed,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(vertical: 13.0, horizontal: 16.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (isLoading)
                   const SizedBox(
-                    width: 20.0,
-                    height: 20.0,
+                    width: 18.0,
+                    height: 18.0,
                     child: CircularProgressIndicator(
-                      strokeWidth: 2.4,
-                      color: Colors.white,
+                      strokeWidth: 2.0,
+                      color: _ProfileScreenState._accentPurple,
                     ),
                   )
                 else if (isLinked)
                   const Icon(
                     Icons.check_circle_rounded,
-                    color: Color(0xFF6EE7B7),
-                    size: 22.0,
+                    color: _ProfileScreenState._accentBlue,
+                    size: 19.0,
                   )
                 else
                   Container(
-                    width: 24.0,
-                    height: 24.0,
+                    width: 22.0,
+                    height: 22.0,
                     alignment: Alignment.center,
                     decoration: const BoxDecoration(
                       color: Colors.white,
@@ -1481,7 +1396,7 @@ class _GoogleLinkCard extends StatelessWidget {
                       style: TextStyle(
                         color: Color(0xFF4285F4),
                         fontWeight: FontWeight.w900,
-                        fontSize: 15.0,
+                        fontSize: 14.0,
                         height: 1.0,
                       ),
                     ),
@@ -1489,15 +1404,16 @@ class _GoogleLinkCard extends StatelessWidget {
                 const SizedBox(width: 10.0),
                 Text(
                   isLoading
-                      ? 'Baglaniyor...'
+                      ? 'Bağlanıyor...'
                       : isLinked
-                      ? 'Hesap Baglandi'
-                      : 'Google ile Hesabini Bagla',
+                      ? 'Google Hesabı Bağlı'
+                      : 'Google ile Hesabını Bağla',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     color: isLinked
-                        ? const Color(0xFF6EE7B7)
-                        : Colors.white,
-                    fontWeight: FontWeight.w700,
+                        ? _ProfileScreenState._accentBlue
+                        : _ProfileScreenState._textHigh,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13.5,
                   ),
                 ),
               ],
@@ -1746,9 +1662,9 @@ class GoalsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _GlassCard(
-      borderRadius: 22.0,
+      borderRadius: 14.0,
       child: Padding(
-        padding: const EdgeInsets.all(14.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1756,10 +1672,12 @@ class GoalsCard extends StatelessWidget {
               'Hedefler',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: _ProfileScreenState._textHigh,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
+                fontSize: 15.0,
+                letterSpacing: -0.2,
               ),
             ),
-            const SizedBox(height: 10.0),
+            const SizedBox(height: 12.0),
             _MetricEditRow(
               label: 'Hedef Kilo',
               value: '${goalWeightKg.toStringAsFixed(1)} kg',
@@ -1767,7 +1685,7 @@ class GoalsCard extends StatelessWidget {
             ),
             const SizedBox(height: 8.0),
             _MetricEditRow(
-              label: 'Haftalik Hedef',
+              label: 'Haftalık Hedef',
               value: '$targetWorkoutsPerWeek antrenman',
               onTap: onEditTargetWorkouts,
             ),
@@ -1934,7 +1852,7 @@ class PersonalRecordsCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: _ProfileScreenState._cardSurfaceSoft,
                       borderRadius: BorderRadius.circular(14.0),
-                      border: Border.all(color: Colors.white.withOpacity(0.08)),
+                      border: Border.all(color: _ProfileScreenState._border),
                     ),
                     child: Row(
                       children: [
@@ -2126,33 +2044,20 @@ class _StatRow extends StatelessWidget {
 }
 
 class _GlassCard extends StatelessWidget {
-  const _GlassCard({required this.child, this.borderRadius = 20.0});
+  const _GlassCard({required this.child, this.borderRadius = 14.0});
 
   final Widget child;
   final double borderRadius;
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
-        child: Container(
-          decoration: BoxDecoration(
-            color: _ProfileScreenState._cardSurface.withOpacity(0.78),
-            borderRadius: BorderRadius.circular(borderRadius),
-            border: Border.all(color: Colors.white.withOpacity(0.08)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.35),
-                blurRadius: 20.0,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: child,
-        ),
+    return Container(
+      decoration: BoxDecoration(
+        color: _ProfileScreenState._cardSurface,
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(color: _ProfileScreenState._border, width: 1.0),
       ),
+      child: child,
     );
   }
 }

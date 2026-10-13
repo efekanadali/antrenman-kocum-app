@@ -3,10 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:calisthenics_app/domain/models/muscle_recovery.dart';
 import 'package:calisthenics_app/domain/services/program_preview.dart';
+import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 import 'package:calisthenics_app/presentation/widgets/biomechanics_info_sheet.dart';
 
 /// Programın "Tahmini Toplam MLI İş Yükü" ve "Ağırlıklı Hedef Kas Grubu"
-/// rozetlerini gösterir.
+/// rozetlerini Nordic & Cyber-Athlete mat koyu temasında gösterir.
 class ProgramPreviewBadge extends StatelessWidget {
   const ProgramPreviewBadge({
     super.key,
@@ -21,11 +22,15 @@ class ProgramPreviewBadge extends StatelessWidget {
   final String? footnote;
   final bool compact;
 
-  static const Color _purple = Color(0xFF6D5BFF);
-  static const Color _blue = Color(0xFF4FC3F7);
-  static const Color _surface = Color(0xFF201836);
-  static const Color _textHigh = Color(0xFFEDE9FF);
-  static const Color _textMid = Color(0xFFB4A9D8);
+  static const Color _surface = AppColors.surface; // #13171C
+  static const Color _surfaceSoft = AppColors.surfaceSoft; // #181D24
+  static const Color _border = AppColors.border; // #1E232A
+  static const Color _volcanic = AppColors.volcanic; // #FF5533
+  static const Color _emerald = AppColors.emerald; // #10B981
+  static const Color _amber = AppColors.amber; // #F59E0B
+  static const Color _textHigh = AppColors.textHigh; // #F1F5F9
+  static const Color _textMid = AppColors.textMid; // #94A3B8
+  static const Color _textMuted = AppColors.textMuted; // #64748B
 
   @override
   Widget build(BuildContext context) {
@@ -35,31 +40,25 @@ class ProgramPreviewBadge extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.all(compact ? 12 : 16),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(compact ? 16 : 20),
-        gradient: LinearGradient(
-          colors: [
-            _purple.withValues(alpha: 0.22),
-            _blue.withValues(alpha: 0.12),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+        color: _surface,
+        borderRadius: BorderRadius.circular(compact ? 14 : 16),
+        border: Border.all(color: _border, width: 1.0),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.biotech_rounded, color: _blue, size: 18),
+              const Icon(Icons.biotech_rounded, color: _volcanic, size: 18),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   title,
                   style: const TextStyle(
                     color: _textHigh,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     fontSize: 14,
+                    letterSpacing: -0.2,
                   ),
                 ),
               ),
@@ -84,7 +83,7 @@ class ProgramPreviewBadge extends StatelessWidget {
           if (preview.isEmpty)
             const Text(
               'Egzersiz ekledikçe tahmini iş yükü burada görünecek.',
-              style: TextStyle(color: _textMid, fontSize: 12),
+              style: TextStyle(color: _textMuted, fontSize: 12),
             )
           else
             Wrap(
@@ -93,13 +92,13 @@ class ProgramPreviewBadge extends StatelessWidget {
               children: [
                 _Pill(
                   icon: Icons.bolt_rounded,
-                  color: _blue,
+                  color: _volcanic,
                   label: 'Tahmini MLI',
                   value: preview.totalMli.round().toString(),
                 ),
                 _Pill(
                   icon: Icons.fitness_center_rounded,
-                  color: _purple,
+                  color: _emerald,
                   label: 'Hedef Kas',
                   value: top == null
                       ? '-'
@@ -107,14 +106,14 @@ class ProgramPreviewBadge extends StatelessWidget {
                 ),
                 _Pill(
                   icon: Icons.speed_rounded,
-                  color: const Color(0xFFC2F13A),
+                  color: _amber,
                   label: 'Ort. Kaldıraç',
                   value: preview.averageLeverage.toStringAsFixed(2),
                 ),
               ],
             ),
           if (!preview.isEmpty && !compact) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
             for (final muscle in _sortedMuscles(preview)) ...[
               _MuscleLine(
                 label: muscle.key.label,
@@ -128,10 +127,10 @@ class ProgramPreviewBadge extends StatelessWidget {
             ],
           ],
           if (footnote != null) ...[
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Text(
               footnote!,
-              style: const TextStyle(color: _textMid, fontSize: 11),
+              style: const TextStyle(color: _textMuted, fontSize: 11),
             ),
           ],
         ],
@@ -164,9 +163,9 @@ class _Pill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: ProgramPreviewBadge._surface.withValues(alpha: 0.85),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.35)),
+        color: ProgramPreviewBadge._surfaceSoft,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: ProgramPreviewBadge._border, width: 1.0),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -179,8 +178,9 @@ class _Pill extends StatelessWidget {
               Text(
                 label,
                 style: const TextStyle(
-                  color: ProgramPreviewBadge._textMid,
+                  color: ProgramPreviewBadge._textMuted,
                   fontSize: 10,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               Text(
@@ -188,7 +188,7 @@ class _Pill extends StatelessWidget {
                 style: const TextStyle(
                   color: ProgramPreviewBadge._textHigh,
                   fontSize: 13,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
@@ -210,24 +210,25 @@ class _MuscleLine extends StatelessWidget {
     return Row(
       children: [
         SizedBox(
-          width: 48,
+          width: 52,
           child: Text(
             label,
             style: const TextStyle(
               color: ProgramPreviewBadge._textHigh,
               fontSize: 12,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
         Expanded(
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: fraction.clamp(0.0, 1.0),
-              minHeight: 6,
-              backgroundColor: Colors.white.withValues(alpha: 0.08),
+              minHeight: 5,
+              backgroundColor: ProgramPreviewBadge._surfaceSoft,
               valueColor: const AlwaysStoppedAnimation<Color>(
-                ProgramPreviewBadge._blue,
+                ProgramPreviewBadge._volcanic,
               ),
             ),
           ),
@@ -241,6 +242,7 @@ class _MuscleLine extends StatelessWidget {
             style: const TextStyle(
               color: ProgramPreviewBadge._textMid,
               fontSize: 11,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),

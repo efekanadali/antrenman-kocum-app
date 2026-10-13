@@ -1,9 +1,8 @@
 // lib/presentation/screens/home_screen.dart
 
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
+import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key, this.showBottomNav = true});
@@ -21,142 +20,104 @@ class HomeTodayScreen extends StatelessWidget {
 
   final bool showBottomNav;
 
-  static const double _radiusLg = 24.0;
-  static const double _radiusMd = 18.0;
-  static const double _spaceXs = 8.0;
+  // ─── Nordic & Cyber-Athlete Spacing & Radius ──────────────────────────────
+  static const double _radiusLg = 16.0;
+  static const double _radiusMd = 12.0;
   static const double _spaceSm = 12.0;
   static const double _spaceMd = 16.0;
   static const double _spaceLg = 24.0;
 
-  static const Color _bgTop = Color(0xFF1A1230);
-  static const Color _bgBottom = Color(0xFF120A22);
-  static const Color _cardSurface = Color(0xFF231A3B);
-  static const Color _cardSurfaceSoft = Color(0xFF2A2048);
-  static const Color _cardSurfaceTint = Color(0xFF2E2552);
-  static const Color _accentPurple = Color(0xFF6D5BFF);
-  static const Color _accentBlue = Color(0xFF4FC3F7);
-  static const Color _textHigh = Color(0xFFEDE9FF);
-  static const Color _textMid = Color(0xFFB4A9D8);
+  // ─── Design Tokens ────────────────────────────────────────────────────────
+  static const Color _bg = AppColors.background; // #0A0C0E
+  static const Color _cardSurface = AppColors.surface; // #13171C
+  static const Color _cardSurfaceSoft = AppColors.surfaceSoft; // #181D24
+  static const Color _border = AppColors.border; // #1E232A
+  static const Color _volcanic = AppColors.volcanic; // #FF5533
+  static const Color _emerald = AppColors.emerald; // #10B981
+  static const Color _amber = AppColors.amber; // #F59E0B
+  static const Color _textHigh = AppColors.textHigh; // #F1F5F9
+  static const Color _textMid = AppColors.textMid; // #94A3B8
+  static const Color _textMuted = AppColors.textMuted; // #64748B
 
   static const HomeInsightData _mockInsightData = HomeInsightData(
     hasWorkoutToday: true,
     workoutTitle: 'Push Day',
-    workoutFocus: 'Chest + Triceps',
+    workoutFocus: 'Göğüs + Triceps Hedefli Güç & Hipertrofi',
     lastWorkoutLoad: 320,
     weeklyTrendPercent: 12,
     recoveryItems: [
-      RecoveryStatusItem(muscle: 'Chest', statusLabel: 'Ready', indicator: '🟢'),
-      RecoveryStatusItem(
-        muscle: 'Back',
-        statusLabel: 'Recovering',
-        indicator: '🟡',
-      ),
+      RecoveryStatusItem(muscle: 'Göğüs', statusLabel: 'Hazır', indicator: '100%'),
+      RecoveryStatusItem(muscle: 'Sırt', statusLabel: 'Toparlanıyor', indicator: '70%'),
     ],
   );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _bgBottom,
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [_bgTop, _bgBottom],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+      backgroundColor: _bg,
+      body: SafeArea(
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  _spaceMd,
+                  _spaceMd,
+                  _spaceMd,
+                  _spaceSm,
+                ),
+                child: GreetingAppBar(),
               ),
             ),
-          ),
-          Positioned(
-            top: -120.0,
-            right: -80.0,
-            child: Container(
-              width: 260.0,
-              height: 260.0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _accentPurple.withOpacity(0.18),
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  _spaceMd,
+                  _spaceSm,
+                  _spaceMd,
+                  _spaceSm,
+                ),
+                child: EnergeticHeadline(),
               ),
             ),
-          ),
-          Positioned(
-            top: 140.0,
-            left: -120.0,
-            child: Container(
-              width: 240.0,
-              height: 240.0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _accentBlue.withOpacity(0.12),
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  _spaceMd,
+                  _spaceSm,
+                  _spaceMd,
+                  _spaceSm,
+                ),
+                child: WeeklyActivityCard(),
               ),
             ),
-          ),
-          SafeArea(
-            child: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      _spaceMd,
-                      _spaceLg,
-                      _spaceMd,
-                      _spaceSm,
-                    ),
-                    child: const EnergeticHeadline(),
-                  ),
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  _spaceMd,
+                  _spaceSm,
+                  _spaceMd,
+                  0,
                 ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      _spaceMd,
-                      _spaceSm,
-                      _spaceMd,
-                      _spaceSm,
-                    ),
-                    child: const GreetingAppBar(),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      _spaceMd,
-                      _spaceSm,
-                      _spaceMd,
-                      _spaceSm,
-                    ),
-                    child: const WeeklyActivityCard(),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      _spaceMd,
-                      _spaceSm,
-                      _spaceMd,
-                      0,
-                    ),
-                    child: const HomeInsightsSection(data: _mockInsightData),
-                  ),
-                ),
-                const SliverToBoxAdapter(
-                  child: SizedBox(height: _spaceLg),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: _spaceMd),
-                    child: const QuickStatsCard(),
-                  ),
-                ),
-                const SliverToBoxAdapter(
-                  child: SizedBox(height: _spaceLg),
-                ),
-                const SliverToBoxAdapter(child: SizedBox(height: 96.0)),
-              ],
+                child: HomeInsightsSection(data: _mockInsightData),
+              ),
             ),
-          ),
-        ],
+            const SliverToBoxAdapter(
+              child: SizedBox(height: _spaceMd),
+            ),
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: _spaceMd),
+                child: QuickStatsCard(),
+              ),
+            ),
+            const SliverToBoxAdapter(
+              child: SizedBox(height: _spaceLg),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 80.0)),
+          ],
+        ),
       ),
       bottomNavigationBar:
           showBottomNav ? const AppBottomNav(selectedIndex: 0) : null,
@@ -164,6 +125,8 @@ class HomeTodayScreen extends StatelessWidget {
   }
 }
 
+/// Hero Kart: "Bugün: Push Day"
+/// Devasa, heyecan verici ve net metriklerle donatılmış mat Cyber-Athlete HUD kartı.
 class HomeInsightsSection extends StatelessWidget {
   const HomeInsightsSection({super.key, required this.data});
 
@@ -172,99 +135,246 @@ class HomeInsightsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final trendPrefix = data.weeklyTrendPercent >= 0 ? '+' : '';
-    final trendEmoji = data.weeklyTrendPercent >= 0 ? '📈' : '📉';
 
-    return GlassCard(
-      borderRadius: HomeTodayScreen._radiusLg,
-      child: Padding(
-        padding: const EdgeInsets.all(HomeTodayScreen._spaceMd),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Bugun',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: HomeTodayScreen._textMid,
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-            const SizedBox(height: 4.0),
-            Text(
-              data.hasWorkoutToday
-                  ? 'Today: ${data.workoutTitle} 💪'
-                  : 'No workout planned',
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: HomeTodayScreen._textHigh,
-                    fontWeight: FontWeight.w700,
-                  ),
-            ),
-            const SizedBox(height: 4.0),
-            Text(
-              data.hasWorkoutToday
-                  ? 'Focus: ${data.workoutFocus}'
-                  : 'Start a session',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: HomeTodayScreen._textMid,
-                  ),
-            ),
-            const SizedBox(height: 12.0),
-            SizedBox(
-              height: 38.0,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pushNamed(AppRoutes.stats);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: HomeTodayScreen._accentPurple,
-                  foregroundColor: HomeTodayScreen._textHigh,
-                  textStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14.0),
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: HomeTodayScreen._cardSurface,
+        borderRadius: BorderRadius.circular(HomeTodayScreen._radiusLg),
+        border: Border.all(color: HomeTodayScreen._border, width: 1.0),
+      ),
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ─── Header: Focus Tag + Weekly Momentum Trend ───────────────────
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                decoration: BoxDecoration(
+                  color: HomeTodayScreen._volcanic.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(
+                    color: HomeTodayScreen._volcanic.withValues(alpha: 0.35),
+                    width: 1.0,
                   ),
                 ),
-                child: const Text('Start Workout'),
-              ),
-            ),
-            const SizedBox(height: 12.0),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(10.0),
-              decoration: BoxDecoration(
-                color: HomeTodayScreen._cardSurfaceSoft,
-                borderRadius: BorderRadius.circular(14.0),
-              ),
-              child: Text(
-                'Last workout: ${data.lastWorkoutLoad.toStringAsFixed(0)} load',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: HomeTodayScreen._textHigh,
-                      fontWeight: FontWeight.w600,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(
+                      Icons.bolt_rounded,
+                      color: HomeTodayScreen._volcanic,
+                      size: 14.0,
                     ),
-              ),
-            ),
-            const SizedBox(height: 10.0),
-            ...data.recoveryItems.map(
-              (item) => Padding(
-                padding: const EdgeInsets.only(bottom: 4.0),
-                child: Text(
-                  '${item.muscle}: ${item.statusLabel} ${item.indicator}',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: HomeTodayScreen._textMid,
+                    SizedBox(width: 4.0),
+                    Text(
+                      'BUGÜNÜN HEDEFİ',
+                      style: TextStyle(
+                        color: HomeTodayScreen._volcanic,
+                        fontSize: 11.0,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.1,
                       ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(height: 4.0),
-            Text(
-              '$trendPrefix${data.weeklyTrendPercent}% this week $trendEmoji',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: HomeTodayScreen._accentBlue,
-                    fontWeight: FontWeight.w700,
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9.0, vertical: 4.0),
+                decoration: BoxDecoration(
+                  color: HomeTodayScreen._emerald.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(
+                    color: HomeTodayScreen._emerald.withValues(alpha: 0.28),
+                    width: 1.0,
                   ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.trending_up_rounded,
+                      color: HomeTodayScreen._emerald,
+                      size: 14.0,
+                    ),
+                    const SizedBox(width: 4.0),
+                    Text(
+                      '$trendPrefix${data.weeklyTrendPercent}% Haftalık İvme',
+                      style: const TextStyle(
+                        color: HomeTodayScreen._emerald,
+                        fontSize: 11.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16.0),
+
+          // ─── Hero Title & Focus ──────────────────────────────────────────
+          Text(
+            data.hasWorkoutToday ? data.workoutTitle.toUpperCase() : 'DİNLENME GÜNÜ',
+            style: const TextStyle(
+              color: HomeTodayScreen._textHigh,
+              fontSize: 28.0,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.5,
+              height: 1.1,
             ),
-          ],
+          ),
+          const SizedBox(height: 6.0),
+          Text(
+            data.hasWorkoutToday
+                ? data.workoutFocus
+                : 'Bugün aktif toparlanma ve esneme günü',
+            style: const TextStyle(
+              color: HomeTodayScreen._textMid,
+              fontSize: 14.0,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+
+          const SizedBox(height: 20.0),
+
+          // ─── Cyber-Athlete HUD Metric Compartments ───────────────────────
+          Row(
+            children: [
+              Expanded(
+                child: _HeroMetricCell(
+                  icon: Icons.fitness_center_rounded,
+                  iconColor: HomeTodayScreen._volcanic,
+                  value: '${data.lastWorkoutLoad.toStringAsFixed(0)} MLI',
+                  label: 'İş Yükü',
+                ),
+              ),
+              const SizedBox(width: 8.0),
+              Expanded(
+                child: _HeroMetricCell(
+                  icon: Icons.shield_rounded,
+                  iconColor: HomeTodayScreen._emerald,
+                  value: 'Göğüs %100',
+                  label: 'Toparlandı',
+                ),
+              ),
+              const SizedBox(width: 8.0),
+              Expanded(
+                child: _HeroMetricCell(
+                  icon: Icons.hourglass_bottom_rounded,
+                  iconColor: HomeTodayScreen._amber,
+                  value: 'Sırt %70',
+                  label: 'Hazırlanıyor',
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 20.0),
+
+          // ─── Massive Volcanic CTA Button ─────────────────────────────────
+          SizedBox(
+            width: double.infinity,
+            height: 50.0,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(AppRoutes.stats);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: HomeTodayScreen._volcanic,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 18.0),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.play_arrow_rounded, size: 24.0),
+                  SizedBox(width: 8.0),
+                  Text(
+                    'Antrenmana Başla',
+                    style: TextStyle(
+                      fontSize: 15.0,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                  Spacer(),
+                  Icon(Icons.arrow_forward_rounded, size: 18.0),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeroMetricCell extends StatelessWidget {
+  const _HeroMetricCell({
+    required this.icon,
+    required this.iconColor,
+    required this.value,
+    required this.label,
+  });
+
+  final IconData icon;
+  final Color iconColor;
+  final String value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+      decoration: BoxDecoration(
+        color: HomeTodayScreen._cardSurfaceSoft,
+        borderRadius: BorderRadius.circular(10.0),
+        border: Border.all(
+          color: HomeTodayScreen._border,
+          width: 1.0,
         ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: iconColor, size: 14.0),
+              const SizedBox(width: 4.0),
+              Expanded(
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    color: HomeTodayScreen._textMuted,
+                    fontSize: 11.0,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6.0),
+          Text(
+            value,
+            style: const TextStyle(
+              color: HomeTodayScreen._textHigh,
+              fontSize: 13.0,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.2,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }
@@ -306,217 +416,90 @@ class GreetingAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Container(
+          width: 42.0,
+          height: 42.0,
+          decoration: BoxDecoration(
+            color: HomeTodayScreen._cardSurface,
+            borderRadius: BorderRadius.circular(12.0),
+            border: Border.all(color: HomeTodayScreen._border, width: 1.0),
+          ),
+          child: const Center(
+            child: Icon(
+              Icons.bolt_rounded,
+              color: HomeTodayScreen._volcanic,
+              size: 22.0,
+            ),
+          ),
+        ),
+        const SizedBox(width: 12.0),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            children: const [
               Text(
-                'İvme',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: HomeTodayScreen._textMid,
-                      fontWeight: FontWeight.w500,
-                    ),
+                'CYBER-ATHLETE',
+                style: TextStyle(
+                  color: HomeTodayScreen._textMuted,
+                  fontSize: 11.0,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.2,
+                ),
               ),
-              const SizedBox(height: 4.0),
+              SizedBox(height: 2.0),
               Text(
-                '7 Günlük Seri',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: HomeTodayScreen._textHigh,
-                      fontWeight: FontWeight.w700,
-                    ),
+                '7 Günlük Seri Aktif',
+                style: TextStyle(
+                  color: HomeTodayScreen._textHigh,
+                  fontSize: 15.0,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.2,
+                ),
               ),
             ],
           ),
         ),
-        const SizedBox(width: 12.0),
-        Stack(
-          children: [
-            const CircleAvatar(
-              radius: 20.0,
-              backgroundColor: HomeTodayScreen._cardSurfaceTint,
-              child: Icon(
-                Icons.person,
-                color: HomeTodayScreen._textHigh,
-              ),
+        InkWell(
+          borderRadius: BorderRadius.circular(12.0),
+          onTap: () {
+            Navigator.of(context).pushNamed(AppRoutes.userProfile);
+          },
+          child: Container(
+            width: 40.0,
+            height: 40.0,
+            decoration: BoxDecoration(
+              color: HomeTodayScreen._cardSurface,
+              borderRadius: BorderRadius.circular(12.0),
+              border: Border.all(color: HomeTodayScreen._border, width: 1.0),
             ),
-            Positioned(
-              right: 2.0,
-              bottom: 2.0,
-              child: Container(
-                width: 10.0,
-                height: 10.0,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF4CD964),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: HomeTodayScreen._bgTop,
-                    width: 2.0,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                const Center(
+                  child: Icon(
+                    Icons.person_rounded,
+                    color: HomeTodayScreen._textHigh,
+                    size: 20.0,
                   ),
                 ),
-              ),
+                Positioned(
+                  right: 4.0,
+                  bottom: 4.0,
+                  child: Container(
+                    width: 7.0,
+                    height: 7.0,
+                    decoration: const BoxDecoration(
+                      color: HomeTodayScreen._emerald,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ],
-    );
-  }
-}
-
-class TodayWorkoutCard extends StatelessWidget {
-  const TodayWorkoutCard({super.key, required this.progress});
-
-  final double progress;
-
-  @override
-  Widget build(BuildContext context) {
-    return GlassCard(
-      borderRadius: HomeTodayScreen._radiusLg,
-      child: Padding(
-        padding: const EdgeInsets.all(HomeTodayScreen._spaceMd),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
-                    decoration: BoxDecoration(
-                      color: HomeTodayScreen._accentPurple.withOpacity(0.18),
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    child: Text(
-                      'Günün Antrenmanı',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: HomeTodayScreen._accentPurple,
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
-                  ),
-                  const SizedBox(height: 10.0),
-                  Text(
-                    'Tüm Vücut Güç',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: HomeTodayScreen._textHigh,
-                          fontWeight: FontWeight.w700,
-                        ),
-                  ),
-                  const SizedBox(height: 6.0),
-                  Text(
-                    '45 dk • Orta seviye',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: HomeTodayScreen._textMid,
-                        ),
-                  ),
-                  const SizedBox(height: 14.0),
-                  Row(
-                    children: [
-                      Text(
-                        'İlerleme',
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: HomeTodayScreen._textMid,
-                              fontWeight: FontWeight.w600,
-                            ),
-                      ),
-                      const Spacer(),
-                      Text(
-                        '${(progress * 100).round()}%',
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: HomeTodayScreen._textHigh,
-                              fontWeight: FontWeight.w700,
-                            ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8.0),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12.0),
-                          child: LinearProgressIndicator(
-                            value: progress,
-                            minHeight: 6.0,
-                            backgroundColor:
-                                HomeTodayScreen._cardSurfaceSoft,
-                            valueColor: const AlwaysStoppedAnimation<Color>(
-                              HomeTodayScreen._accentBlue,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12.0),
-                    ],
-                  ),
-                  const SizedBox(height: 14.0),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          _AvatarStack(
-                            avatars: const [
-                              Icons.person,
-                              Icons.person_outline,
-                              Icons.person_outline,
-                            ],
-                          ),
-                          const SizedBox(width: 8.0),
-                          Expanded(
-                            child: Text(
-                              '+5 arkadaş şu an aktif',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(
-                                    color: HomeTodayScreen._textMid,
-                                  ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10.0),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.of(context)
-                                .pushNamed(AppRoutes.workoutLibrary);
-                          },
-                          style: TextButton.styleFrom(
-                            foregroundColor: HomeTodayScreen._textHigh,
-                            backgroundColor: HomeTodayScreen._cardSurfaceSoft,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14.0,
-                              vertical: 8.0,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            ),
-                            textStyle: Theme.of(context)
-                                .textTheme
-                                .labelSmall
-                                ?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                          ),
-                          child: const Text('Hareketleri keşfet'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 12.0),
-            const _PlayButton(),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -528,21 +511,25 @@ class EnergeticHeadline extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      children: const [
         Text(
-          'Günaydın,',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: HomeTodayScreen._textMid,
-                fontWeight: FontWeight.w600,
-              ),
+          'GÜNAYDIN',
+          style: TextStyle(
+            color: HomeTodayScreen._textMuted,
+            fontSize: 12.0,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1.4,
+          ),
         ),
-        const SizedBox(height: 6.0),
+        SizedBox(height: 4.0),
         Text(
           'Bugünü domine edelim 💪',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: HomeTodayScreen._textHigh,
-                fontWeight: FontWeight.w800,
-              ),
+          style: TextStyle(
+            color: HomeTodayScreen._textHigh,
+            fontSize: 22.0,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.4,
+          ),
         ),
       ],
     );
@@ -555,109 +542,90 @@ class WeeklyActivityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const weekData = [
-      _WeekDayChip(
-        label: 'Pzt',
-        dayOfMonth: '18',
-        isDone: true,
-      ),
-      _WeekDayChip(
-        label: 'Sal',
-        dayOfMonth: '19',
-        isDone: true,
-      ),
-      _WeekDayChip(
-        label: 'Car',
-        dayOfMonth: '20',
-        isActive: true,
-      ),
-      _WeekDayChip(
-        label: 'Per',
-        dayOfMonth: '21',
-      ),
-      _WeekDayChip(
-        label: 'Cum',
-        dayOfMonth: '22',
-      ),
-      _WeekDayChip(
-        label: 'Cmt',
-        dayOfMonth: '23',
-      ),
-      _WeekDayChip(
-        label: 'Paz',
-        dayOfMonth: '24',
-      ),
+      _WeekDayChip(label: 'Pzt', dayOfMonth: '18', isDone: true),
+      _WeekDayChip(label: 'Sal', dayOfMonth: '19', isDone: true),
+      _WeekDayChip(label: 'Çar', dayOfMonth: '20', isActive: true),
+      _WeekDayChip(label: 'Per', dayOfMonth: '21'),
+      _WeekDayChip(label: 'Cum', dayOfMonth: '22'),
+      _WeekDayChip(label: 'Cmt', dayOfMonth: '23'),
+      _WeekDayChip(label: 'Paz', dayOfMonth: '24'),
     ];
 
-    return GlassCard(
-      borderRadius: HomeTodayScreen._radiusLg,
-      child: Padding(
-        padding: const EdgeInsets.all(HomeTodayScreen._spaceMd),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text(
-                  'Antrenman Takvimi',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: HomeTodayScreen._textHigh,
-                        fontWeight: FontWeight.w700,
-                      ),
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: HomeTodayScreen._cardSurface,
+        borderRadius: BorderRadius.circular(HomeTodayScreen._radiusLg),
+        border: Border.all(color: HomeTodayScreen._border, width: 1.0),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text(
+                'Antrenman Takvimi',
+                style: TextStyle(
+                  color: HomeTodayScreen._textHigh,
+                  fontSize: 15.0,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.2,
                 ),
-                const Spacer(),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10.0,
-                    vertical: 6.0,
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8.0,
+                  vertical: 4.0,
+                ),
+                decoration: BoxDecoration(
+                  color: HomeTodayScreen._volcanic.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(
+                    color: HomeTodayScreen._volcanic.withValues(alpha: 0.3),
+                    width: 1.0,
                   ),
-                  decoration: BoxDecoration(
-                    color: HomeTodayScreen._accentPurple.withOpacity(0.16),
-                    borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: const Text(
+                  '7 Gün Seri 🔥',
+                  style: TextStyle(
+                    color: HomeTodayScreen._volcanic,
+                    fontSize: 11.0,
+                    fontWeight: FontWeight.w700,
                   ),
-                  child: Text(
-                    '7 gun seri',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: HomeTodayScreen._accentPurple,
-                          fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4.0),
+          const Text(
+            'Mart 2026 • Bu hafta 3/5 seans tamamlandı',
+            style: TextStyle(
+              color: HomeTodayScreen._textMid,
+              fontSize: 12.0,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          const SizedBox(height: 14.0),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
+            decoration: BoxDecoration(
+              color: HomeTodayScreen._cardSurfaceSoft,
+              borderRadius: BorderRadius.circular(HomeTodayScreen._radiusMd),
+              border: Border.all(color: HomeTodayScreen._border, width: 1.0),
+            ),
+            child: Row(
+              children: weekData
+                  .map((day) => Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                          child: day,
                         ),
-                  ),
-                ),
-              ],
+                      ))
+                  .toList(),
             ),
-            const SizedBox(height: 6.0),
-            Text(
-              'Mart 2026 • Bu hafta 3/5 antrenman',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: HomeTodayScreen._textMid,
-                    fontWeight: FontWeight.w500,
-                  ),
-            ),
-            const SizedBox(height: 12.0),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 10.0,
-                vertical: 12.0,
-              ),
-              decoration: BoxDecoration(
-                color: HomeTodayScreen._cardSurfaceTint,
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.06),
-                ),
-                borderRadius: BorderRadius.circular(HomeTodayScreen._radiusMd),
-              ),
-              child: Row(
-                children: weekData
-                    .map((day) => Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                            child: day,
-                          ),
-                        ))
-                    .toList(),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -668,47 +636,54 @@ class QuickStatsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassCard(
-      borderRadius: HomeTodayScreen._radiusLg,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: HomeTodayScreen._spaceMd,
-          vertical: HomeTodayScreen._spaceSm,
-        ),
-        child: Row(
-          children: const [
-            Expanded(
-              child: _QuickStatItem(
-                value: '4s 20d',
-                label: 'Haftalık süre',
-              ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+      decoration: BoxDecoration(
+        color: HomeTodayScreen._cardSurface,
+        borderRadius: BorderRadius.circular(HomeTodayScreen._radiusLg),
+        border: Border.all(color: HomeTodayScreen._border, width: 1.0),
+      ),
+      child: Row(
+        children: const [
+          Expanded(
+            child: _QuickStatItem(
+              value: '4s 20d',
+              label: 'Haftalık Süre',
+              icon: Icons.timer_outlined,
             ),
-            _QuickStatDivider(),
-            Expanded(
-              child: _QuickStatItem(
-                value: '5 Days',
-                label: 'Aktif Gün',
-              ),
+          ),
+          _QuickStatDivider(),
+          Expanded(
+            child: _QuickStatItem(
+              value: '5 Gün',
+              label: 'Aktif Gün',
+              icon: Icons.calendar_today_rounded,
             ),
-            _QuickStatDivider(),
-            Expanded(
-              child: _QuickStatItem(
-                value: '2 KR',
-                label: 'Yeni Rekor',
-              ),
+          ),
+          _QuickStatDivider(),
+          Expanded(
+            child: _QuickStatItem(
+              value: '2 KR',
+              label: 'Kişisel Rekor',
+              icon: Icons.emoji_events_outlined,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
 class _QuickStatItem extends StatelessWidget {
-  const _QuickStatItem({required this.value, required this.label});
+  const _QuickStatItem({
+    required this.value,
+    required this.label,
+    required this.icon,
+  });
 
   final String value;
   final String label;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
@@ -716,20 +691,29 @@ class _QuickStatItem extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Row(
+          children: [
+            Icon(icon, color: HomeTodayScreen._textMuted, size: 13.0),
+            const SizedBox(width: 4.0),
+            Text(
+              label,
+              style: const TextStyle(
+                color: HomeTodayScreen._textMuted,
+                fontSize: 11.0,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6.0),
         Text(
           value,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: HomeTodayScreen._textHigh,
-                fontWeight: FontWeight.w700,
-              ),
-        ),
-        const SizedBox(height: 4.0),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: HomeTodayScreen._textMid,
-                fontWeight: FontWeight.w600,
-              ),
+          style: const TextStyle(
+            color: HomeTodayScreen._textHigh,
+            fontSize: 16.0,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.3,
+          ),
         ),
       ],
     );
@@ -743,9 +727,93 @@ class _QuickStatDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 1.0,
-      height: 42.0,
-      margin: const EdgeInsets.symmetric(horizontal: 12.0),
-      color: HomeTodayScreen._cardSurfaceTint,
+      height: 36.0,
+      margin: const EdgeInsets.symmetric(horizontal: 10.0),
+      color: HomeTodayScreen._border,
+    );
+  }
+}
+
+class TodayWorkoutCard extends StatelessWidget {
+  const TodayWorkoutCard({super.key, required this.progress});
+
+  final double progress;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: HomeTodayScreen._cardSurface,
+        borderRadius: BorderRadius.circular(HomeTodayScreen._radiusLg),
+        border: Border.all(color: HomeTodayScreen._border, width: 1.0),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                decoration: BoxDecoration(
+                  color: HomeTodayScreen._volcanic.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(
+                    color: HomeTodayScreen._volcanic.withValues(alpha: 0.3),
+                    width: 1.0,
+                  ),
+                ),
+                child: const Text(
+                  'Günün Antrenmanı',
+                  style: TextStyle(
+                    color: HomeTodayScreen._volcanic,
+                    fontSize: 11.0,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '${(progress * 100).round()}%',
+                style: const TextStyle(
+                  color: HomeTodayScreen._textHigh,
+                  fontSize: 13.0,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10.0),
+          const Text(
+            'Tüm Vücut Güç',
+            style: TextStyle(
+              color: HomeTodayScreen._textHigh,
+              fontSize: 16.0,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 4.0),
+          const Text(
+            '45 dk • Orta Seviye',
+            style: TextStyle(
+              color: HomeTodayScreen._textMid,
+              fontSize: 12.0,
+            ),
+          ),
+          const SizedBox(height: 12.0),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4.0),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 5.0,
+              backgroundColor: HomeTodayScreen._cardSurfaceSoft,
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                HomeTodayScreen._volcanic,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -758,24 +826,25 @@ class BrowseCategoriesRow extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Kategorilere Göz At',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: HomeTodayScreen._textHigh,
-                fontWeight: FontWeight.w700,
-              ),
+          style: TextStyle(
+            color: HomeTodayScreen._textHigh,
+            fontSize: 16.0,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         const SizedBox(height: 12.0),
         SizedBox(
-          height: 120.0,
+          height: 90.0,
           child: ListView(
             scrollDirection: Axis.horizontal,
             children: const [
               CategoryCard(label: 'Güç'),
-              SizedBox(width: 12.0),
+              SizedBox(width: 10.0),
               CategoryCard(label: 'Kardiyo'),
-              SizedBox(width: 12.0),
-              CategoryCard(label: 'YYA'),
+              SizedBox(width: 10.0),
+              CategoryCard(label: 'Mobilite'),
             ],
           ),
         ),
@@ -791,29 +860,31 @@ class RecommendedList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      children: const [
         Text(
           'Sana Özel Öneriler',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: HomeTodayScreen._textHigh,
-                fontWeight: FontWeight.w700,
-              ),
+          style: TextStyle(
+            color: HomeTodayScreen._textHigh,
+            fontSize: 16.0,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        const SizedBox(height: 12.0),
-        const RecommendedItem(
+        SizedBox(height: 12.0),
+        RecommendedItem(
           title: 'Üst Vücut Güç',
-          meta: '30 dk • İleri',
+          meta: '30 dk • İleri Seviye',
         ),
-        const SizedBox(height: 12.0),
-        const RecommendedItem(
+        SizedBox(height: 10.0),
+        RecommendedItem(
           title: 'Gece Koşu Aralıkları',
-          meta: '45 dk • Orta seviye',
+          meta: '45 dk • Orta Seviye',
         ),
       ],
     );
   }
 }
 
+/// Cyber-Athlete Matte Bottom Navigation Bar
 class AppBottomNav extends StatelessWidget {
   const AppBottomNav({
     super.key,
@@ -826,85 +897,80 @@ class AppBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-        decoration: BoxDecoration(
-          color: HomeTodayScreen._cardSurface,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(HomeTodayScreen._radiusLg),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.35),
-              blurRadius: 20.0,
-              offset: const Offset(0, -6),
-            ),
-          ],
+    return Container(
+      decoration: const BoxDecoration(
+        color: HomeTodayScreen._cardSurface,
+        border: Border(
+          top: BorderSide(color: HomeTodayScreen._border, width: 1.0),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            AppBottomNavItem(
-              icon: Icons.home_rounded,
-              label: 'Ana Sayfa',
-              selected: selectedIndex == 0,
-              onTap: selectedIndex == 0
-                  ? null
-                  : () {
-                      if (onItemSelected != null) {
-                        onItemSelected?.call(0);
-                        return;
-                      }
-                      Navigator.of(context).pushNamed(AppRoutes.home);
-                    },
-            ),
-            AppBottomNavItem(
-              icon: Icons.fitness_center,
-              label: 'Hareketler',
-              selected: selectedIndex == 1,
-              onTap: selectedIndex == 1
-                  ? null
-                  : () {
-                      if (onItemSelected != null) {
-                        onItemSelected?.call(1);
-                        return;
-                      }
-                      Navigator.of(context)
-                          .pushNamed(AppRoutes.workoutLibrary);
-                    },
-            ),
-            AppBottomNavItem(
-              icon: Icons.event_note,
-              label: 'Program',
-              selected: selectedIndex == 2,
-              onTap: selectedIndex == 2
-                  ? null
-                  : () {
-                      if (onItemSelected != null) {
-                        onItemSelected?.call(2);
-                        return;
-                      }
-                      Navigator.of(context).pushNamed(AppRoutes.stats);
-                    },
-            ),
-            AppBottomNavItem(
-              icon: Icons.person,
-              label: 'Profil',
-              selected: selectedIndex == 3,
-              onTap: selectedIndex == 3
-                  ? null
-                  : () {
-                      if (onItemSelected != null) {
-                        onItemSelected?.call(3);
-                        return;
-                      }
-                      Navigator.of(context)
-                          .pushNamed(AppRoutes.userProfile);
-                    },
-            ),
-          ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              AppBottomNavItem(
+                icon: Icons.home_rounded,
+                label: 'Ana Sayfa',
+                selected: selectedIndex == 0,
+                onTap: selectedIndex == 0
+                    ? null
+                    : () {
+                        if (onItemSelected != null) {
+                          onItemSelected?.call(0);
+                          return;
+                        }
+                        Navigator.of(context).pushNamed(AppRoutes.home);
+                      },
+              ),
+              AppBottomNavItem(
+                icon: Icons.fitness_center_rounded,
+                label: 'Hareketler',
+                selected: selectedIndex == 1,
+                onTap: selectedIndex == 1
+                    ? null
+                    : () {
+                        if (onItemSelected != null) {
+                          onItemSelected?.call(1);
+                          return;
+                        }
+                        Navigator.of(context)
+                            .pushNamed(AppRoutes.workoutLibrary);
+                      },
+              ),
+              AppBottomNavItem(
+                icon: Icons.event_note_rounded,
+                label: 'Program',
+                selected: selectedIndex == 2,
+                onTap: selectedIndex == 2
+                    ? null
+                    : () {
+                        if (onItemSelected != null) {
+                          onItemSelected?.call(2);
+                          return;
+                        }
+                        Navigator.of(context).pushNamed(AppRoutes.stats);
+                      },
+              ),
+              AppBottomNavItem(
+                icon: Icons.person_rounded,
+                label: 'Profil',
+                selected: selectedIndex == 3,
+                onTap: selectedIndex == 3
+                    ? null
+                    : () {
+                        if (onItemSelected != null) {
+                          onItemSelected?.call(3);
+                          return;
+                        }
+                        Navigator.of(context)
+                            .pushNamed(AppRoutes.userProfile);
+                      },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -928,23 +994,24 @@ class AppBottomNavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color =
-        selected ? HomeTodayScreen._accentPurple : HomeTodayScreen._textMid;
+        selected ? HomeTodayScreen._volcanic : HomeTodayScreen._textMuted;
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(18.0),
+      borderRadius: BorderRadius.circular(10.0),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: color, size: 24.0),
-            const SizedBox(height: 4.0),
+            Icon(icon, color: color, size: 22.0),
+            const SizedBox(height: 3.0),
             Text(
               label,
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: color,
-                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                  ),
+              style: TextStyle(
+                color: color,
+                fontSize: 11.0,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -962,47 +1029,23 @@ class CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 120.0,
+      width: 110.0,
+      padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(HomeTodayScreen._radiusLg),
-        image: image == null
-            ? null
-            : DecorationImage(
-                image: image!,
-                fit: BoxFit.cover,
-              ),
-        gradient: image == null
-            ? const LinearGradient(
-                colors: [
-                  Color(0xFF2A2050),
-                  Color(0xFF3A2F6C),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
-            : null,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.35),
-            blurRadius: 16.0,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        color: HomeTodayScreen._cardSurface,
+        borderRadius: BorderRadius.circular(HomeTodayScreen._radiusMd),
+        border: Border.all(color: HomeTodayScreen._border, width: 1.0),
       ),
-      child: Stack(
-        children: [
-          Positioned(
-            left: 12.0,
-            bottom: 12.0,
-            child: Text(
-              label,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: HomeTodayScreen._textHigh,
-                    fontWeight: FontWeight.w700,
-                  ),
-            ),
+      child: Align(
+        alignment: Alignment.bottomLeft,
+        child: Text(
+          label,
+          style: const TextStyle(
+            color: HomeTodayScreen._textHigh,
+            fontSize: 13.0,
+            fontWeight: FontWeight.w600,
           ),
-        ],
+        ),
       ),
     );
   }
@@ -1022,89 +1065,79 @@ class RecommendedItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassCard(
-      borderRadius: HomeTodayScreen._radiusLg,
-      child: Padding(
-        padding: const EdgeInsets.all(HomeTodayScreen._spaceSm),
-        child: Row(
-          children: [
-            Container(
-              width: 64.0,
-              height: 64.0,
-              decoration: BoxDecoration(
-                borderRadius:
-                    BorderRadius.circular(HomeTodayScreen._radiusMd),
-                image: thumbnail == null
-                    ? null
-                    : DecorationImage(
-                        image: thumbnail!,
-                        fit: BoxFit.cover,
-                      ),
-                gradient: thumbnail == null
-                    ? const LinearGradient(
-                        colors: [
-                          Color(0xFF2C224E),
-                          Color(0xFF453579),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      )
-                    : null,
-              ),
-              child: thumbnail == null
-                  ? const Icon(
-                      Icons.fitness_center,
-                      color: HomeTodayScreen._textHigh,
-                    )
-                  : null,
+    return Container(
+      padding: const EdgeInsets.all(12.0),
+      decoration: BoxDecoration(
+        color: HomeTodayScreen._cardSurface,
+        borderRadius: BorderRadius.circular(HomeTodayScreen._radiusMd),
+        border: Border.all(color: HomeTodayScreen._border, width: 1.0),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44.0,
+            height: 44.0,
+            decoration: BoxDecoration(
+              color: HomeTodayScreen._cardSurfaceSoft,
+              borderRadius: BorderRadius.circular(10.0),
+              border: Border.all(color: HomeTodayScreen._border, width: 1.0),
             ),
-            const SizedBox(width: 12.0),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: HomeTodayScreen._textHigh,
-                          fontWeight: FontWeight.w700,
-                        ),
+            child: const Icon(
+              Icons.fitness_center_rounded,
+              color: HomeTodayScreen._volcanic,
+              size: 20.0,
+            ),
+          ),
+          const SizedBox(width: 12.0),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: HomeTodayScreen._textHigh,
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w600,
                   ),
-                  const SizedBox(height: 4.0),
-                  Text(
-                    meta,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: HomeTodayScreen._textMid,
-                        ),
+                ),
+                const SizedBox(height: 2.0),
+                Text(
+                  meta,
+                  style: const TextStyle(
+                    color: HomeTodayScreen._textMid,
+                    fontSize: 12.0,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            const SizedBox(width: 8.0),
-            Container(
-              width: 36.0,
-              height: 36.0,
-              decoration: BoxDecoration(
-                color: HomeTodayScreen._cardSurfaceSoft,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.add,
-                color: HomeTodayScreen._accentPurple,
-              ),
+          ),
+          Container(
+            width: 32.0,
+            height: 32.0,
+            decoration: BoxDecoration(
+              color: HomeTodayScreen._cardSurfaceSoft,
+              shape: BoxShape.circle,
+              border: Border.all(color: HomeTodayScreen._border, width: 1.0),
             ),
-          ],
-        ),
+            child: const Icon(
+              Icons.chevron_right_rounded,
+              color: HomeTodayScreen._textMid,
+              size: 20.0,
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
+/// Matte Nordic Card (Drop-in replacement for GlassCard with no neon blur)
 class GlassCard extends StatelessWidget {
   const GlassCard({
     super.key,
     required this.child,
-    this.borderRadius = 20.0,
+    this.borderRadius = 16.0,
   });
 
   final Widget child;
@@ -1112,91 +1145,13 @@ class GlassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
-        child: Container(
-          decoration: BoxDecoration(
-            color: HomeTodayScreen._cardSurface.withOpacity(0.78),
-            borderRadius: BorderRadius.circular(borderRadius),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.08),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.35),
-                blurRadius: 20.0,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: child,
-        ),
-      ),
-    );
-  }
-}
-
-class _PlayButton extends StatelessWidget {
-  const _PlayButton();
-
-  @override
-  Widget build(BuildContext context) {
     return Container(
-      width: 54.0,
-      height: 54.0,
       decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: const LinearGradient(
-          colors: [Color(0xFF4FC3F7), Color(0xFF3A8DFF)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: HomeTodayScreen._accentBlue.withOpacity(0.45),
-            blurRadius: 18.0,
-            spreadRadius: 2.0,
-          ),
-        ],
+        color: HomeTodayScreen._cardSurface,
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(color: HomeTodayScreen._border, width: 1.0),
       ),
-      child: const Icon(
-        Icons.play_arrow,
-        color: Colors.white,
-        size: 28.0,
-      ),
-    );
-  }
-}
-
-class _AvatarStack extends StatelessWidget {
-  const _AvatarStack({required this.avatars});
-
-  final List<IconData> avatars;
-
-  @override
-  Widget build(BuildContext context) {
-    final width = 12.0 + (avatars.length - 1) * 16.0 + 24.0;
-    return SizedBox(
-      height: 26.0,
-      width: width,
-      child: Stack(
-        children: List.generate(avatars.length, (index) {
-          return Positioned(
-            left: index * 16.0,
-            child: CircleAvatar(
-              radius: 12.0,
-              backgroundColor: HomeTodayScreen._cardSurfaceSoft,
-              child: Icon(
-                avatars[index],
-                size: 14.0,
-                color: HomeTodayScreen._textHigh,
-              ),
-            ),
-          );
-        }),
-      ),
+      child: child,
     );
   }
 }
@@ -1216,43 +1171,51 @@ class _WeekDayChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = isActive
-        ? HomeTodayScreen._accentPurple
-        : (isDone
-            ? HomeTodayScreen._accentBlue.withOpacity(0.2)
-            : HomeTodayScreen._cardSurface);
+    final Color bgColor;
+    final Color borderColor;
+    final Color textColor;
 
-    final borderColor = isActive
-        ? HomeTodayScreen._accentPurple.withOpacity(0.85)
-        : (isDone
-            ? HomeTodayScreen._accentBlue.withOpacity(0.6)
-            : Colors.white.withOpacity(0.08));
+    if (isActive) {
+      bgColor = HomeTodayScreen._volcanic;
+      borderColor = HomeTodayScreen._volcanic;
+      textColor = Colors.white;
+    } else if (isDone) {
+      bgColor = HomeTodayScreen._emerald.withValues(alpha: 0.14);
+      borderColor = HomeTodayScreen._emerald.withValues(alpha: 0.35);
+      textColor = HomeTodayScreen._emerald;
+    } else {
+      bgColor = HomeTodayScreen._cardSurfaceSoft;
+      borderColor = HomeTodayScreen._border;
+      textColor = HomeTodayScreen._textMuted;
+    }
 
     return Container(
-      height: 62.0,
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      height: 56.0,
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: borderColor),
+        borderRadius: BorderRadius.circular(10.0),
+        border: Border.all(color: borderColor, width: 1.0),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             label,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: HomeTodayScreen._textMid,
-                  fontWeight: FontWeight.w600,
-                ),
+            style: TextStyle(
+              color: isActive ? Colors.white70 : HomeTodayScreen._textMid,
+              fontSize: 10.0,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-          const SizedBox(height: 4.0),
+          const SizedBox(height: 2.0),
           Text(
             dayOfMonth,
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: HomeTodayScreen._textHigh,
-                  fontWeight: FontWeight.w700,
-                ),
+            style: TextStyle(
+              color: textColor,
+              fontSize: 13.0,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ],
       ),

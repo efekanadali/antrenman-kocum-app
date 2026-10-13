@@ -5,19 +5,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calisthenics_app/domain/models/workout_session_summary.dart';
 import 'package:calisthenics_app/presentation/providers/workout_history_provider.dart';
+import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 import 'package:calisthenics_app/presentation/widgets/muscle_recovery_card.dart';
 
-// ─── Design Tokens ───────────────────────────────────────────────────────────
-const Color _bgTop = Color(0xFF151028);
-const Color _bgBottom = Color(0xFF0E0A1D);
-const Color _surface = Color(0xFF201836);
-const Color _surfaceSoft = Color(0xFF2A2048);
-const Color _purple = Color(0xFF6D5BFF);
-const Color _blue = Color(0xFF4FC3F7);
-const Color _neon = Color(0xFFC2F13A);
-const Color _textHigh = Color(0xFFEDE9FF);
-const Color _textMid = Color(0xFFB4A9D8);
-const Color _textMuted = Color(0xFF7E73A3);
+// ─── Design Tokens (Nordic & Cyber-Athlete) ──────────────────────────────────
+const Color _bg = AppColors.background; // #0A0C0E
+const Color _surface = AppColors.surface; // #13171C
+const Color _surfaceSoft = AppColors.surfaceSoft; // #181D24
+const Color _border = AppColors.border; // #1E232A
+
+const Color _volcanic = AppColors.volcanic; // #FF5533
+const Color _volcanicSoft = AppColors.volcanicSoft; // #FF7733
+const Color _emerald = AppColors.emerald; // #10B981
+const Color _nordicIce = AppColors.nordicIce; // #38BDF8
+const Color _amber = AppColors.amber; // #F59E0B
+
+const Color _textHigh = AppColors.textHigh; // #F1F5F9
+const Color _textMid = AppColors.textMid; // #94A3B8
+const Color _textMuted = AppColors.textMuted; // #64748B
 
 const List<String> _muscleLabels = [
   'Göğüs',
@@ -28,21 +33,20 @@ const List<String> _muscleLabels = [
   'Bacak',
 ];
 
+// Mat Nordic kas paleti
 const List<Color> _muscleColors = [
-  Color(0xFF6D5BFF),
-  Color(0xFF4FC3F7),
-  Color(0xFFC2F13A),
-  Color(0xFFFF7ACB),
-  Color(0xFFFFB84D),
-  Color(0xFF3DDC97),
+  _volcanic, // Göğüs (Volkanik Turuncu)
+  _emerald, // Sırt (Toparlanma Yeşili)
+  _nordicIce, // Omuz (Buz Mavisi)
+  _amber, // Kol (Kehribar)
+  Color(0xFFFF6B6B), // Karın (Mat Mercan)
+  Color(0xFF34D399), // Bacak (Mat Nane Yeşili)
 ];
 
 const List<String> _weekdayShort = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
 
 enum AnalyticsRange { weekly, monthly }
 
-/// Kas grubu anahtarını (enum adı / Türkçe ad) 6 ana gruptan birine eşler.
-/// Eşleşmeyen anahtarlar (ör. "Genel") için `null` döner.
 int? _muscleBucket(String rawKey) {
   final key = rawKey.toLowerCase().trim();
   const map = <String, int>{
@@ -138,82 +142,77 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     final historyAsync = ref.watch(workoutHistoryProvider);
 
     return Scaffold(
-      backgroundColor: _bgBottom,
+      backgroundColor: _bg,
       appBar: AppBar(
-        backgroundColor: _bgTop,
+        backgroundColor: _bg,
         elevation: 0,
+        scrolledUnderElevation: 0,
         title: const Text(
           'Analitik & Kas Yükü',
           style: TextStyle(
             color: _textHigh,
-            fontWeight: FontWeight.w700,
-            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            fontSize: 17,
+            letterSpacing: -0.2,
           ),
         ),
         iconTheme: const IconThemeData(color: _textHigh),
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [_bgTop, _bgBottom],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+      body: historyAsync.when(
+        loading: () => const Center(
+          child: CircularProgressIndicator(
+            strokeWidth: 2.5,
+            color: _volcanic,
           ),
         ),
-        child: historyAsync.when(
-          loading: () => const Center(
-            child: CircularProgressIndicator(color: _purple),
-          ),
-          error: (e, _) => _MessageView(
-            icon: Icons.wifi_off_rounded,
-            title: 'Veriler yüklenemedi',
-            message: 'Bağlantını kontrol edip tekrar dene.',
-            actionLabel: 'Tekrar Dene',
-            onAction: () => ref.invalidate(workoutHistoryProvider),
-          ),
-          data: (sessions) {
-            if (sessions.length < 2) {
-              return ListView(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
-                children: const [
-                  _MessageView(
-                    icon: Icons.insights_rounded,
-                    title: 'Henüz yeterli antrenman verisi bulunmuyor',
-                    message:
-                        'Seans tamamladıkça grafikler güncellenecektir.',
-                  ),
-                  SizedBox(height: 16),
-                  MuscleRecoveryCard(),
-                ],
-              );
-            }
-            final days = _range == AnalyticsRange.weekly ? 7 : 30;
-            final data = _compute(sessions, days);
+        error: (e, _) => _MessageView(
+          icon: Icons.wifi_off_rounded,
+          title: 'Veriler yüklenemedi',
+          message: 'Bağlantını kontrol edip tekrar dene.',
+          actionLabel: 'Tekrar Dene',
+          onAction: () => ref.invalidate(workoutHistoryProvider),
+        ),
+        data: (sessions) {
+          if (sessions.length < 2) {
             return ListView(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
-              children: [
-                _RangeToggle(
-                  value: _range,
-                  onChanged: (r) => setState(() => _range = r),
+              children: const [
+                _MessageView(
+                  icon: Icons.insights_rounded,
+                  title: 'Henüz yeterli antrenman verisi bulunmuyor',
+                  message: 'Seans tamamladıkça grafikler ve analizler otomatik güncellenecektir.',
                 ),
-                const SizedBox(height: 14),
-                _SummaryRow(data: data, weekly: _range == AnalyticsRange.weekly),
-                const SizedBox(height: 14),
-                _LoadChartCard(data: data, weekly: _range == AnalyticsRange.weekly),
-                const SizedBox(height: 14),
-                _MuscleDistributionCard(data: data),
-                const SizedBox(height: 14),
-                const MuscleRecoveryCard(),
+                SizedBox(height: 16),
+                MuscleRecoveryCard(),
               ],
             );
-          },
-        ),
+          }
+          final days = _range == AnalyticsRange.weekly ? 7 : 30;
+          final data = _compute(sessions, days);
+          return ListView(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
+            children: [
+              _RangeToggle(
+                value: _range,
+                onChanged: (r) => setState(() => _range = r),
+              ),
+              const SizedBox(height: 12),
+              _SummaryRow(data: data),
+              const SizedBox(height: 12),
+              _LoadChartCard(data: data, weekly: _range == AnalyticsRange.weekly),
+              const SizedBox(height: 12),
+              _MuscleDistributionCard(data: data),
+              const SizedBox(height: 12),
+              const MuscleRecoveryCard(),
+            ],
+          );
+        },
       ),
     );
   }
 }
 
-// ─── Range toggle ────────────────────────────────────────────────────────────
+// ─── Range Toggle (Nordic Mat Seçici) ─────────────────────────────────────────
 class _RangeToggle extends StatelessWidget {
   const _RangeToggle({required this.value, required this.onChanged});
 
@@ -228,20 +227,22 @@ class _RangeToggle extends StatelessWidget {
         child: GestureDetector(
           onTap: () => onChanged(r),
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 220),
-            padding: const EdgeInsets.symmetric(vertical: 10),
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(vertical: 9),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              gradient: selected
-                  ? const LinearGradient(colors: [_purple, _blue])
+              color: selected ? _surfaceSoft : Colors.transparent,
+              borderRadius: BorderRadius.circular(10),
+              border: selected
+                  ? Border.all(color: _volcanic.withValues(alpha: 0.35), width: 1)
                   : null,
             ),
             alignment: Alignment.center,
             child: Text(
               label,
               style: TextStyle(
-                color: selected ? Colors.white : _textMid,
-                fontWeight: FontWeight.w700,
+                color: selected ? _textHigh : _textMid,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                fontSize: 13,
               ),
             ),
           ),
@@ -253,8 +254,8 @@ class _RangeToggle extends StatelessWidget {
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: _surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: _border, width: 1),
       ),
       child: Row(
         children: [
@@ -266,12 +267,11 @@ class _RangeToggle extends StatelessWidget {
   }
 }
 
-// ─── Summary cards ───────────────────────────────────────────────────────────
+// ─── Summary Cards (Özet Kartları - Minimalist Mat İkonlar) ────────────────────
 class _SummaryRow extends StatelessWidget {
-  const _SummaryRow({required this.data, required this.weekly});
+  const _SummaryRow({required this.data});
 
   final _AnalyticsData data;
-  final bool weekly;
 
   @override
   Widget build(BuildContext context) {
@@ -281,7 +281,7 @@ class _SummaryRow extends StatelessWidget {
         Expanded(
           child: _SummaryCard(
             icon: Icons.check_circle_outline_rounded,
-            color: _neon,
+            iconColor: _emerald,
             value: '${data.sessionCount}',
             label: 'Toplam Seans',
           ),
@@ -290,18 +290,18 @@ class _SummaryRow extends StatelessWidget {
         Expanded(
           child: _SummaryCard(
             icon: Icons.bolt_rounded,
-            color: _blue,
+            iconColor: _volcanic,
             value: data.totalLoad.round().toString(),
-            label: 'Toplam MLI Yükü',
+            label: 'Toplam MLI',
           ),
         ),
         const SizedBox(width: 10),
         Expanded(
           child: _SummaryCard(
             icon: Icons.fitness_center_rounded,
-            color: _purple,
+            iconColor: _nordicIce,
             value: top == null ? '-' : _muscleLabels[top],
-            label: 'En Çok Çalışan',
+            label: 'Ağırlıklı Kas',
           ),
         ),
       ],
@@ -312,13 +312,13 @@ class _SummaryRow extends StatelessWidget {
 class _SummaryCard extends StatelessWidget {
   const _SummaryCard({
     required this.icon,
-    required this.color,
+    required this.iconColor,
     required this.value,
     required this.label,
   });
 
   final IconData icon;
-  final Color color;
+  final Color iconColor;
   final String value;
   final String label;
 
@@ -328,19 +328,24 @@ class _SummaryCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
       decoration: BoxDecoration(
         color: _surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: color.withValues(alpha: 0.25)),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.10),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: _border, width: 1),
       ),
       child: Column(
         children: [
-          Icon(icon, color: color, size: 22),
+          // Minimalist, mat renkli ikon rozeti
+          Container(
+            padding: const EdgeInsets.all(7),
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: iconColor.withValues(alpha: 0.24),
+                width: 1,
+              ),
+            ),
+            child: Icon(icon, color: iconColor, size: 17),
+          ),
           const SizedBox(height: 8),
           FittedBox(
             fit: BoxFit.scaleDown,
@@ -348,16 +353,18 @@ class _SummaryCard extends StatelessWidget {
               value,
               style: const TextStyle(
                 color: _textHigh,
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.3,
               ),
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 3),
           Text(
             label,
             textAlign: TextAlign.center,
-            maxLines: 2,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               color: _textMid,
               fontSize: 11,
@@ -370,7 +377,7 @@ class _SummaryCard extends StatelessWidget {
   }
 }
 
-// ─── Bar chart ───────────────────────────────────────────────────────────────
+// ─── Bar Chart (Günlük MLI İş Yükü - Mat Volkanik Turuncu Gradyan) ────────────
 class _LoadChartCard extends StatelessWidget {
   const _LoadChartCard({required this.data, required this.weekly});
 
@@ -384,10 +391,10 @@ class _LoadChartCard extends StatelessWidget {
     final labelStep = weekly ? 1 : 5;
 
     return _Panel(
-      title: 'MLI İş Yükü',
-      subtitle: weekly ? 'Günlük toplam (7 gün)' : 'Günlük toplam (30 gün)',
+      title: 'MLI İş Yükü Dağılımı',
+      subtitle: weekly ? 'Son 7 günün seans yükleri' : 'Son 30 günün seans yükleri',
       child: SizedBox(
-        height: 220,
+        height: 200,
         child: BarChart(
           BarChartData(
             maxY: top,
@@ -396,8 +403,8 @@ class _LoadChartCard extends StatelessWidget {
               show: true,
               drawVerticalLine: false,
               horizontalInterval: top / 4,
-              getDrawingHorizontalLine: (_) => FlLine(
-                color: Colors.white.withValues(alpha: 0.06),
+              getDrawingHorizontalLine: (_) => const FlLine(
+                color: _border,
                 strokeWidth: 1,
               ),
             ),
@@ -408,7 +415,7 @@ class _LoadChartCard extends StatelessWidget {
               leftTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
-                  reservedSize: 38,
+                  reservedSize: 34,
                   interval: top / 4,
                   getTitlesWidget: (v, meta) {
                     if (v == meta.max) return const SizedBox.shrink();
@@ -422,7 +429,7 @@ class _LoadChartCard extends StatelessWidget {
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
-                  reservedSize: 26,
+                  reservedSize: 24,
                   getTitlesWidget: (v, meta) {
                     final i = v.toInt();
                     if (i < 0 ||
@@ -444,12 +451,14 @@ class _LoadChartCard extends StatelessWidget {
             barTouchData: BarTouchData(
               touchTooltipData: BarTouchTooltipData(
                 getTooltipColor: (_) => _surfaceSoft,
+                tooltipBorder: const BorderSide(color: _border, width: 1),
+                tooltipBorderRadius: BorderRadius.circular(8),
                 getTooltipItem: (group, gi, rod, ri) => BarTooltipItem(
                   '${data.dayLabels[group.x]}\n${rod.toY.round()} MLI',
                   const TextStyle(
                     color: _textHigh,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 11,
                   ),
                 ),
               ),
@@ -462,16 +471,17 @@ class _LoadChartCard extends StatelessWidget {
                     BarChartRodData(
                       toY: data.dailyLoad[i],
                       width: weekly ? 18 : 5,
-                      borderRadius: BorderRadius.circular(weekly ? 6 : 3),
+                      borderRadius: BorderRadius.circular(weekly ? 5 : 2.5),
+                      // Mat Volkanik Turuncu Gradyan (#FF5533 -> #FF7733)
                       gradient: const LinearGradient(
-                        colors: [_purple, _blue],
+                        colors: [_volcanic, _volcanicSoft],
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
                       ),
                       backDrawRodData: BackgroundBarChartRodData(
                         show: true,
                         toY: top,
-                        color: Colors.white.withValues(alpha: 0.03),
+                        color: _surfaceSoft,
                       ),
                     ),
                   ],
@@ -484,7 +494,7 @@ class _LoadChartCard extends StatelessWidget {
   }
 }
 
-// ─── Muscle distribution ─────────────────────────────────────────────────────
+// ─── Muscle Distribution (Kas Grubu Dağılımı) ────────────────────────────────
 class _MuscleDistributionCard extends StatelessWidget {
   const _MuscleDistributionCard({required this.data});
 
@@ -497,13 +507,13 @@ class _MuscleDistributionCard extends StatelessWidget {
     if (sum <= 0) {
       return const _Panel(
         title: 'Kas Grubu Dağılımı',
-        subtitle: 'Seçili dönem',
+        subtitle: 'Seçili dönem iş yükü',
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 20),
           child: Center(
             child: Text(
               'Bu dönemde kas grubu verisi yok.',
-              style: TextStyle(color: _textMid),
+              style: TextStyle(color: _textMid, fontSize: 13),
             ),
           ),
         ),
@@ -515,28 +525,27 @@ class _MuscleDistributionCard extends StatelessWidget {
 
     return _Panel(
       title: 'Kas Grubu Dağılımı',
-      subtitle: 'Seçili dönem',
+      subtitle: 'Seçili dönemin toplam iş yükü payı',
       child: Column(
         children: [
           SizedBox(
-            height: 190,
+            height: 175,
             child: PieChart(
               PieChartData(
-                sectionsSpace: 3,
-                centerSpaceRadius: 46,
+                sectionsSpace: 2,
+                centerSpaceRadius: 44,
                 sections: [
                   for (final i in order)
                     if (data.muscleTotals[i] > 0)
                       PieChartSectionData(
                         value: data.muscleTotals[i],
                         color: _muscleColors[i],
-                        radius: 32,
-                        title:
-                            '${(data.muscleTotals[i] / sum * 100).round()}%',
+                        radius: 28,
+                        title: '${(data.muscleTotals[i] / sum * 100).round()}%',
                         titleStyle: const TextStyle(
-                          color: Color(0xFF0E0A1D),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                 ],
@@ -551,7 +560,7 @@ class _MuscleDistributionCard extends StatelessWidget {
               fraction: data.muscleTotals[i] / sum,
               value: data.muscleTotals[i],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 9),
           ],
         ],
       ),
@@ -577,8 +586,8 @@ class _MuscleBar extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 10,
-          height: 10,
+          width: 8,
+          height: 8,
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 8),
@@ -586,16 +595,16 @@ class _MuscleBar extends StatelessWidget {
           width: 52,
           child: Text(
             label,
-            style: const TextStyle(color: _textHigh, fontSize: 13),
+            style: const TextStyle(color: _textHigh, fontSize: 13, fontWeight: FontWeight.w500),
           ),
         ),
         Expanded(
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: fraction.clamp(0.0, 1.0),
-              minHeight: 8,
-              backgroundColor: Colors.white.withValues(alpha: 0.07),
+              minHeight: 6,
+              backgroundColor: _border,
               valueColor: AlwaysStoppedAnimation<Color>(color),
             ),
           ),
@@ -618,7 +627,7 @@ class _MuscleBar extends StatelessWidget {
   }
 }
 
-// ─── Shared widgets ──────────────────────────────────────────────────────────
+// ─── Shared Nordic Panel ─────────────────────────────────────────────────────
 class _Panel extends StatelessWidget {
   const _Panel({
     required this.title,
@@ -635,9 +644,9 @@ class _Panel extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _surface.withValues(alpha: 0.92),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        color: _surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: _border, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -646,16 +655,17 @@ class _Panel extends StatelessWidget {
             title,
             style: const TextStyle(
               color: _textHigh,
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.2,
             ),
           ),
           const SizedBox(height: 2),
           Text(
             subtitle,
-            style: const TextStyle(color: _textMuted, fontSize: 12),
+            style: const TextStyle(color: _textMuted, fontSize: 11.5),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           child,
         ],
       ),
@@ -687,48 +697,49 @@ class _MessageView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 92,
-              height: 92,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [
-                    _purple.withValues(alpha: 0.35),
-                    _blue.withValues(alpha: 0.25),
-                  ],
-                ),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+                color: _surface,
+                border: Border.all(color: _border, width: 1),
               ),
-              child: Icon(icon, size: 42, color: _textHigh),
+              child: Icon(icon, size: 36, color: _textMid),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
             Text(
               title,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: _textHigh,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.2,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: _textMid, fontSize: 14),
+              style: const TextStyle(color: _textMid, fontSize: 13, height: 1.4),
             ),
             if (actionLabel != null) ...[
-              const SizedBox(height: 20),
+              const SizedBox(height: 18),
               ElevatedButton(
                 onPressed: onAction,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _purple,
+                  backgroundColor: _volcanic,
                   foregroundColor: Colors.white,
+                  elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 ),
-                child: Text(actionLabel!),
+                child: Text(
+                  actionLabel!,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
               ),
             ],
           ],

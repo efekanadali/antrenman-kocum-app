@@ -1,8 +1,7 @@
-// lib/presentation/screens/training_program_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/presentation/screens/training_day_session_screen.dart';
+import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 
 class TrainingProgramScreen extends StatelessWidget {
   const TrainingProgramScreen({super.key});
@@ -267,70 +266,30 @@ class TrainingProgramScreen extends StatelessWidget {
     required IconData icon,
     required bool selected,
   }) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.0, end: selected ? 1.0 : 0.0),
-      duration: const Duration(milliseconds: 220),
-      curve: Curves.easeOut,
-      builder: (context, value, child) {
-        return Container(
-          padding: const EdgeInsets.all(6.0),
-          decoration: BoxDecoration(
-            color: Color.lerp(
-              Colors.transparent,
-              colorScheme.primary.withOpacity(0.12),
-              value,
-            ),
-            borderRadius: BorderRadius.circular(12.0),
-            boxShadow: value == 0.0
-                ? []
-                : [
-                    BoxShadow(
-                      color: colorScheme.primary.withOpacity(0.25 * value),
-                      blurRadius: 12.0,
-                      spreadRadius: 1.0,
-                    ),
-                  ],
-          ),
-          child: Transform.scale(
-            scale: 1.0 + (0.06 * value),
-            child: Icon(
-              icon,
-              color: selected
-                  ? colorScheme.primary
-                  : colorScheme.onSurfaceVariant,
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _showSoonSnack(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+    return Container(
+      padding: const EdgeInsets.all(6.0),
+      child: Icon(
+        icon,
+        color: selected ? AppColors.volcanic : AppColors.textMuted,
+        size: 22.0,
+      ),
     );
   }
 
   Widget _buildBottomNavBar(BuildContext context, {required int selectedIndex}) {
-    return SafeArea(
-      top: false,
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 12.0),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24.0)),
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).colorScheme.shadow.withOpacity(0.08),
-              blurRadius: 16.0,
-              offset: const Offset(0, -6),
-            ),
-          ],
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.surface,
+        border: Border(
+          top: BorderSide(color: AppColors.border, width: 1.0),
         ),
+      ),
+      child: SafeArea(
+        top: false,
         child: NavigationBar(
-          height: 68.0,
+          backgroundColor: AppColors.surface,
+          indicatorColor: AppColors.volcanic.withValues(alpha: 0.15),
+          height: 64.0,
           selectedIndex: selectedIndex,
           onDestinationSelected: (index) {
             if (index == selectedIndex) {
@@ -388,7 +347,7 @@ class TrainingProgramScreen extends StatelessWidget {
                 icon: Icons.event_note,
                 selected: true,
               ),
-              label: 'Antrenman Programı',
+              label: 'Program',
             ),
             NavigationDestination(
               icon: _buildNavIcon(
@@ -414,7 +373,7 @@ class TrainingProgramScreen extends StatelessWidget {
                 icon: Icons.person,
                 selected: true,
               ),
-              label: 'Kullanıcı',
+              label: 'Profil',
             ),
           ],
         ),
@@ -423,69 +382,93 @@ class TrainingProgramScreen extends StatelessWidget {
   }
 
   Widget _buildCustomPlanCard(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return InkWell(
-      borderRadius: BorderRadius.circular(20.0),
-      onTap: () {
-        Navigator.pushNamed(context, AppRoutes.customPlan);
-      },
-      child: Container(
-        padding: const EdgeInsets.all(18.0),
-        decoration: BoxDecoration(
-          color: colorScheme.primary.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(20.0),
-          border: Border.all(color: colorScheme.primary.withOpacity(0.25)),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceSoft,
+        borderRadius: BorderRadius.circular(16.0),
+        border: Border.all(
+          color: AppColors.volcanic.withValues(alpha: 0.35),
+          width: 1.0,
         ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12.0),
-              decoration: BoxDecoration(
-                color: colorScheme.primary.withOpacity(0.15),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.auto_awesome,
-                color: colorScheme.primary,
-              ),
-            ),
-            const SizedBox(width: 14.0),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Senin Planin',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16.0),
+          onTap: () {
+            Navigator.pushNamed(context, AppRoutes.customPlan);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10.0),
+                  decoration: BoxDecoration(
+                    color: AppColors.volcanic.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(12.0),
+                    border: Border.all(
+                      color: AppColors.volcanic.withValues(alpha: 0.35),
+                      width: 1.0,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.auto_awesome_rounded,
+                    color: AppColors.volcanic,
+                    size: 22.0,
+                  ),
+                ),
+                const SizedBox(width: 14.0),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        'Senin Planın',
+                        style: TextStyle(
+                          color: AppColors.textHigh,
+                          fontSize: 16.0,
                           fontWeight: FontWeight.w700,
                         ),
-                  ),
-                  const SizedBox(height: 6.0),
-                  Text(
-                    'Kendi antrenman programini olustur ve kaydet.',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
+                      ),
+                      SizedBox(height: 3.0),
+                      Text(
+                        'Kendi antrenman programını oluştur ve kaydet.',
+                        style: TextStyle(
+                          color: AppColors.textMid,
+                          fontSize: 12.0,
                         ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8.0),
-            OutlinedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, AppRoutes.customPlan);
-              },
-              style: OutlinedButton.styleFrom(
-                foregroundColor: colorScheme.primary,
-                side: BorderSide(color: colorScheme.primary.withOpacity(0.5)),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14.0),
                 ),
-              ),
-              child: const Text('Olustur'),
+                const SizedBox(width: 8.0),
+                FilledButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.customPlan);
+                  },
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.volcanic,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14.0,
+                      vertical: 8.0,
+                    ),
+                  ),
+                  child: const Text(
+                    'Oluştur',
+                    style: TextStyle(
+                      fontSize: 13.0,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -493,32 +476,37 @@ class TrainingProgramScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Antrenman Programı'),
+        backgroundColor: AppColors.background,
+        elevation: 0,
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 112.0),
+        padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 96.0),
         children: [
-          Text(
+          const Text(
             'Programlar',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+            style: TextStyle(
+              color: AppColors.textHigh,
+              fontSize: 22.0,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.3,
+            ),
           ),
-          const SizedBox(height: 8.0),
-          Text(
-            'Evde ve spor salonunda uygulanacak iki plan.',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
+          const SizedBox(height: 4.0),
+          const Text(
+            'Evde ve spor salonunda uygulanacak elit planlar.',
+            style: TextStyle(
+              color: AppColors.textMid,
+              fontSize: 13.0,
+            ),
           ),
           const SizedBox(height: 16.0),
           for (final program in _programData)
             _LevelSection(program: program),
-          const SizedBox(height: 8.0),
+          const SizedBox(height: 6.0),
           _buildCustomPlanCard(context),
         ],
       ),
@@ -534,7 +522,6 @@ class _LevelSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final level = (program["level"] as String).toUpperCase();
     final days = program["days"] as List<dynamic>;
 
@@ -542,9 +529,9 @@ class _LevelSection extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(20.0),
-        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.4)),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16.0),
+        border: Border.all(color: AppColors.border, width: 1.0),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -553,22 +540,25 @@ class _LevelSection extends StatelessWidget {
             children: [
               Container(
                 width: 4.0,
-                height: 20.0,
+                height: 18.0,
                 decoration: BoxDecoration(
-                  color: colorScheme.primary,
-                  borderRadius: BorderRadius.circular(8.0),
+                  color: AppColors.volcanic,
+                  borderRadius: BorderRadius.circular(4.0),
                 ),
               ),
               const SizedBox(width: 10.0),
               Text(
                 level,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+                style: const TextStyle(
+                  color: AppColors.textHigh,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 12.0),
+          const SizedBox(height: 14.0),
           for (final day in days)
             _DayCard(
               day: day as Map<String, dynamic>,
@@ -594,20 +584,17 @@ class _DayCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final warmup = (day["warmup"] as List<dynamic>).cast<String>();
     final workout = day["workout"] as List<dynamic>;
     final cooldown = (day["cooldown"] as List<dynamic>).cast<String>();
-    const accent = Color(0xFFC7F54B);
-    const accentText = Color(0xFF121600);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12.0),
       padding: const EdgeInsets.all(14.0),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.4)),
+        color: AppColors.surfaceSoft,
+        borderRadius: BorderRadius.circular(14.0),
+        border: Border.all(color: AppColors.border, width: 1.0),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -617,40 +604,51 @@ class _DayCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   day["name"] as String,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                  style: const TextStyle(
+                    color: AppColors.textHigh,
+                    fontSize: 15.0,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
-              Text(
-                day["focus"] as String,
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w600,
-                    ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3.0),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(6.0),
+                  border: Border.all(color: AppColors.border, width: 1.0),
+                ),
+                child: Text(
+                  day["focus"] as String,
+                  style: const TextStyle(
+                    color: AppColors.textMid,
+                    fontSize: 11.0,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ],
           ),
+          const SizedBox(height: 12.0),
+          _SectionList(title: "Isınma", items: warmup),
           const SizedBox(height: 10.0),
-          _SectionList(title: "Isinma", items: warmup),
-          const SizedBox(height: 10.0),
-          Text(
+          const Text(
             "Ana Antrenman",
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+            style: TextStyle(
+              color: AppColors.textHigh,
+              fontSize: 13.0,
+              fontWeight: FontWeight.w700,
+            ),
           ),
           const SizedBox(height: 8.0),
           for (final item in workout)
             _WorkoutItem(item: item as Map<String, dynamic>),
           const SizedBox(height: 10.0),
-          _SectionList(title: "Esneme", items: cooldown),
-          const SizedBox(height: 12.0),
+          _SectionList(title: "Esneme & Soğuma", items: cooldown),
+          const SizedBox(height: 14.0),
           SizedBox(
             width: double.infinity,
             child: _StartWorkoutButton(
-              accent: accent,
-              textColor: accentText,
               onPressed: () {
                 Navigator.pushNamed(
                   context,
@@ -673,69 +671,40 @@ class _DayCard extends StatelessWidget {
 class _StartWorkoutButton extends StatelessWidget {
   const _StartWorkoutButton({
     required this.onPressed,
-    required this.accent,
-    required this.textColor,
   });
 
   final VoidCallback onPressed;
-  final Color accent;
-  final Color textColor;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(18.0),
-      onTap: onPressed,
-      child: Ink(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              accent,
-              accent.withOpacity(0.86),
-            ],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
+    return SizedBox(
+      height: 44.0,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.volcanic,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
           ),
-          borderRadius: BorderRadius.circular(18.0),
-          boxShadow: [
-            BoxShadow(
-              color: accent.withOpacity(0.35),
-              blurRadius: 16.0,
-              offset: const Offset(0, 8),
-            ),
-          ],
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
         ),
         child: Row(
-          children: [
-            Container(
-              width: 34.0,
-              height: 34.0,
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.12),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.play_arrow_rounded,
-                color: textColor,
-                size: 22.0,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Icon(Icons.play_arrow_rounded, size: 20.0),
+            SizedBox(width: 8.0),
+            Text(
+              'Antrenmana Başla',
+              style: TextStyle(
+                fontSize: 13.0,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.2,
               ),
             ),
-            const SizedBox(width: 12.0),
-            Expanded(
-              child: Text(
-                'Antrenmana Basla',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: textColor,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.3,
-                    ),
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_rounded,
-              color: textColor,
-            ),
+            Spacer(),
+            Icon(Icons.arrow_forward_rounded, size: 16.0),
           ],
         ),
       ),
@@ -754,25 +723,27 @@ class _SectionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+          style: const TextStyle(
+            color: AppColors.textMid,
+            fontSize: 12.0,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        const SizedBox(height: 6.0),
+        const SizedBox(height: 4.0),
         for (final item in items)
           Padding(
-            padding: const EdgeInsets.only(bottom: 4.0),
+            padding: const EdgeInsets.only(bottom: 3.0),
             child: Text(
-              '- $item',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
+              '• $item',
+              style: const TextStyle(
+                color: AppColors.textMuted,
+                fontSize: 12.0,
+              ),
             ),
           ),
       ],
@@ -787,43 +758,47 @@ class _WorkoutItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.only(bottom: 8.0),
       padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.4)),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(10.0),
+        border: Border.all(color: AppColors.border, width: 1.0),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             item["exercise"] as String,
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+            style: const TextStyle(
+              color: AppColors.textHigh,
+              fontSize: 13.0,
+              fontWeight: FontWeight.w700,
+            ),
           ),
           const SizedBox(height: 4.0),
           Text(
             '${item["sets"]} set | ${item["reps_or_time"]} | Dinlenme: ${item["rest"]}',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
+            style: const TextStyle(
+              color: AppColors.textMid,
+              fontSize: 12.0,
+            ),
           ),
-          const SizedBox(height: 6.0),
+          const SizedBox(height: 4.0),
           Text(
             'İlerleme: ${item["progression"]}',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
+            style: const TextStyle(
+              color: AppColors.textMuted,
+              fontSize: 11.0,
+            ),
           ),
           Text(
             'Kolaylaştırma: ${item["regression"]}',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
+            style: const TextStyle(
+              color: AppColors.textMuted,
+              fontSize: 11.0,
+            ),
           ),
         ],
       ),

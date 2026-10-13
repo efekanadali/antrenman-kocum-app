@@ -1,29 +1,19 @@
 // lib/presentation/screens/workout_library_screen.dart
 
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:calisthenics_app/core/utils/enum_label.dart';
+import 'package:calisthenics_app/domain/enums/exercise_level.dart';
 import 'package:calisthenics_app/domain/enums/muscle_group.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart';
 import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/presentation/screens/home_screen.dart';
+import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 
 class WorkoutLibraryScreen extends ConsumerStatefulWidget {
   const WorkoutLibraryScreen({super.key, this.showBottomNav = true});
 
   final bool showBottomNav;
-
-  static const Color _bgTop = Color(0xFF151028);
-  static const Color _bgBottom = Color(0xFF0E0A1D);
-  static const Color _cardSurface = Color(0xFF201836);
-  static const Color _cardSurfaceSoft = Color(0xFF2A2048);
-  static const Color _accentPurple = Color(0xFF6D5BFF);
-  static const Color _accentBlue = Color(0xFF4FC3F7);
-  static const Color _textHigh = Color(0xFFEDE9FF);
-  static const Color _textMid = Color(0xFFB4A9D8);
 
   @override
   ConsumerState<WorkoutLibraryScreen> createState() =>
@@ -65,27 +55,27 @@ class _WorkoutLibraryScreenState extends ConsumerState<WorkoutLibraryScreen> {
   String _muscleLabel(MuscleGroup group) {
     switch (group) {
       case MuscleGroup.chest:
-        return 'Chest';
+        return 'Göğüs';
       case MuscleGroup.back:
-        return 'Back';
+        return 'Sırt';
       case MuscleGroup.shoulders:
-        return 'Shoulders';
+        return 'Omuz';
       case MuscleGroup.biceps:
         return 'Biceps';
       case MuscleGroup.triceps:
         return 'Triceps';
       case MuscleGroup.core:
-        return 'Core';
+        return 'Karın / Core';
       case MuscleGroup.quads:
-        return 'Quads';
+        return 'Ön Bacak';
       case MuscleGroup.hamstrings:
-        return 'Hamstrings';
+        return 'Arka Bacak';
       case MuscleGroup.glutes:
-        return 'Glutes';
+        return 'Kalça';
       case MuscleGroup.calves:
-        return 'Calves';
+        return 'Kalf';
       case MuscleGroup.legs:
-        return 'Legs';
+        return 'Bacak';
     }
   }
 
@@ -108,102 +98,98 @@ class _WorkoutLibraryScreenState extends ConsumerState<WorkoutLibraryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: WorkoutLibraryScreen._bgBottom,
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  WorkoutLibraryScreen._bgTop,
-                  WorkoutLibraryScreen._bgBottom,
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-          ),
-          Positioned(
-            top: -120.0,
-            left: -60.0,
-            child: Container(
-              width: 240.0,
-              height: 240.0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: WorkoutLibraryScreen._accentPurple.withOpacity(0.16),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: -100.0,
-            right: -40.0,
-            child: Container(
-              width: 220.0,
-              height: 220.0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: WorkoutLibraryScreen._accentBlue.withOpacity(0.12),
-              ),
-            ),
-          ),
-          SafeArea(
-            child: FutureBuilder<List<Exercise>>(
-              future: _exerciseFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: FutureBuilder<List<Exercise>>(
+          future: _exerciseFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(
+                  color: AppColors.volcanic,
+                ),
+              );
+            }
 
-                if (snapshot.hasError) {
-                  return Center(child: Text('Hata: ${snapshot.error}'));
-                }
+            if (snapshot.hasError) {
+              return Center(
+                child: Text(
+                  'Hata: ${snapshot.error}',
+                  style: const TextStyle(color: AppColors.textMid),
+                ),
+              );
+            }
 
-                final exercises = snapshot.data ?? <Exercise>[];
-                final availableGroups = _allMuscleGroups();
-                final filteredWorkouts = _selectedMuscleGroups.isEmpty
-                    ? exercises
-                    : exercises
-                        .where(
-                          (exercise) => _selectedMuscleGroups.every(
-                            (group) =>
-                                exercise.targetMuscleGroups.contains(group),
-                          ),
-                        )
-                        .toList();
+            final exercises = snapshot.data ?? <Exercise>[];
+            final availableGroups = _allMuscleGroups();
+            final filteredWorkouts = _selectedMuscleGroups.isEmpty
+                ? exercises
+                : exercises
+                    .where(
+                      (exercise) => _selectedMuscleGroups.every(
+                        (group) =>
+                            exercise.targetMuscleGroups.contains(group),
+                      ),
+                    )
+                    .toList();
 
-                return CustomScrollView(
-                  slivers: [
+            return CustomScrollView(
+              slivers: [
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 12.0),
+                    padding: const EdgeInsets.fromLTRB(20.0, 16.0, 20.0, 8.0),
                     child: Row(
                       children: [
                         _BackButton(
                           onPressed: () => Navigator.of(context).maybePop(),
                         ),
-                        const SizedBox(width: 12.0),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Hareket Kütüphanesi',
-                              style:
-                                  Theme.of(context).textTheme.titleLarge?.copyWith(
-                                        color: WorkoutLibraryScreen._textHigh,
-                                        fontWeight: FontWeight.w800,
-                                      ),
+                        const SizedBox(width: 14.0),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: const [
+                              Text(
+                                'Hareket Kütüphanesi',
+                                style: TextStyle(
+                                  color: AppColors.textHigh,
+                                  fontSize: 22.0,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: -0.3,
+                                ),
+                              ),
+                              SizedBox(height: 3.0),
+                              Text(
+                                'Kalisthenik Egzersiz Kataloğu',
+                                style: TextStyle(
+                                  color: AppColors.textMid,
+                                  fontSize: 13.0,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10.0,
+                            vertical: 5.0,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceSoft,
+                            borderRadius: BorderRadius.circular(10.0),
+                            border: Border.all(
+                              color: AppColors.border,
+                              width: 1.0,
                             ),
-                            const SizedBox(height: 4.0),
-                            Text(
-                              'Kalisthenik hareketler',
-                              style:
-                                  Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: WorkoutLibraryScreen._textMid,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                          ),
+                          child: Text(
+                            '${filteredWorkouts.length} Hareket',
+                            style: const TextStyle(
+                              color: AppColors.textMid,
+                              fontSize: 12.0,
+                              fontWeight: FontWeight.w600,
                             ),
-                          ],
+                          ),
                         ),
                       ],
                     ),
@@ -211,18 +197,7 @@ class _WorkoutLibraryScreenState extends ConsumerState<WorkoutLibraryScreen> {
                 ),
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: Text(
-                      'Hareket kartlarına dokunup detaylı bilgi alabilirsin.',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: WorkoutLibraryScreen._textMid,
-                          ),
-                    ),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 16.0, 20.0, 8.0),
+                    padding: const EdgeInsets.fromLTRB(20.0, 12.0, 20.0, 8.0),
                     child: _TargetRegionPicker(
                       availableGroups: availableGroups,
                       selectedGroups: _selectedMuscleGroups,
@@ -234,13 +209,13 @@ class _WorkoutLibraryScreenState extends ConsumerState<WorkoutLibraryScreen> {
                 ),
                 SliverPadding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                      const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
                         final item = filteredWorkouts[index];
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: 14.0),
+                          padding: const EdgeInsets.only(bottom: 12.0),
                           child: _WorkoutCard(
                             exercise: item,
                             muscleLabels: _exerciseMuscleLabels(item),
@@ -261,12 +236,10 @@ class _WorkoutLibraryScreenState extends ConsumerState<WorkoutLibraryScreen> {
                 const SliverToBoxAdapter(
                   child: SizedBox(height: 32.0),
                 ),
-                  ],
-                );
-              },
-            ),
-          ),
-        ],
+              ],
+            );
+          },
+        ),
       ),
       bottomNavigationBar:
           widget.showBottomNav ? const AppBottomNav(selectedIndex: 1) : null,
@@ -291,67 +264,90 @@ class _TargetRegionPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _GlassCard(
-      borderRadius: 22.0,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text(
-                  'Hedeflediğin bölge',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: WorkoutLibraryScreen._textHigh,
-                        fontWeight: FontWeight.w700,
-                      ),
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16.0),
+        border: Border.all(color: AppColors.border, width: 1.0),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text(
+                'Hedef Bölge Filtresi',
+                style: TextStyle(
+                  color: AppColors.textHigh,
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.2,
                 ),
-                const Spacer(),
-                if (selectedGroups.isNotEmpty)
-                  TextButton(
-                    onPressed: onClear,
-                    child: Text(
-                      'Temizle',
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            color: WorkoutLibraryScreen._accentBlue,
+              ),
+              const Spacer(),
+              if (selectedGroups.isNotEmpty)
+                GestureDetector(
+                  onTap: onClear,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0,
+                      vertical: 4.0,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceSoft,
+                      borderRadius: BorderRadius.circular(8.0),
+                      border: Border.all(
+                        color: AppColors.border,
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(
+                          Icons.close_rounded,
+                          size: 13.0,
+                          color: AppColors.volcanic,
+                        ),
+                        SizedBox(width: 4.0),
+                        Text(
+                          'Temizle',
+                          style: TextStyle(
+                            color: AppColors.volcanic,
+                            fontSize: 11.0,
                             fontWeight: FontWeight.w600,
                           ),
+                        ),
+                      ],
                     ),
                   ),
-              ],
+                ),
+            ],
+          ),
+          const SizedBox(height: 6.0),
+          const Text(
+            'İlgili kas grubuna dokunarak egzersizleri daralt.',
+            style: TextStyle(
+              color: AppColors.textMuted,
+              fontSize: 12.0,
             ),
-            const SizedBox(height: 6.0),
-            Text(
-              'Kartlara dokunarak hedef bölgeyi seç.',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: WorkoutLibraryScreen._textMid,
+          ),
+          const SizedBox(height: 12.0),
+          Wrap(
+            spacing: 8.0,
+            runSpacing: 8.0,
+            children: availableGroups
+                .map(
+                  (group) => _RegionCard(
+                    label: labelBuilder(group),
+                    isSelected: selectedGroups.contains(group),
+                    onTap: () => onToggleGroup(group),
                   ),
-            ),
-            const SizedBox(height: 14.0),
-            if (availableGroups.isEmpty)
-              Text(
-                'Şu an listelenecek bölge yok.',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: WorkoutLibraryScreen._textMid,
-                    ),
-              )
-            else
-              Wrap(
-                spacing: 10.0,
-                runSpacing: 10.0,
-                children: availableGroups
-                    .map(
-                      (group) => _RegionCard(
-                        label: labelBuilder(group),
-                        isSelected: selectedGroups.contains(group),
-                        onTap: () => onToggleGroup(group),
-                      ),
-                    )
-                    .toList(),
-              ),
-          ],
-        ),
+                )
+                .toList(),
+          ),
+        ],
       ),
     );
   }
@@ -370,43 +366,31 @@ class _RegionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = isSelected
-        ? WorkoutLibraryScreen._accentPurple.withOpacity(0.28)
-        : WorkoutLibraryScreen._cardSurface;
-    final borderColor = isSelected
-        ? WorkoutLibraryScreen._accentPurple
-        : Colors.white.withOpacity(0.18);
-    final textColor = isSelected
-        ? WorkoutLibraryScreen._accentPurple
-        : WorkoutLibraryScreen._textHigh;
-
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16.0),
-        splashColor: WorkoutLibraryScreen._accentBlue.withOpacity(0.2),
-        highlightColor: WorkoutLibraryScreen._accentBlue.withOpacity(0.08),
-        child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        borderRadius: BorderRadius.circular(12.0),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
           decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(16.0),
-            border: Border.all(color: borderColor),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.18),
-                blurRadius: 10.0,
-                offset: const Offset(0, 6),
-              ),
-            ],
+            color: isSelected ? AppColors.volcanic : AppColors.surfaceSoft,
+            borderRadius: BorderRadius.circular(12.0),
+            border: Border.all(
+              color: isSelected ? AppColors.volcanic : AppColors.border,
+              width: 1.0,
+            ),
           ),
           child: Text(
             label,
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: textColor,
-                  fontWeight: FontWeight.w600,
-                ),
+            style: TextStyle(
+              color: isSelected ? Colors.white : AppColors.textMid,
+              fontSize: 12.5,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+              letterSpacing: -0.1,
+            ),
           ),
         ),
       ),
@@ -425,129 +409,173 @@ class _WorkoutCard extends StatelessWidget {
   final List<String> muscleLabels;
   final VoidCallback onTap;
 
+  Color _levelColor(ExerciseLevel level) {
+    switch (level) {
+      case ExerciseLevel.beginner:
+        return AppColors.emerald;
+      case ExerciseLevel.intermediate:
+        return AppColors.amber;
+      case ExerciseLevel.advanced:
+        return AppColors.volcanic;
+    }
+  }
+
+  String _levelName(ExerciseLevel level) {
+    switch (level) {
+      case ExerciseLevel.beginner:
+        return 'Başlangıç';
+      case ExerciseLevel.intermediate:
+        return 'Orta';
+      case ExerciseLevel.advanced:
+        return 'İleri';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return _GlassCard(
-      borderRadius: 20.0,
+    final stripeColor = _levelColor(exercise.level);
+    final levelName = _levelName(exercise.level);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14.0),
+        border: Border.all(color: AppColors.border, width: 1.0),
+      ),
+      clipBehavior: Clip.antiAlias,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(20.0),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          borderRadius: BorderRadius.circular(14.0),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 44.0,
-                      height: 44.0,
-                      decoration: BoxDecoration(
-                        color: WorkoutLibraryScreen._cardSurfaceSoft,
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      child: const Icon(
-                        Icons.fitness_center,
-                        color: WorkoutLibraryScreen._textHigh,
-                      ),
-                    ),
-                    const SizedBox(width: 12.0),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            exercise.name,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(
-                                  color: WorkoutLibraryScreen._textHigh,
+                // 3px Zarif Dikey Seviye Şeridi
+                Container(
+                  width: 3.5,
+                  color: stripeColor,
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Koyu Mat Grafit İkon Kutusu
+                            Container(
+                              width: 42.0,
+                              height: 42.0,
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceSoft,
+                                borderRadius: BorderRadius.circular(10.0),
+                                border: Border.all(
+                                  color: AppColors.border,
+                                  width: 1.0,
+                                ),
+                              ),
+                              child: const Icon(
+                                Icons.fitness_center_rounded,
+                                color: AppColors.textHigh,
+                                size: 20.0,
+                              ),
+                            ),
+                            const SizedBox(width: 12.0),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    exercise.name,
+                                    style: const TextStyle(
+                                      color: AppColors.textHigh,
+                                      fontSize: 15.5,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: -0.2,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 3.0),
+                                  Text(
+                                    '${exercise.name} hareketi için biyomekanik aktivasyon profili.',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: AppColors.textMuted,
+                                      fontSize: 12.0,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8.0),
+                            // Seviye Kapsülü
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 9.0,
+                                vertical: 4.0,
+                              ),
+                              decoration: BoxDecoration(
+                                color: stripeColor.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(8.0),
+                                border: Border.all(
+                                  color: stripeColor.withValues(alpha: 0.35),
+                                  width: 1.0,
+                                ),
+                              ),
+                              child: Text(
+                                levelName,
+                                style: TextStyle(
+                                  color: stripeColor,
+                                  fontSize: 11.0,
                                   fontWeight: FontWeight.w700,
                                 ),
-                          ),
-                          const SizedBox(height: 6.0),
-                          Text(
-                            '${exercise.name} hareketi icin kas aktivasyon dagilimi.',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(
-                                  color: WorkoutLibraryScreen._textMid,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12.0),
+                        Wrap(
+                          spacing: 6.0,
+                          runSpacing: 6.0,
+                          children: muscleLabels
+                              .map(
+                                (label) => Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0,
+                                    vertical: 3.5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surfaceSoft,
+                                    borderRadius: BorderRadius.circular(6.0),
+                                    border: Border.all(
+                                      color: AppColors.border,
+                                      width: 1.0,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    label,
+                                    style: const TextStyle(
+                                      color: AppColors.textMid,
+                                      fontSize: 11.0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                                 ),
-                          ),
-                        ],
-                      ),
+                              )
+                              .toList(),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 8.0),
-                    _LevelPill(level: exercise.level.label),
-                  ],
-                ),
-                const SizedBox(height: 12.0),
-                Wrap(
-                  spacing: 8.0,
-                  runSpacing: 8.0,
-                  children: muscleLabels
-                      .map(
-                        (group) => _MuscleChip(label: group),
-                      )
-                      .toList(),
+                  ),
                 ),
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _LevelPill extends StatelessWidget {
-  const _LevelPill({required this.level});
-
-  final String level;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
-      decoration: BoxDecoration(
-        color: WorkoutLibraryScreen._accentPurple.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(20.0),
-      ),
-      child: Text(
-        level,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: WorkoutLibraryScreen._accentPurple,
-              fontWeight: FontWeight.w700,
-            ),
-      ),
-    );
-  }
-}
-
-class _MuscleChip extends StatelessWidget {
-  const _MuscleChip({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
-      decoration: BoxDecoration(
-        color: WorkoutLibraryScreen._cardSurfaceSoft,
-        borderRadius: BorderRadius.circular(16.0),
-      ),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: WorkoutLibraryScreen._textHigh,
-              fontWeight: FontWeight.w600,
-            ),
       ),
     );
   }
@@ -560,55 +588,24 @@ class _BackButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onPressed,
-      borderRadius: BorderRadius.circular(14.0),
-      child: Ink(
-        decoration: BoxDecoration(
-          color: WorkoutLibraryScreen._cardSurface,
-          borderRadius: BorderRadius.circular(14.0),
-        ),
-        child: const SizedBox(
-          width: 44.0,
-          height: 44.0,
-          child: Icon(
-            Icons.arrow_back_rounded,
-            color: WorkoutLibraryScreen._textHigh,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _GlassCard extends StatelessWidget {
-  const _GlassCard({required this.child, this.borderRadius = 20.0});
-
-  final Widget child;
-  final double borderRadius;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(12.0),
         child: Container(
+          width: 40.0,
+          height: 40.0,
           decoration: BoxDecoration(
-            color: WorkoutLibraryScreen._cardSurface.withOpacity(0.78),
-            borderRadius: BorderRadius.circular(borderRadius),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.08),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.35),
-                blurRadius: 20.0,
-                offset: const Offset(0, 10),
-              ),
-            ],
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(12.0),
+            border: Border.all(color: AppColors.border, width: 1.0),
           ),
-          child: child,
+          child: const Icon(
+            Icons.arrow_back_rounded,
+            color: AppColors.textHigh,
+            size: 20.0,
+          ),
         ),
       ),
     );

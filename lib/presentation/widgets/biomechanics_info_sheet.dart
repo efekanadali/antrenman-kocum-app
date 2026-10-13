@@ -1,6 +1,7 @@
 // lib/presentation/widgets/biomechanics_info_sheet.dart
 
 import 'package:flutter/material.dart';
+import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 
 /// Hangi bilginin öncelikli olarak gösterileceğini belirten sekme filtresi.
 enum BiomechanicsTopic {
@@ -12,7 +13,8 @@ enum BiomechanicsTopic {
   final String label;
 }
 
-/// Biyomekanik Formül ve RIR Toparlanma modelini açıklayan koyu temalı BottomSheet.
+/// Biyomekanik Formül ve RIR Toparlanma modelini açıklayan
+/// "Premium Nordic & Cyber-Athlete" mat koyu temalı BottomSheet.
 Future<void> showBiomechanicsInfoSheet(
   BuildContext context, {
   BiomechanicsTopic initialTopic = BiomechanicsTopic.all,
@@ -21,7 +23,7 @@ Future<void> showBiomechanicsInfoSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    barrierColor: Colors.black.withValues(alpha: 0.65),
+    barrierColor: Colors.black.withValues(alpha: 0.70),
     builder: (ctx) => BiomechanicsInfoSheet(initialTopic: initialTopic),
   );
 }
@@ -41,18 +43,16 @@ class BiomechanicsInfoSheet extends StatefulWidget {
 class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
   late BiomechanicsTopic _selectedTopic;
 
-  static const Color _bgTop = Color(0xFF1B1435);
-  static const Color _bgBottom = Color(0xFF0F0A1F);
-  static const Color _surface = Color(0xFF22193E);
-  static const Color _surfaceSoft = Color(0xFF2A204C);
-  static const Color _purple = Color(0xFF6D5BFF);
-  static const Color _blue = Color(0xFF4FC3F7);
-  static const Color _lime = Color(0xFFC2F13A);
-  static const Color _ready = Color(0xFF3DDC97);
-  static const Color _amber = Color(0xFFFFB84D);
-  static const Color _red = Color(0xFFFF5370);
-  static const Color _textHigh = Color(0xFFEDE9FF);
-  static const Color _textMid = Color(0xFFB4A9D8);
+  static const Color _bg = AppColors.surface; // #13171C
+  static const Color _surface = AppColors.surfaceSoft; // #181D24
+  static const Color _border = AppColors.border; // #1E232A
+  static const Color _volcanic = AppColors.volcanic; // #FF5533
+  static const Color _emerald = AppColors.emerald; // #10B981
+  static const Color _amber = AppColors.amber; // #F59E0B
+  static const Color _red = AppColors.volcanic; // #FF5533
+  static const Color _textHigh = AppColors.textHigh; // #F1F5F9
+  static const Color _textMid = AppColors.textMid; // #94A3B8
+  static const Color _textMuted = AppColors.textMuted; // #64748B
 
   @override
   void initState() {
@@ -68,23 +68,9 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
     return Container(
       constraints: BoxConstraints(maxHeight: maxHeight),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [_bgTop, _bgBottom],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.10),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.50),
-            blurRadius: 30,
-            offset: const Offset(0, -10),
-          ),
-        ],
+        color: _bg,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        border: Border.all(color: _border, width: 1),
       ),
       child: SafeArea(
         top: false,
@@ -95,10 +81,10 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
             // Sürükleme Tutamacı (Drag Handle)
             Center(
               child: Container(
-                width: 44,
-                height: 5,
+                width: 40,
+                height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.22),
+                  color: _border,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -113,16 +99,14 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: _purple.withValues(alpha: 0.20),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: _purple.withValues(alpha: 0.35),
-                      ),
+                      color: _surface,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: _border),
                     ),
                     child: const Icon(
                       Icons.biotech_rounded,
-                      color: _blue,
-                      size: 22,
+                      color: _volcanic,
+                      size: 20,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -134,8 +118,8 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
                           'Biyomekanik & Toparlanma',
                           style: TextStyle(
                             color: _textHigh,
-                            fontSize: 17,
-                            fontWeight: FontWeight.w800,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
                             letterSpacing: -0.2,
                           ),
                         ),
@@ -152,7 +136,7 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
                   ),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close_rounded, color: _textMid, size: 22),
+                    icon: const Icon(Icons.close_rounded, color: _textMid, size: 20),
                     splashRadius: 20,
                   ),
                 ],
@@ -161,7 +145,7 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
 
             const SizedBox(height: 14),
 
-            // Konu Seçim Hapları (Segmented Selector)
+            // Konu Seçim Bölmeleri (Segmented Selector)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -169,33 +153,34 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
                   final isSelected = _selectedTopic == topic;
                   return Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 3),
                       child: InkWell(
                         onTap: () {
                           setState(() {
                             _selectedTopic = topic;
                           });
                         },
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
+                          duration: const Duration(milliseconds: 180),
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? _purple.withValues(alpha: 0.35)
-                                : _surface.withValues(alpha: 0.75),
-                            borderRadius: BorderRadius.circular(12),
+                                ? _volcanic.withValues(alpha: 0.15)
+                                : _surface,
+                            borderRadius: BorderRadius.circular(10),
                             border: Border.all(
                               color: isSelected
-                                  ? _purple.withValues(alpha: 0.70)
-                                  : Colors.white.withValues(alpha: 0.08),
+                                  ? _volcanic.withValues(alpha: 0.50)
+                                  : _border,
+                              width: 1,
                             ),
                           ),
                           child: Center(
                             child: Text(
                               topic.label,
                               style: TextStyle(
-                                color: isSelected ? _textHigh : _textMid,
+                                color: isSelected ? _volcanic : _textMid,
                                 fontSize: 12,
                                 fontWeight: isSelected
                                     ? FontWeight.w700
@@ -211,11 +196,8 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
               ),
             ),
 
-            const SizedBox(height: 10),
-            Divider(
-              color: Colors.white.withValues(alpha: 0.08),
-              height: 1,
-            ),
+            const SizedBox(height: 12),
+            const Divider(color: _border, height: 1),
 
             // Kaydırılabilir İçerik Alanı
             Flexible(
@@ -228,7 +210,7 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
                         _selectedTopic == BiomechanicsTopic.mli) ...[
                       _buildMliSection(),
                       if (_selectedTopic == BiomechanicsTopic.all)
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 20),
                     ],
                     if (_selectedTopic == BiomechanicsTopic.all ||
                         _selectedTopic == BiomechanicsTopic.recovery) ...[
@@ -239,21 +221,21 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
                     // Kapat Butonu
                     SizedBox(
                       width: double.infinity,
+                      height: 46,
                       child: ElevatedButton(
                         onPressed: () => Navigator.of(context).pop(),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _purple,
+                          backgroundColor: _volcanic,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
                           elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                         child: const Text(
                           'Anladım',
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 14,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -274,16 +256,19 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Başlık Rozeti
         Row(
           children: [
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: _lime.withValues(alpha: 0.16),
+                color: _volcanic.withValues(alpha: 0.14),
                 borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: _volcanic.withValues(alpha: 0.3),
+                  width: 1,
+                ),
               ),
-              child: const Icon(Icons.bolt_rounded, color: _lime, size: 18),
+              child: const Icon(Icons.bolt_rounded, color: _volcanic, size: 16),
             ),
             const SizedBox(width: 8),
             const Text(
@@ -291,7 +276,7 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
               style: TextStyle(
                 color: _textHigh,
                 fontSize: 15,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ],
@@ -303,15 +288,9 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
           width: double.infinity,
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: _surface.withValues(alpha: 0.90),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: _blue.withValues(alpha: 0.35)),
-            boxShadow: [
-              BoxShadow(
-                color: _blue.withValues(alpha: 0.08),
-                blurRadius: 16,
-              ),
-            ],
+            color: _surface,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: _border, width: 1),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -319,9 +298,9 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
               const Text(
                 'İŞ YÜKÜ HESAPLAMA FORMÜLÜ',
                 style: TextStyle(
-                  color: _blue,
+                  color: _volcanic,
                   fontSize: 11,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w700,
                   letterSpacing: 0.6,
                 ),
               ),
@@ -330,11 +309,9 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
-                  color: _surfaceSoft,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.08),
-                  ),
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: _border),
                 ),
                 child: const Text(
                   'MLI = Set × Tekrar × Kaldıraç Zorluk Katsayısı',
@@ -350,7 +327,7 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
               const Text(
                 '• Statik tutuşlarda süre: Süre (sn) ÷ 2 olarak hesaba katılır.\n'
                 '• Ek ağırlık eklendiğinde: (1 + Ek Ağırlık ÷ Vücut Ağırlığı) çarpanı uygulanır.',
-                style: TextStyle(color: _textMid, fontSize: 11.5, height: 1.4),
+                style: TextStyle(color: _textMuted, fontSize: 11.5, height: 1.4),
               ),
             ],
           ),
@@ -363,16 +340,16 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
           width: double.infinity,
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: _surface.withValues(alpha: 0.60),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+            color: _surface,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: _border, width: 1),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Row(
                 children: [
-                  Icon(Icons.architecture_rounded, color: _lime, size: 16),
+                  Icon(Icons.architecture_rounded, color: _emerald, size: 16),
                   SizedBox(width: 6),
                   Text(
                     'Kalistenikte Kaldıraç Neden Önemli?',
@@ -397,7 +374,7 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
               const SizedBox(height: 6),
               _buildLeverageRow('Dips & Barfiks', '1.30x', 'Tüm vücut kütlesi yerçekimine karşı çekilir'),
               const SizedBox(height: 6),
-              _buildLeverageRow('Planche / Front Lever', '1.80x - 2.20x', 'Moment kolu uzar, kas lifi gerilimi katlanır'),
+              _buildLeverageRow('Planche / Front Lever', '1.80x - 2.20x', 'Moment kolu uzar, kas gerilimi katlanır'),
             ],
           ),
         ),
@@ -409,8 +386,9 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: _surfaceSoft.withValues(alpha: 0.8),
+        color: _bg,
         borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: _border),
       ),
       child: Row(
         children: [
@@ -428,7 +406,7 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
                 ),
                 Text(
                   note,
-                  style: const TextStyle(color: _textMid, fontSize: 10.5),
+                  style: const TextStyle(color: _textMuted, fontSize: 10.5),
                 ),
               ],
             ),
@@ -436,16 +414,16 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: _lime.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: _lime.withValues(alpha: 0.3)),
+              color: _emerald.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: _emerald.withValues(alpha: 0.3)),
             ),
             child: Text(
               factor,
               style: const TextStyle(
-                color: _lime,
+                color: _emerald,
                 fontSize: 11,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
@@ -459,16 +437,19 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Başlık Rozeti
         Row(
           children: [
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: _ready.withValues(alpha: 0.16),
+                color: _emerald.withValues(alpha: 0.14),
                 borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: _emerald.withValues(alpha: 0.3),
+                  width: 1,
+                ),
               ),
-              child: const Icon(Icons.healing_rounded, color: _ready, size: 18),
+              child: const Icon(Icons.healing_rounded, color: _emerald, size: 16),
             ),
             const SizedBox(width: 8),
             const Text(
@@ -476,7 +457,7 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
               style: TextStyle(
                 color: _textHigh,
                 fontSize: 15,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ],
@@ -509,7 +490,7 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
         ),
         const SizedBox(height: 8),
         _buildRirCard(
-          badgeColor: _ready,
+          badgeColor: _emerald,
           rirRange: '4+ RIR (Hafif / Teknik & Hız)',
           hours: '24 Saat',
           description:
@@ -524,14 +505,14 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: _purple.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: _purple.withValues(alpha: 0.28)),
+            color: _surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: _border),
           ),
           child: const Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.shield_rounded, color: _purple, size: 18),
+              Icon(Icons.shield_rounded, color: _volcanic, size: 18),
               SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -550,7 +531,7 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
                       'Bir kas grubu henüz %100 toparlanmadan tekrar çalıştırılırsa, '
                       'kalan saatler sıfırlanmaz; yeni seansın RIR yükü kümülatif olarak eklenerek sürantrenman (overtraining) riski engellenir.',
                       style: TextStyle(
-                        color: _textMid,
+                        color: _textMuted,
                         fontSize: 11,
                         height: 1.4,
                       ),
@@ -576,9 +557,9 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: _surface.withValues(alpha: 0.85),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: badgeColor.withValues(alpha: 0.28)),
+        color: _surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: _border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -600,15 +581,19 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: badgeColor.withValues(alpha: 0.16),
-                  borderRadius: BorderRadius.circular(8),
+                  color: badgeColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: badgeColor.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
                 ),
                 child: Text(
                   hours,
                   style: TextStyle(
                     color: badgeColor,
                     fontSize: 11,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
