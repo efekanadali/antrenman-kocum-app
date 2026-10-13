@@ -9,6 +9,8 @@ import 'package:calisthenics_app/presentation/screens/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:calisthenics_app/data/services/auth_service.dart';
 import 'package:calisthenics_app/data/services/firestore_service.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 
@@ -75,6 +77,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   List<PersonalRecordEntry> _personalRecords = const [];
   int _syncedStreak = 0;
   int _syncedTotalWorkouts = 0;
+  bool _isLinkingGoogle = false;
 
   @override
   void initState() {
@@ -1000,8 +1003,102 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     await _saveBodyMetrics();
   }
 
+  Future<void> _linkGoogleAccount() async {
+    if (_isLinkingGoogle) return;
+    setState(() => _isLinkingGoogle = true);
+    String? message;
+    try {
+      final result = await ref
+          .read(authServiceProvider)
+          .linkAnonymousWithGoogle();
+      switch (result.status) {
+        case GoogleLinkStatus.linked:
+          message = 'Hesabin Google ile baglandi. Verilerin korundu.';
+          break;
+        case GoogleLinkStatus.conflict:
+          if (mounted) {
+            await _showAccountConflictDialog();
+          }
+          break;
+        case GoogleLinkStatus.signedInExisting:
+          message = 'Mevcut Google hesabinla giris yapildi.';
+          _syncUserStreakAndStats();
+          break;
+        case GoogleLinkStatus.alreadyLinked:
+        case GoogleLinkStatus.cancelled:
+          break;
+      }
+    } on FirebaseAuthException catch (e) {
+      message = e.message ?? 'Google ile baglama basarisiz oldu.';
+    } catch (_) {
+      message = 'Google ile baglama basarisiz oldu. Lutfen tekrar dene.';
+    } finally {
+      if (mounted) {
+        setState(() => _isLinkingGoogle = false);
+      }
+    }
+    if (message != null && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
+
+  Future<void> _showAccountConflictDialog() async {
+    final signIn = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: _cardSurface,
+        title: const Text(
+          'Hesap zaten kullanimda',
+          style: TextStyle(color: _textHigh),
+        ),
+        content: const Text(
+          'Bu Google hesabi daha once baska bir profile baglanmis. '
+          'Bu hesapla giris yaparsan su anki anonim verilerin bu cihazda '
+          'gorunmez olur ve Google hesabindaki verilerin yuklenir.',
+          style: TextStyle(color: _textMid),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Vazgec'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Hesapla giris yap'),
+          ),
+        ],
+      ),
+    );
+    if (signIn != true) return;
+    try {
+      await ref
+          .read(authServiceProvider)
+          .linkAnonymousWithGoogle(signInIfAlreadyInUse: true);
+      _syncUserStreakAndStats();
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? 'Giris basarisiz oldu.')),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Giris basarisiz oldu.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final authUser =
+        ref.watch(authUserProvider).valueOrNull ??
+        FirebaseAuth.instance.currentUser;
+    final isGoogleLinked =
+        authUser?.providerData.any((p) => p.providerId == 'google.com') ?? false;
+    final headerName = (isGoogleLinked &&
+            (authUser?.displayName?.trim().isNotEmpty ?? false))
+        ? authUser!.displayName!.trim()
+        : 'Calisthenics Athlete';
     return Scaffold(
       backgroundColor: _bgBottom,
       body: Stack(
@@ -1075,8 +1172,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 24.0),
                     children: [
-                      const _UserHeader(username: 'Calisthenics Athlete'),
+                      _UserHeader(
+                        username: headerName,
+                        email: isGoogleLinked ? authUser?.email : null,
+                        photoUrl: isGoogleLinked ? authUser?.photoURL : null,
+                      ),
                       const SizedBox(height: 16.0),
+                      _GoogleLinkCard(
+                        isLinked: isGoogleLinked,
+                        isLoading: _isLinkingGoogle,
+                        onPressed: _linkGoogleAccount,
+                      ),
+                      const SizedBox(height: 12.0),
                       BodyMetricsCard(
                         heightCm: _heightCm,
                         weightKg: _weightKg,
@@ -1302,23 +1409,127 @@ class _MetricEditRow extends StatelessWidget {
   }
 }
 
-class _UserHeader extends StatelessWidget {
-  const _UserHeader({required this.username});
+class _GoogleLinkCard extends StatelessWidget {
+  const _GoogleLinkCard({
+    required this.isLinked,
+    required this.isLoading,
+    required this.onPressed,
+  });
 
-  final String username;
+  final bool isLinked;
+  final bool isLoading;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
+    final disabled = isLinked || isLoading;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18.0),
+        gradient: isLinked
+            ? null
+            : const LinearGradient(
+                colors: [
+                  _ProfileScreenState._accentPurple,
+                  _ProfileScreenState._accentBlue,
+                ],
+              ),
+        color: isLinked ? const Color(0xFF1F3B33) : null,
+        border: Border.all(color: Colors.white.withOpacity(0.08)),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(18.0),
+          onTap: disabled ? null : onPressed,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (isLoading)
+                  const SizedBox(
+                    width: 20.0,
+                    height: 20.0,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.4,
+                      color: Colors.white,
+                    ),
+                  )
+                else if (isLinked)
+                  const Icon(
+                    Icons.check_circle_rounded,
+                    color: Color(0xFF6EE7B7),
+                    size: 22.0,
+                  )
+                else
+                  Container(
+                    width: 24.0,
+                    height: 24.0,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Text(
+                      'G',
+                      style: TextStyle(
+                        color: Color(0xFF4285F4),
+                        fontWeight: FontWeight.w900,
+                        fontSize: 15.0,
+                        height: 1.0,
+                      ),
+                    ),
+                  ),
+                const SizedBox(width: 10.0),
+                Text(
+                  isLoading
+                      ? 'Baglaniyor...'
+                      : isLinked
+                      ? 'Hesap Baglandi'
+                      : 'Google ile Hesabini Bagla',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: isLinked
+                        ? const Color(0xFF6EE7B7)
+                        : Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _UserHeader extends StatelessWidget {
+  const _UserHeader({required this.username, this.email, this.photoUrl});
+
+  final String username;
+  final String? email;
+  final String? photoUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasPhoto = photoUrl != null && photoUrl!.isNotEmpty;
+    final hasEmail = email != null && email!.isNotEmpty;
     return Row(
       children: [
         CircleAvatar(
           radius: 28,
           backgroundColor: _ProfileScreenState._cardSurfaceSoft,
-          child: const Icon(
-            Icons.person,
-            size: 30,
-            color: _ProfileScreenState._textHigh,
-          ),
+          backgroundImage: hasPhoto ? NetworkImage(photoUrl!) : null,
+          child: hasPhoto
+              ? null
+              : const Icon(
+                  Icons.person,
+                  size: 30,
+                  color: _ProfileScreenState._textHigh,
+                ),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -1334,7 +1545,7 @@ class _UserHeader extends StatelessWidget {
               ),
               const SizedBox(height: 4.0),
               Text(
-                'Workout Insights',
+                hasEmail ? email! : 'Workout Insights',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: _ProfileScreenState._textMid,
                   fontWeight: FontWeight.w500,
