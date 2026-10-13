@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calisthenics_app/domain/models/workout_session_summary.dart';
 import 'package:calisthenics_app/presentation/providers/workout_history_provider.dart';
+import 'package:calisthenics_app/presentation/widgets/muscle_recovery_card.dart';
 
 // ─── Design Tokens ───────────────────────────────────────────────────────────
 const Color _bgTop = Color(0xFF151028);
@@ -172,11 +173,18 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
           ),
           data: (sessions) {
             if (sessions.length < 2) {
-              return const _MessageView(
-                icon: Icons.insights_rounded,
-                title: 'Henüz yeterli antrenman verisi bulunmuyor',
-                message:
-                    'Seans tamamladıkça grafikler güncellenecektir.',
+              return ListView(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
+                children: const [
+                  _MessageView(
+                    icon: Icons.insights_rounded,
+                    title: 'Henüz yeterli antrenman verisi bulunmuyor',
+                    message:
+                        'Seans tamamladıkça grafikler güncellenecektir.',
+                  ),
+                  SizedBox(height: 16),
+                  MuscleRecoveryCard(),
+                ],
               );
             }
             final days = _range == AnalyticsRange.weekly ? 7 : 30;
@@ -194,6 +202,8 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                 _LoadChartCard(data: data, weekly: _range == AnalyticsRange.weekly),
                 const SizedBox(height: 14),
                 _MuscleDistributionCard(data: data),
+                const SizedBox(height: 14),
+                const MuscleRecoveryCard(),
               ],
             );
           },

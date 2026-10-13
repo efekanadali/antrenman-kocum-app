@@ -6,6 +6,7 @@ import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/core/local_storage/workout_history_storage.dart';
 import 'package:calisthenics_app/core/local_storage/workout_summary_storage.dart';
 import 'package:calisthenics_app/domain/services/mli_calculator.dart';
+import 'package:calisthenics_app/domain/services/recovery_calculator.dart';
 import 'package:calisthenics_app/data/services/firestore_service.dart';
 
 // ─── Design Tokens ───────────────────────────────────────────────────────────
@@ -26,6 +27,8 @@ class WorkoutSummaryArgs {
     required this.totalSets,
     required this.totalLoad,
     required this.muscleLoad,
+    this.muscleRir = const {},
+    this.averageRir,
   });
 
   final String exerciseName;
@@ -34,6 +37,8 @@ class WorkoutSummaryArgs {
   final int totalSets;
   final double totalLoad;
   final Map<String, double> muscleLoad;
+  final Map<String, double> muscleRir;
+  final double? averageRir;
 }
 
 // ─── Screen ──────────────────────────────────────────────────────────────────
@@ -85,10 +90,18 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
         'totalSets': widget.args.totalSets,
       };
 
-      ref
-          .read(firestoreServiceProvider)
-          .saveWorkoutSession(sessionData)
-          .catchError((_) {});
+      final firestore = ref.read(firestoreServiceProvider);
+      firestore.saveWorkoutSession(sessionData).catchError((_) {});
+
+      final recovery = buildSessionRecovery(
+        muscleLoad: widget.args.muscleLoad,
+        muscleRir: widget.args.muscleRir,
+        completedAt: DateTime.now(),
+        defaultRir: widget.args.averageRir ?? kDefaultRir,
+      );
+      if (recovery.isNotEmpty) {
+        firestore.saveSessionRecovery(recovery).catchError((_) {});
+      }
     } catch (_) {
       // Sessiz hata yakalama: UI akışını engellemez
     }

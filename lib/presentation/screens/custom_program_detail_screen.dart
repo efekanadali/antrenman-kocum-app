@@ -11,6 +11,9 @@ import 'package:calisthenics_app/core/utils/enum_label.dart';
 import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/presentation/screens/custom_program_day_session_screen.dart';
+import 'package:calisthenics_app/domain/services/program_preview.dart';
+import 'package:calisthenics_app/presentation/providers/muscle_recovery_provider.dart';
+import 'package:calisthenics_app/presentation/widgets/program_preview_badge.dart';
 
 class CustomProgramDetailScreen extends ConsumerWidget {
   const CustomProgramDetailScreen({
@@ -97,6 +100,15 @@ class CustomProgramDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final exerciseRepository = ref.watch(exerciseRepositoryProvider);
+    final resolver = ref.watch(exerciseMliResolverProvider).valueOrNull;
+    ProgramPreview? previewFor(Iterable<CustomProgramExercise> items) {
+      if (resolver == null) return null;
+      return estimateProgramPreview(items, resolver);
+    }
+
+    final programPreview = previewFor(
+      program.days.expand((day) => day.exercises),
+    );
     return Scaffold(
       backgroundColor: _bgBottom,
       body: Stack(
@@ -184,6 +196,15 @@ class CustomProgramDetailScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 16.0),
+                  if (programPreview != null) ...[
+                    ProgramPreviewBadge(
+                      title: 'Tahmini Haftalık İş Yükü',
+                      preview: programPreview,
+                      footnote:
+                          'Tüm günlerin toplamı, RIR 2 varsayımıyla (kaldıraç × kas ağırlığı).',
+                    ),
+                    const SizedBox(height: 16.0),
+                  ],
                   for (final day in program.days)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 14.0),
@@ -302,6 +323,15 @@ class CustomProgramDetailScreen extends ConsumerWidget {
                                   ],
                                 ),
                               const SizedBox(height: 4.0),
+                              if (previewFor(day.exercises) case final dayPreview?)
+                                if (!dayPreview.isEmpty) ...[
+                                  ProgramPreviewBadge(
+                                    title: 'Gün Önizlemesi',
+                                    preview: dayPreview,
+                                    compact: true,
+                                  ),
+                                  const SizedBox(height: 10.0),
+                                ],
                               SizedBox(
                                 width: double.infinity,
                                 child: FilledButton.icon(

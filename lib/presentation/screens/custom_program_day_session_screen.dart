@@ -5,14 +5,12 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:calisthenics_app/core/utils/enum_label.dart';
-import 'package:calisthenics_app/domain/enums/difficulty_level.dart';
 import 'package:calisthenics_app/domain/models/custom_program.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart' as domain;
-import 'package:calisthenics_app/domain/models/exercise_database.dart'
-    as library_data;
 import 'package:calisthenics_app/domain/models/mli_models.dart' as mli;
 import 'package:calisthenics_app/domain/services/mli_calculator.dart';
+import 'package:calisthenics_app/domain/services/exercise_mli_resolver.dart';
+import 'package:calisthenics_app/domain/services/recovery_calculator.dart';
 import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/presentation/screens/workout_summary_screen.dart';
@@ -57,18 +55,10 @@ class _CustomProgramDaySessionScreenState
   late final List<List<int?>> _actualRirs;
   late final List<List<double?>> _actualExtraWeights;
   late final List<List<double?>> _actualBodyWeights;
-  final Map<String, domain.Exercise> _exerciseById =
-      <String, domain.Exercise>{};
-  final Map<String, domain.Exercise> _exerciseByName =
-      <String, domain.Exercise>{};
-  final Map<String, domain.Exercise> _exerciseByNormalizedName =
-      <String, domain.Exercise>{};
-  final Map<String, mli.Exercise> _libraryExerciseByNormalizedName =
-      <String, mli.Exercise>{};
-  final Set<String> _loggedFallbackExercises = <String>{};
-  bool _exerciseDetailsLoaded = false;
+  ExerciseMliResolver _resolver = ExerciseMliResolver();
   Map<String, double> _lastSetLoadByMuscle = <String, double>{};
   Map<String, double> _workoutLoadByMuscle = <String, double>{};
+  Map<String, double> _workoutRirByMuscle = <String, double>{};
   static const int _defaultRir = 2;
   static const double _defaultBodyWeightKg = 70.0;
   double _lastBodyWeightKg = _defaultBodyWeightKg;
@@ -94,13 +84,6 @@ class _CustomProgramDaySessionScreenState
     _actualBodyWeights = widget.args.day.exercises
         .map((exercise) => List<double?>.filled(exercise.sets, null))
         .toList();
-    for (final entry in library_data.exerciseDatabase.entries) {
-      final exercise = entry.value;
-      _libraryExerciseByNormalizedName[_normalizeExerciseName(entry.key)] =
-          exercise;
-      _libraryExerciseByNormalizedName[_normalizeExerciseName(exercise.name)] =
-          exercise;
-    }
     _loadExerciseDetails();
     _startWorkTimer();
   }
@@ -113,200 +96,21 @@ class _CustomProgramDaySessionScreenState
     }
 
     setState(() {
-      _exerciseById
-        ..clear()
-        ..addEntries(allExercises.map((item) => MapEntry(item.id, item)));
-      _exerciseByName
-        ..clear()
-        ..addEntries(allExercises.map((item) => MapEntry(item.name, item)));
-      _exerciseByNormalizedName
-        ..clear()
-        ..addEntries(
-          allExercises.map(
-            (item) => MapEntry(_normalizeExerciseName(item.name), item),
-          ),
-        );
-      _exerciseDetailsLoaded = true;
+      _resolver = ExerciseMliResolver(catalog: allExercises);
     });
 
     _recalculateWorkoutLoad(widget.args.day);
   }
 
-  String _normalizeExerciseName(String value) {
-    return value
-        .toLowerCase()
-        .replaceAll(RegExp(r'[^a-z0-9]+'), ' ')
-        .trim()
-        .replaceAll(RegExp(r'\s+'), ' ');
-  }
-
   domain.Exercise? _resolveExerciseDetail(CustomProgramExercise exercise) {
-    return _exerciseById[exercise.exerciseId] ??
-        _exerciseByName[exercise.exerciseName] ??
-        _exerciseByNormalizedName[_normalizeExerciseName(
-          exercise.exerciseName,
-        )];
-  }
-
-  mli.Exercise? _resolveLibraryExercise(CustomProgramExercise exercise) {
-    return library_data.exerciseDatabase[exercise.exerciseId] ??
-        _libraryExerciseByNormalizedName[_normalizeExerciseName(
-          exercise.exerciseId,
-        )] ??
-        _libraryExerciseByNormalizedName[_normalizeExerciseName(
-          exercise.exerciseName,
-        )];
-  }
-
-  void _logFallbackOnce(CustomProgramExercise source, String strategy) {
-    if (!kDebugMode) {
-      return;
-    }
-
-    final key = '${source.exerciseId}|${source.exerciseName}|$strategy';
-    if (_loggedFallbackExercises.add(key)) {
-      debugPrint(
-        '[MLI-Fallback] strategy=$strategy id=${source.exerciseId} name=${source.exerciseName}',
-      );
-    }
-  }
-
-  mli.Exercise _inferExerciseFromName(CustomProgramExercise source) {
-    final normalized = _normalizeExerciseName(source.exerciseName);
-
-    // omega: Ana kas=1.0, Yardimci=0.5, Stabilizator=0.2
-    if (normalized.contains('push') || normalized.contains('dip')) {
-      return mli.Exercise(
-        name: source.exerciseName,
-        difficulty: 1.0,
-        muscles: {
-          'chest': 1.0,
-          'triceps': 0.5,
-          'shoulders': 0.5,
-          'core': 0.2,
-        },
-      );
-    }
-
-    if (normalized.contains('pull') ||
-        normalized.contains('row') ||
-        normalized.contains('chin') ||
-        normalized.contains('lever')) {
-      return mli.Exercise(
-        name: source.exerciseName,
-        difficulty: 1.0,
-        muscles: {
-          'back': 1.0,
-          'biceps': 0.5,
-          'shoulders': 0.5,
-          'core': 0.2,
-        },
-      );
-    }
-
-    if (normalized.contains('squat') ||
-        normalized.contains('lunge') ||
-        normalized.contains('pistol') ||
-        normalized.contains('shrimp') ||
-        normalized.contains('jump') ||
-        normalized.contains('calf') ||
-        normalized.contains('bridge') ||
-        normalized.contains('curl')) {
-      return mli.Exercise(
-        name: source.exerciseName,
-        difficulty: 1.0,
-        muscles: {
-          'quads': 1.0,
-          'glutes': 0.5,
-          'hamstrings': 0.5,
-          'calves': 0.2,
-        },
-      );
-    }
-
-    // Genel/core egzersiz
-    return mli.Exercise(
-      name: source.exerciseName,
-      difficulty: 1.0,
-      muscles: {'core': 1.0, 'shoulders': 0.5, 'back': 0.5},
-    );
+    return _resolver.resolveDetail(exercise);
   }
 
   mli.Exercise _buildMliExercise(
     CustomProgramExercise source,
     domain.Exercise? exerciseDetail,
   ) {
-    if (exerciseDetail != null) {
-      return _toMliExercise(source, exerciseDetail);
-    }
-
-    final libraryExercise = _resolveLibraryExercise(source);
-    if (libraryExercise != null) {
-      _logFallbackOnce(source, 'library-match');
-      return mli.Exercise(
-        name: source.exerciseName,
-        difficulty: libraryExercise.difficulty,
-        muscles: libraryExercise.muscles,
-      );
-    }
-
-    _logFallbackOnce(source, 'name-inference');
-    return _inferExerciseFromName(source);
-  }
-
-  double _difficultyCoefficient(domain.Exercise? exerciseDetail) {
-    if (exerciseDetail == null) {
-      return 1.0;
-    }
-
-    switch (exerciseDetail.difficulty) {
-      case DifficultyLevel.easy:
-        return 1.0;
-      case DifficultyLevel.medium:
-        return 1.25;
-      case DifficultyLevel.hard:
-        return 1.5;
-    }
-  }
-
-  mli.Exercise _toMliExercise(
-    CustomProgramExercise source,
-    domain.Exercise? exerciseDetail,
-  ) {
-    final muscles = <String, double>{};
-
-    if (exerciseDetail != null && exerciseDetail.muscleRatings.isNotEmpty) {
-      // omega ataması: maxRating -> 1.0 (Ana kas)
-      //                max/2 ve üstü -> 0.5 (Yardimci kas)
-      //                diğerleri     -> 0.2 (Stabilizatör)
-      final maxRating = exerciseDetail.muscleRatings.values
-          .fold<int>(0, (m, v) => v > m ? v : m);
-
-      exerciseDetail.muscleRatings.forEach((group, rating) {
-        final double omega;
-        if (rating >= maxRating) {
-          omega = 1.0;
-        } else if (rating * 2 >= maxRating) {
-          omega = 0.5;
-        } else {
-          omega = 0.2;
-        }
-        muscles[group.label] = omega;
-      });
-    } else if (exerciseDetail != null &&
-        exerciseDetail.targetMuscleGroups.isNotEmpty) {
-      // İlk kas birincil (1.0), diğerleri yardimci (0.5)
-      final groups = exerciseDetail.targetMuscleGroups;
-      for (var i = 0; i < groups.length; i++) {
-        muscles[groups[i].label] = i == 0 ? 1.0 : 0.5;
-      }
-    }
-
-    return mli.Exercise(
-      name: source.exerciseName,
-      difficulty: _difficultyCoefficient(exerciseDetail),
-      muscles: muscles,
-    );
+    return _resolver.build(source, detail: exerciseDetail);
   }
 
   void _recalculateWorkoutLoad(CustomProgramDay day) {
@@ -361,8 +165,10 @@ class _CustomProgramDaySessionScreenState
     }
 
     final totals = calculateWorkoutLoad(entries);
+    final rirs = calculateWorkoutMuscleRir(entries);
     setState(() {
       _workoutLoadByMuscle = totals;
+      _workoutRirByMuscle = rirs;
     });
   }
 
@@ -700,6 +506,7 @@ class _CustomProgramDaySessionScreenState
         totalSets: totalSetsCount,
         totalLoad: totalLoad,
         muscleLoad: muscleLoad,
+        muscleRir: _workoutRirByMuscle,
       ),
     );
   }

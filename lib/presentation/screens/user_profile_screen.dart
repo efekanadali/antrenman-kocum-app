@@ -13,6 +13,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:calisthenics_app/data/services/auth_service.dart';
 import 'package:calisthenics_app/data/services/firestore_service.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
+import 'package:calisthenics_app/presentation/widgets/muscle_recovery_card.dart';
 
 class UserProfileScreen extends StatelessWidget {
   const UserProfileScreen({super.key, this.showBottomNav = true});
@@ -1249,6 +1250,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           Navigator.pushNamed(context, AppRoutes.workoutHistory);
                         },
                       ),
+                      const SizedBox(height: 12.0),
+                      const MuscleRecoveryCard(),
                       const SizedBox(height: 12.0),
                       TrendCard(
                         currentSevenDayLoad: trend.current,

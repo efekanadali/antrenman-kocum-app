@@ -10,6 +10,9 @@ import 'package:calisthenics_app/domain/models/custom_program.dart';
 import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
 import 'package:calisthenics_app/presentation/providers/custom_program_provider.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
+import 'package:calisthenics_app/domain/services/exercise_mli_resolver.dart';
+import 'package:calisthenics_app/domain/services/program_preview.dart';
+import 'package:calisthenics_app/presentation/widgets/program_preview_badge.dart';
 
 class CustomPlanScreen extends ConsumerStatefulWidget {
   const CustomPlanScreen({super.key});
@@ -346,6 +349,22 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
     });
   }
 
+  ProgramPreview _buildPreview(List<Exercise> catalog) {
+    final resolver = ExerciseMliResolver(catalog: catalog);
+    final items = _days.expand(
+      (day) => day.exercises.map(
+        (e) => CustomProgramExercise(
+          exerciseId: e.exerciseId,
+          exerciseName: e.exerciseName,
+          sets: e.sets,
+          value: e.value,
+          isTimed: e.isTimed,
+        ),
+      ),
+    );
+    return estimateProgramPreview(items, resolver);
+  }
+
   Future<void> _saveProgram() async {
     if (_daysCount == null) {
       return;
@@ -666,6 +685,13 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                                       onRemove: (index) =>
                                           _removeExercise(day.dayIndex, index),
                                     ),
+                                  const SizedBox(height: 16.0),
+                                  ProgramPreviewBadge(
+                                    title: 'Canlı Biyomekanik Önizleme',
+                                    preview: _buildPreview(exercises),
+                                    footnote:
+                                        'Haftalık toplam, RIR 2 varsayımıyla; kaldıraç katsayısı ve kas ağırlıklarına göre hesaplanır.',
+                                  ),
                                   const SizedBox(height: 16.0),
                                   SizedBox(
                                     width: double.infinity,

@@ -4,6 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calisthenics_app/domain/models/exercise_database.dart';
 import 'package:calisthenics_app/core/local_storage/workout_summary_storage.dart';
 import 'package:calisthenics_app/domain/models/workout_session_summary.dart';
+import 'package:calisthenics_app/domain/models/custom_program.dart';
+import 'package:calisthenics_app/domain/models/muscle_recovery.dart';
+import 'package:calisthenics_app/domain/services/recovery_calculator.dart';
 
 final firestoreServiceProvider = Provider<FirestoreService>((ref) {
   return FirestoreService(
@@ -240,6 +243,95 @@ class FirestoreService {
       return snapshot.docs.map((doc) {
         return WorkoutSessionSummary.fromFirestore(doc.id, doc.data());
       }).toList();
+    });
+  }
+
+  // 7. Özel Programlar (users/{uid}/custom_programs)
+  CollectionReference<Map<String, dynamic>> _customProgramsRef(String uid) {
+    return _firestore.collection('users').doc(uid).collection('custom_programs');
+  }
+
+  /// Buluttaki özel programları getirir. Hata durumunda istisna fırlatır;
+  /// çağıran taraf yerel veriyle devam etmelidir.
+  Future<List<CustomProgram>> fetchCustomPrograms() async {
+    final uid = await getOrCreateUserId();
+    final snapshot = await _customProgramsRef(uid).get();
+    final programs = <CustomProgram>[];
+    for (final doc in snapshot.docs) {
+      try {
+        programs.add(CustomProgram.fromJson(doc.data()));
+      } catch (_) {
+        // Bozuk kayıtları atla
+      }
+    }
+    return programs;
+  }
+
+  Future<void> upsertCustomProgram(CustomProgram program) async {
+    final uid = await getOrCreateUserId();
+    await _customProgramsRef(uid).doc(program.id).set({
+      ...program.toJson(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> deleteCustomProgram(String programId) async {
+    final uid = await getOrCreateUserId();
+    await _customProgramsRef(uid).doc(programId).delete();
+  }
+
+  // 8. Kas Toparlanma Durumu (users/{uid}/muscle_recovery/{muscle})
+  /// Seans sonrası kas bazlı toparlanma kayıtlarını (mevcutla birleştirerek)
+  /// yazar ve `users/{uid}` belgesine son toparlanma güncellemesini işler.
+  Future<void> saveSessionRecovery(
+    Map<RecoveryMuscle, MuscleRecoveryRecord> incoming,
+  ) async {
+    if (incoming.isEmpty) return;
+    try {
+      final uid = await getOrCreateUserId();
+      final userRef = _firestore.collection('users').doc(uid);
+      final recoveryRef = userRef.collection('muscle_recovery');
+      final batch = _firestore.batch();
+
+      for (final entry in incoming.entries) {
+        final doc = recoveryRef.doc(entry.key.name);
+        MuscleRecoveryRecord? existing;
+        try {
+          final snap = await doc.get();
+          final data = snap.data();
+          if (data != null) existing = MuscleRecoveryRecord.fromMap(data);
+        } catch (_) {
+          existing = null;
+        }
+        final merged = mergeRecovery(existing, entry.value);
+        batch.set(doc, {
+          ...merged.toMap(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+      }
+
+      batch.set(userRef, {
+        'lastRecoveryUpdateAt': DateTime.now().toIso8601String(),
+      }, SetOptions(merge: true));
+
+      await batch.commit();
+    } catch (_) {
+      // Sessiz hata yönetimi: UI akışını engellemez
+    }
+  }
+
+  Stream<List<MuscleRecoveryRecord>> getMuscleRecoveryStream() async* {
+    final uid = await getOrCreateUserId();
+    yield* _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('muscle_recovery')
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs
+          .map((doc) => MuscleRecoveryRecord.fromMap(doc.data()))
+          .whereType<MuscleRecoveryRecord>()
+          .toList();
     });
   }
 }
