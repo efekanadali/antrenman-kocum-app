@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:calisthenics_app/domain/models/muscle_recovery.dart';
 import 'package:calisthenics_app/domain/services/program_preview.dart';
+import 'package:calisthenics_app/presentation/widgets/biomechanics_info_sheet.dart';
 
 /// Programın "Tahmini Toplam MLI İş Yükü" ve "Ağırlıklı Hedef Kas Grubu"
 /// rozetlerini gösterir.
@@ -52,12 +53,29 @@ class ProgramPreviewBadge extends StatelessWidget {
             children: [
               const Icon(Icons.biotech_rounded, color: _blue, size: 18),
               const SizedBox(width: 8),
-              Text(
-                title,
-                style: const TextStyle(
-                  color: _textHigh,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14,
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: _textHigh,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(
+                  Icons.info_outline,
+                  color: _textMid,
+                  size: 18,
+                ),
+                tooltip: 'Biyomekanik Bilgisi',
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                visualDensity: VisualDensity.compact,
+                onPressed: () => showBiomechanicsInfoSheet(
+                  context,
+                  initialTopic: BiomechanicsTopic.mli,
                 ),
               ),
             ],

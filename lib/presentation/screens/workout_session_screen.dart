@@ -123,7 +123,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
           _restRemaining = Duration.zero;
           _restRunning = false;
         });
-        HapticFeedback.mediumImpact();
+        HapticFeedback.heavyImpact();
         if (mounted) {
           ScaffoldMessenger.of(
             context,
@@ -140,6 +140,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
 
   void _stopRest() {
     _restTimer?.cancel();
+    HapticFeedback.heavyImpact();
     setState(() {
       _restRunning = false;
       _restRemaining = Duration.zero;

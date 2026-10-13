@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calisthenics_app/domain/models/muscle_recovery.dart';
 import 'package:calisthenics_app/presentation/providers/muscle_recovery_provider.dart';
+import 'package:calisthenics_app/presentation/widgets/biomechanics_info_sheet.dart';
 
 /// Kas gruplarının toparlanma durumunu (Hazır %100 / Toparlanıyor %xx) gösterir.
 class MuscleRecoveryCard extends ConsumerWidget {
@@ -57,6 +58,21 @@ class MuscleRecoveryCard extends ConsumerWidget {
                     color: _purple,
                   ),
                 ),
+              IconButton(
+                icon: const Icon(
+                  Icons.info_outline,
+                  color: _textMid,
+                  size: 18,
+                ),
+                tooltip: 'Toparlanma & RIR Bilgisi',
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                visualDensity: VisualDensity.compact,
+                onPressed: () => showBiomechanicsInfoSheet(
+                  context,
+                  initialTopic: BiomechanicsTopic.recovery,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 4),

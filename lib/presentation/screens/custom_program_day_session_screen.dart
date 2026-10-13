@@ -2,8 +2,8 @@
 
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calisthenics_app/domain/models/custom_program.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart' as domain;
@@ -313,11 +313,12 @@ class _CustomProgramDaySessionScreenState
                         label: Text('$rir'),
                         selected: tempRir == rir,
                         onSelected: (_) {
+                          HapticFeedback.selectionClick();
                           setModalState(() {
                             tempRir = rir;
                           });
                         },
-                        selectedColor: _accentPurple.withOpacity(0.35),
+                        selectedColor: _accentPurple.withValues(alpha: 0.35),
                         backgroundColor: _cardSurfaceSoft,
                         labelStyle: TextStyle(
                           color: tempRir == rir ? _textHigh : _textMid,
@@ -431,6 +432,8 @@ class _CustomProgramDaySessionScreenState
     if (!mounted || effort == null) {
       return;
     }
+
+    HapticFeedback.selectionClick();
 
     final exerciseDetail = _resolveExerciseDetail(activeExercise);
     final mliExercise = _buildMliExercise(activeExercise, exerciseDetail);
@@ -684,6 +687,7 @@ class _CustomProgramDaySessionScreenState
     _restTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_restRemainingSeconds <= 1) {
         timer.cancel();
+        HapticFeedback.heavyImpact();
         setState(() {
           _restRemainingSeconds = 0;
         });
@@ -698,6 +702,7 @@ class _CustomProgramDaySessionScreenState
 
   void _stopRestTimer() {
     _restTimer?.cancel();
+    HapticFeedback.heavyImpact();
     setState(() {
       _restRemainingSeconds = 0;
     });
@@ -872,7 +877,7 @@ class _CustomProgramDaySessionScreenState
                     decoration: BoxDecoration(
                       color: _cardSurface,
                       borderRadius: BorderRadius.circular(999.0),
-                      border: Border.all(color: Colors.white.withOpacity(0.12)),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
                     ),
                     child: Row(
                       children: [
@@ -970,7 +975,7 @@ class _CustomProgramDaySessionScreenState
                         decoration: BoxDecoration(
                           color: _cardSurface,
                           borderRadius: BorderRadius.circular(20.0),
-                          border: Border.all(color: Colors.white.withOpacity(0.12)),
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
                         ),
                         child: Row(
                           children: [
@@ -1141,7 +1146,7 @@ class _SessionTopIconButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: _cardSurface,
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withOpacity(0.12)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
         ),
         child: Icon(icon, color: _sessionInk, size: 19.0),
       ),
@@ -1205,7 +1210,7 @@ class _SessionHeroFrame extends StatelessWidget {
               child: Icon(
                 Icons.accessibility_new_rounded,
                 size: 64.0,
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha: 0.9),
               ),
             );
           },
@@ -1292,7 +1297,7 @@ class _TimeUnitCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: _cardSurface,
         borderRadius: BorderRadius.circular(14.0),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
       ),
       child: Column(
         children: [
@@ -1331,7 +1336,7 @@ class _SessionInfoTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: _cardSurface,
         borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1375,7 +1380,7 @@ class _ExerciseInsightCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: _cardSurface,
         borderRadius: BorderRadius.circular(18.0),
-        border: Border.all(color: Colors.white.withOpacity(0.14)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1424,7 +1429,7 @@ class _ExerciseInsightCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: _cardSurfaceSoft,
                       borderRadius: BorderRadius.circular(999.0),
-                      border: Border.all(color: Colors.white.withOpacity(0.12)),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
                     ),
                     child: Text(
                       label,
@@ -1458,7 +1463,7 @@ class _WorkoutLoadCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: _cardSurface,
         borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1517,7 +1522,7 @@ class _LastSetLoadCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: _cardSurface,
         borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1616,7 +1621,7 @@ class _ProgressHeader extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20.0),
         color: _cardSurface,
-        border: Border.all(color: Colors.white.withOpacity(0.08)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1679,10 +1684,10 @@ class _ActiveExerciseCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: _cardSurface,
         borderRadius: BorderRadius.circular(20.0),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.25),
+            color: Colors.black.withValues(alpha: 0.25),
             blurRadius: 16.0,
             offset: const Offset(0, 8),
           ),
@@ -1731,7 +1736,7 @@ class _ActiveExerciseCard extends StatelessWidget {
                   vertical: 6.0,
                 ),
                 decoration: BoxDecoration(
-                  color: _accentPurple.withOpacity(0.18),
+                  color: _accentPurple.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(12.0),
                 ),
                 child: Text(
@@ -1766,7 +1771,7 @@ class _NextUpCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: _cardSurfaceSoft,
         borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: Colors.white.withOpacity(0.08)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: Row(
         children: [
@@ -1904,7 +1909,7 @@ class _EmptyWorkoutCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: _cardSurface,
         borderRadius: BorderRadius.circular(20.0),
-        border: Border.all(color: Colors.white.withOpacity(0.08)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: Text(
         'Bu gun icin egzersiz yok.',
@@ -1936,7 +1941,7 @@ class _SetPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: _cardSurfaceSoft,
         borderRadius: BorderRadius.circular(18.0),
-        border: Border.all(color: Colors.white.withOpacity(0.08)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1956,7 +1961,7 @@ class _SetPanel extends StatelessWidget {
               final value = values[index];
               final label = value == null
                   ? 'Set ${index + 1}'
-                  : '${value}${exercise.isTimed ? ' sn' : ''}';
+                  : '$value${exercise.isTimed ? ' sn' : ''}';
               return InkWell(
                 onTap: () => onEdit(index),
                 borderRadius: BorderRadius.circular(12.0),
@@ -1968,12 +1973,12 @@ class _SetPanel extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: value == null
                         ? _cardSurface
-                        : _accentBlue.withOpacity(0.2),
+                        : _accentBlue.withValues(alpha: 0.20),
                     borderRadius: BorderRadius.circular(12.0),
                     border: Border.all(
                       color: value == null
-                          ? Colors.white.withOpacity(0.08)
-                          : _accentBlue.withOpacity(0.5),
+                          ? Colors.white.withValues(alpha: 0.08)
+                          : _accentBlue.withValues(alpha: 0.50),
                     ),
                   ),
                   child: Text(
@@ -2006,7 +2011,7 @@ class _QuickAdjustButton extends StatelessWidget {
         onPressed: onTap,
         style: OutlinedButton.styleFrom(
           foregroundColor: _textHigh,
-          side: BorderSide(color: Colors.white.withOpacity(0.2)),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.20)),
           padding: const EdgeInsets.symmetric(vertical: 12.0),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14.0),
@@ -2031,10 +2036,10 @@ class _RestOverlay extends StatelessWidget {
       decoration: BoxDecoration(
         color: _cardSurface,
         borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.30),
             blurRadius: 16.0,
             offset: const Offset(0, 8),
           ),
