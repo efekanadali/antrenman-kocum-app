@@ -21,6 +21,7 @@ import 'package:calisthenics_app/presentation/screens/custom_program_day_session
 import 'package:calisthenics_app/presentation/screens/main_swipe_shell.dart';
 import 'package:calisthenics_app/presentation/screens/training_day_session_screen.dart';
 import 'package:calisthenics_app/presentation/screens/workout_history_screen.dart';
+import 'package:calisthenics_app/presentation/screens/analytics_screen.dart';
 
 class AppRoutes {
   static const String home = '/';
@@ -41,6 +42,7 @@ class AppRoutes {
   static const String weeklyGoal = '/profile/weekly-goal';
   static const String totalTime = '/profile/total-time';
   static const String workoutHistory = '/profile/workout-history';
+  static const String analytics = '/profile/analytics';
 
   static const List<String> _tabOrder = [
     home,
@@ -216,6 +218,11 @@ class AppRoutes {
       case workoutHistory:
         return _buildSlideRoute(
           page: const WorkoutHistoryScreen(),
+          settings: settings,
+        );
+      case analytics:
+        return _buildSlideRoute(
+          page: const AnalyticsScreen(),
           settings: settings,
         );
       default:

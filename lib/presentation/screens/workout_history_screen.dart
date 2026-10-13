@@ -43,6 +43,11 @@ class WorkoutHistoryScreen extends ConsumerWidget {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.insights_rounded, color: _accentBlue, size: 22),
+            tooltip: 'Analitik',
+            onPressed: () => Navigator.pushNamed(context, AppRoutes.analytics),
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh_rounded, color: _accent, size: 22),
             tooltip: 'Yenile',
             onPressed: () => ref.invalidate(workoutHistoryProvider),
