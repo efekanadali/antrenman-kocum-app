@@ -367,8 +367,8 @@ Tasarım felsefesi **Obsidian Siyahı**, **Volkanik Turuncu** ve **Zümrüt Yeş
 | :---: | :---: | :---: | :---: |
 | <img src="docs/screenshots/dashboard.png" width="220" alt="Home Dashboard" onerror="this.src='https://placehold.co/400x850/13171C/FF5533?text=Dashboard+UI';"/> | <img src="docs/screenshots/mli_analytics.png" width="220" alt="MLI Analytics" onerror="this.src='https://placehold.co/400x850/13171C/10B981?text=MLI+Analytics';"/> | <img src="docs/screenshots/muscle_recovery.png" width="220" alt="Muscle Recovery" onerror="this.src='https://placehold.co/400x850/13171C/38BDF8?text=Recovery+Radar';"/> | <img src="docs/screenshots/program_builder.png" width="220" alt="Program Builder" onerror="this.src='https://placehold.co/400x850/13171C/F59E0B?text=Custom+Plan';"/> |
 
-> [!TIP]
-> Gerçek ekran görüntüleri için projenizin `docs/screenshots/` dizinine ilgili adlarla PNG dosyalarını ekleyebilir ya da CI/CD artifactleri ile güncelleyebilirsiniz.
+
+> Gerçek ekran görüntüleri proje tamamen bittikten sonra yüklenecektir. 
 
 ---
 
