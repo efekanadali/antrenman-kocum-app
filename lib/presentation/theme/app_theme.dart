@@ -20,6 +20,7 @@ class AppColors {
 
   // ─── Yardımcı İkincil Metrik Renkleri ──────────────────────────────────────
   static const Color nordicIce = Color(0xFF38BDF8); // Buz Mavisi (Süre / Su)
+  static const Color iceBlue = nordicIce; // Nordic Dark Buz Mavisi Aksanı
   static const Color amber = Color(0xFFF59E0B); // Kehribar (Orta Yük)
 
   // ─── Tipografi & Kontrast ────────────────────────────────────────────────

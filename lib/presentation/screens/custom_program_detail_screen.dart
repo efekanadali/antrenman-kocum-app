@@ -6,7 +6,7 @@ import 'package:calisthenics_app/domain/enums/muscle_group.dart';
 import 'package:calisthenics_app/domain/models/custom_program.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart';
 import 'package:calisthenics_app/core/utils/enum_label.dart';
-import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
+import 'package:calisthenics_app/presentation/providers/exercise_list_provider.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/presentation/screens/custom_program_day_session_screen.dart';
 import 'package:calisthenics_app/domain/services/program_preview.dart';
@@ -85,7 +85,7 @@ class CustomProgramDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final exerciseRepository = ref.watch(exerciseRepositoryProvider);
+    final exercisesAsync = ref.watch(exerciseListProvider);
     final resolver = ref.watch(exerciseMliResolverProvider).valueOrNull;
     ProgramPreview? previewFor(Iterable<CustomProgramExercise> items) {
       if (resolver == null) return null;
@@ -344,28 +344,20 @@ class CustomProgramDetailScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(16.0),
                   border: Border.all(color: AppColors.border, width: 1.0),
                 ),
-                child: FutureBuilder<List<Exercise>>(
-                  future: exerciseRepository.getAllExercises(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.volcanic,
-                        ),
-                      );
-                    }
-
-                    if (snapshot.hasError) {
-                      return const Text(
-                        'Bölge dağılımı yüklenemedi.',
-                        style: TextStyle(
-                          color: AppColors.textMid,
-                          fontSize: 12.0,
-                        ),
-                      );
-                    }
-
-                    final exercises = snapshot.data ?? <Exercise>[];
+                child: exercisesAsync.when(
+                  loading: () => const Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.volcanic,
+                    ),
+                  ),
+                  error: (_, _) => const Text(
+                    'Bölge dağılımı yüklenemedi.',
+                    style: TextStyle(
+                      color: AppColors.textMid,
+                      fontSize: 12.0,
+                    ),
+                  ),
+                  data: (exercises) {
                     final summaries = _buildMuscleSummaries(exercises);
                     if (summaries.isEmpty) {
                       return const Text(

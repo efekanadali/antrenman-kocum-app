@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calisthenics_app/core/utils/exercise_unit.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart';
 import 'package:calisthenics_app/domain/models/custom_program.dart';
-import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
+import 'package:calisthenics_app/presentation/providers/exercise_list_provider.dart';
 import 'package:calisthenics_app/presentation/providers/custom_program_provider.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/domain/services/exercise_mli_resolver.dart';
@@ -434,7 +434,7 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final exerciseRepository = ref.watch(exerciseRepositoryProvider);
+    final exercisesAsync = ref.watch(exerciseListProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -654,20 +654,22 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                   [
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      child: FutureBuilder<List<Exercise>>(
-                        future: exerciseRepository.getAllExercises(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator(
-                                color: AppColors.volcanic,
-                              ),
-                            );
-                          }
-
-                          final exercises = snapshot.data ?? <Exercise>[];
-
+                      child: exercisesAsync.when(
+                        loading: () => const Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.volcanic,
+                          ),
+                        ),
+                        error: (_, _) => const Center(
+                          child: Text(
+                            'Egzersiz kataloğu yüklenemedi.',
+                            style: TextStyle(
+                              color: AppColors.textMid,
+                              fontSize: 12.0,
+                            ),
+                          ),
+                        ),
+                        data: (exercises) {
                           return Column(
                             children: [
                               for (final day in _days)

@@ -16,19 +16,6 @@ import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/presentation/screens/workout_summary_screen.dart';
 import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 
-const Color _bgTop = AppColors.surfaceSoft;
-const Color _bgBottom = AppColors.background;
-const Color _cardSurface = AppColors.surface;
-const Color _cardSurfaceSoft = AppColors.surfaceSoft;
-const Color _accentVolcanic = AppColors.volcanic;
-const Color _accentEmerald = AppColors.emerald;
-const Color _accentBlue = AppColors.nordicIce;
-const Color _textHigh = AppColors.textHigh;
-const Color _textMid = AppColors.textMid;
-const Color _sessionPageBg = AppColors.background;
-const Color _sessionInk = AppColors.textHigh;
-const Color _sessionSoft = AppColors.surfaceSoft;
-const Color _sessionMuted = AppColors.textMuted;
 const String _sessionHeroImageAsset = 'assets/images/Incline-pushup.png';
 
 class CustomProgramDaySessionArgs {
@@ -262,7 +249,7 @@ class _CustomProgramDaySessionScreenState
       backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
-        side: BorderSide(color: AppColors.borderSubtle, width: 1.0),
+        side: BorderSide(color: AppColors.border, width: 1.0),
       ),
       builder: (context) {
         var tempRir = _defaultRir;
@@ -282,7 +269,7 @@ class _CustomProgramDaySessionScreenState
                         ? 'Kac saniye daha durabilirdin?'
                         : 'Kac tekrar daha cikarabilirdin?',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: _textHigh,
+                      color: AppColors.textHigh,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -300,16 +287,18 @@ class _CustomProgramDaySessionScreenState
                             tempRir = rir;
                           });
                         },
-                        selectedColor: _accentVolcanic.withValues(alpha: 0.22),
-                        backgroundColor: _cardSurfaceSoft,
-                        checkmarkColor: _accentVolcanic,
+                        selectedColor: AppColors.iceBlue.withValues(alpha: 0.22),
+                        backgroundColor: AppColors.surfaceSoft,
+                        checkmarkColor: AppColors.iceBlue,
                         side: BorderSide(
                           color: isSelected
-                              ? _accentVolcanic
-                              : AppColors.borderSubtle,
+                              ? AppColors.iceBlue
+                              : AppColors.border,
                         ),
                         labelStyle: TextStyle(
-                          color: isSelected ? Colors.white : _textMid,
+                          color: isSelected
+                              ? AppColors.textHigh
+                              : AppColors.textMid,
                           fontWeight: FontWeight.w700,
                         ),
                       );
@@ -349,7 +338,7 @@ class _CustomProgramDaySessionScreenState
                         child: TextButton(
                           onPressed: () => Navigator.pop(context),
                           style: TextButton.styleFrom(
-                            foregroundColor: _textMid,
+                            foregroundColor: AppColors.textMid,
                           ),
                           child: const Text('Vazgec'),
                         ),
@@ -384,7 +373,7 @@ class _CustomProgramDaySessionScreenState
                             );
                           },
                           style: FilledButton.styleFrom(
-                            backgroundColor: _accentVolcanic,
+                            backgroundColor: AppColors.volcanic,
                             foregroundColor: Colors.white,
                           ),
                           child: const Text('Kaydet'),
@@ -562,8 +551,8 @@ class _CustomProgramDaySessionScreenState
       context: context,
       backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24.0)),
-        side: BorderSide(color: AppColors.borderSubtle, width: 1.0),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+        side: BorderSide(color: AppColors.border, width: 1.0),
       ),
       builder: (context) {
         var tempValue = _restDurationSeconds.toDouble();
@@ -578,7 +567,7 @@ class _CustomProgramDaySessionScreenState
                   Text(
                     'Dinlenme suresi',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: _textHigh,
+                      color: AppColors.textHigh,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -587,15 +576,15 @@ class _CustomProgramDaySessionScreenState
                     '${tempValue.toInt()} sn',
                     style: Theme.of(
                       context,
-                    ).textTheme.bodySmall?.copyWith(color: _textMid),
+                    ).textTheme.bodySmall?.copyWith(color: AppColors.textMid),
                   ),
                   Slider(
                     value: tempValue,
                     min: 30.0,
                     max: 180.0,
                     divisions: 15,
-                    activeColor: _accentVolcanic,
-                    inactiveColor: AppColors.borderSubtle,
+                    activeColor: AppColors.iceBlue,
+                    inactiveColor: AppColors.border,
                     label: '${tempValue.toInt()} sn',
                     onChanged: (value) {
                       setModalState(() {
@@ -611,14 +600,17 @@ class _CustomProgramDaySessionScreenState
                         Navigator.pop(context, tempValue.toInt());
                       },
                       style: FilledButton.styleFrom(
-                        backgroundColor: _accentVolcanic,
-                        foregroundColor: Colors.white,
+                        backgroundColor: AppColors.iceBlue,
+                        foregroundColor: AppColors.background,
                         padding: const EdgeInsets.symmetric(vertical: 12.0),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14.0),
                         ),
                       ),
-                      child: const Text('Dinlenmeyi baslat'),
+                      child: const Text(
+                        'Dinlenmeyi baslat',
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
                     ),
                   ),
                 ],
@@ -672,7 +664,7 @@ class _CustomProgramDaySessionScreenState
         : (_restRemainingSeconds / _restDurationSeconds).clamp(0.0, 1.0);
 
     return Scaffold(
-      backgroundColor: _sessionPageBg,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
@@ -691,9 +683,9 @@ class _CustomProgramDaySessionScreenState
                       vertical: 6.0,
                     ),
                     decoration: BoxDecoration(
-                      color: _cardSurface,
+                      color: AppColors.surface,
                       borderRadius: BorderRadius.circular(999.0),
-                      border: Border.all(color: AppColors.borderSubtle),
+                      border: Border.all(color: AppColors.border),
                     ),
                     child: Row(
                       children: [
@@ -701,7 +693,7 @@ class _CustomProgramDaySessionScreenState
                           width: 10.0,
                           height: 10.0,
                           decoration: const BoxDecoration(
-                            color: _accentVolcanic,
+                            color: AppColors.iceBlue,
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -709,7 +701,7 @@ class _CustomProgramDaySessionScreenState
                         Text(
                           _formatDuration(_workElapsed),
                           style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                                color: _sessionInk,
+                                color: AppColors.textHigh,
                                 fontWeight: FontWeight.w800,
                               ),
                         ),
@@ -734,7 +726,7 @@ class _CustomProgramDaySessionScreenState
                         activeExercise?.exerciseName ?? 'Workout',
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                              color: _sessionInk,
+                              color: AppColors.textHigh,
                               fontWeight: FontWeight.w900,
                             ),
                       ),
@@ -746,16 +738,16 @@ class _CustomProgramDaySessionScreenState
                             text: activeExercise == null
                                 ? 'Set -'
                                 : 'Set $activeSet of ${activeExercise.sets}',
-                            background: _sessionSoft,
-                            textColor: _sessionInk,
-                            borderColor: AppColors.borderSubtle,
+                            background: AppColors.surface,
+                            textColor: AppColors.textHigh,
+                            borderColor: AppColors.border,
                           ),
                           const SizedBox(width: 8.0),
                           _SessionTagChip(
                             text: 'Target: $targetLabel',
-                            background: _accentEmerald.withValues(alpha: 0.16),
-                            textColor: AppColors.emeraldSoft,
-                            borderColor: _accentEmerald.withValues(alpha: 0.45),
+                            background: AppColors.iceBlue.withValues(alpha: 0.16),
+                            textColor: AppColors.iceBlue,
+                            borderColor: AppColors.iceBlue.withValues(alpha: 0.45),
                           ),
                         ],
                       ),
@@ -774,11 +766,13 @@ class _CustomProgramDaySessionScreenState
                             style: const TextStyle(fontWeight: FontWeight.w900),
                           ),
                           style: FilledButton.styleFrom(
-                            backgroundColor: _accentVolcanic,
+                            backgroundColor: isWorkoutDone
+                                ? AppColors.emerald
+                                : AppColors.volcanic,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 18.0),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(22.0),
+                              borderRadius: BorderRadius.circular(14.0),
                             ),
                           ),
                         ),
@@ -791,8 +785,8 @@ class _CustomProgramDaySessionScreenState
                           vertical: 14.0,
                         ),
                         decoration: BoxDecoration(
-                          color: _cardSurface,
-                          borderRadius: BorderRadius.circular(20.0),
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(14.0),
                           border: Border.all(color: AppColors.border),
                         ),
                         child: Row(
@@ -800,13 +794,14 @@ class _CustomProgramDaySessionScreenState
                             Container(
                               width: 42.0,
                               height: 42.0,
-                              decoration: const BoxDecoration(
-                                color: _cardSurfaceSoft,
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceSoft,
                                 shape: BoxShape.circle,
+                                border: Border.all(color: AppColors.border),
                               ),
                               child: const Icon(
                                 Icons.fitness_center_rounded,
-                                color: _accentVolcanic,
+                                color: AppColors.iceBlue,
                                 size: 20.0,
                               ),
                             ),
@@ -821,7 +816,7 @@ class _CustomProgramDaySessionScreenState
                                         .textTheme
                                         .labelSmall
                                         ?.copyWith(
-                                          color: _sessionMuted,
+                                          color: AppColors.textMuted,
                                           letterSpacing: 1.0,
                                           fontWeight: FontWeight.w800,
                                         ),
@@ -833,7 +828,7 @@ class _CustomProgramDaySessionScreenState
                                         .textTheme
                                         .titleSmall
                                         ?.copyWith(
-                                          color: _sessionInk,
+                                          color: AppColors.textHigh,
                                           fontWeight: FontWeight.w800,
                                         ),
                                   ),
@@ -843,7 +838,7 @@ class _CustomProgramDaySessionScreenState
                                       style: Theme.of(context)
                                           .textTheme
                                           .bodySmall
-                                          ?.copyWith(color: _sessionMuted),
+                                          ?.copyWith(color: AppColors.textMuted),
                                     ),
                                 ],
                               ),
@@ -851,7 +846,7 @@ class _CustomProgramDaySessionScreenState
                             const Icon(
                               Icons.arrow_forward_ios_rounded,
                               size: 16.0,
-                              color: _textMid,
+                              color: AppColors.textMid,
                             ),
                           ],
                         ),
@@ -881,9 +876,9 @@ class _CustomProgramDaySessionScreenState
                   child: LinearProgressIndicator(
                     value: restProgress,
                     minHeight: 8.0,
-                    backgroundColor: _cardSurfaceSoft,
+                    backgroundColor: AppColors.surfaceSoft,
                     valueColor: const AlwaysStoppedAnimation<Color>(
-                      _accentVolcanic,
+                      AppColors.iceBlue,
                     ),
                   ),
                 ),
@@ -897,8 +892,8 @@ class _CustomProgramDaySessionScreenState
                       icon: _workPaused
                           ? Icons.play_circle_fill_rounded
                           : Icons.pause_circle_filled_rounded,
-                      backgroundColor: _sessionSoft,
-                      foregroundColor: _sessionInk,
+                      backgroundColor: AppColors.surface,
+                      foregroundColor: AppColors.textHigh,
                       onPressed: _togglePause,
                     ),
                   ),
@@ -907,7 +902,7 @@ class _CustomProgramDaySessionScreenState
                     child: _SessionActionPill(
                       label: 'STOP',
                       icon: Icons.stop_circle_rounded,
-                      backgroundColor: _accentVolcanic,
+                      backgroundColor: AppColors.volcanic,
                       foregroundColor: Colors.white,
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -923,7 +918,7 @@ class _CustomProgramDaySessionScreenState
                       child: Text(
                         'Dinlenmeyi bitir',
                         style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                              color: _accentVolcanic,
+                              color: AppColors.volcanic,
                               fontWeight: FontWeight.w700,
                             ),
                       ),
@@ -934,7 +929,7 @@ class _CustomProgramDaySessionScreenState
                       child: Text(
                         '+30 saniye',
                         style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                              color: _accentBlue,
+                              color: AppColors.iceBlue,
                               fontWeight: FontWeight.w700,
                             ),
                       ),
@@ -964,11 +959,11 @@ class _SessionTopIconButton extends StatelessWidget {
         width: 38.0,
         height: 38.0,
         decoration: BoxDecoration(
-          color: _cardSurface,
+          color: AppColors.surface,
           shape: BoxShape.circle,
-          border: Border.all(color: AppColors.borderSubtle),
+          border: Border.all(color: AppColors.border),
         ),
-        child: Icon(icon, color: _sessionInk, size: 19.0),
+        child: Icon(icon, color: AppColors.textHigh, size: 19.0),
       ),
     );
   }
@@ -984,13 +979,9 @@ class _SessionHeroCard extends StatelessWidget {
       height: 290.0,
       padding: const EdgeInsets.all(10.0),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30.0),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14.0),
         border: Border.all(color: AppColors.border),
-        gradient: const LinearGradient(
-          colors: [_bgTop, _bgBottom],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
       ),
       child: const _SessionHeroFrame(
         imageFit: BoxFit.contain,
@@ -1013,25 +1004,22 @@ class _SessionHeroFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18.0),
-        gradient: const LinearGradient(
-          colors: [AppColors.surfaceSubtle, AppColors.surface],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppColors.surfaceSoft,
+        borderRadius: BorderRadius.circular(12.0),
+        border: Border.all(color: AppColors.border),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(18.0),
+        borderRadius: BorderRadius.circular(12.0),
         child: Image.asset(
           _sessionHeroImageAsset,
           fit: imageFit,
           alignment: imageAlignment,
           errorBuilder: (context, error, stackTrace) {
-            return Center(
+            return const Center(
               child: Icon(
                 Icons.accessibility_new_rounded,
                 size: 64.0,
-                color: Colors.white.withValues(alpha: 0.9),
+                color: AppColors.textHigh,
               ),
             );
           },
@@ -1098,7 +1086,8 @@ class _SessionActionPill extends StatelessWidget {
         foregroundColor: foregroundColor,
         padding: const EdgeInsets.symmetric(vertical: 16.0),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(999.0),
+          borderRadius: BorderRadius.circular(14.0),
+          side: const BorderSide(color: AppColors.border),
         ),
       ),
       icon: Icon(icon, size: 18.0),
@@ -1124,8 +1113,8 @@ class _WorkoutLoadCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14.0),
       decoration: BoxDecoration(
-        color: _cardSurface,
-        borderRadius: BorderRadius.circular(16.0),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14.0),
         border: Border.all(color: AppColors.border),
       ),
       child: Column(
@@ -1134,7 +1123,7 @@ class _WorkoutLoadCard extends StatelessWidget {
           Text(
             'Kas Yuk Sonucu',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: _textHigh,
+              color: AppColors.textHigh,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -1148,7 +1137,7 @@ class _WorkoutLoadCard extends StatelessWidget {
                     child: Text(
                       entry.key,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: _textHigh,
+                        color: AppColors.textHigh,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -1156,7 +1145,7 @@ class _WorkoutLoadCard extends StatelessWidget {
                   Text(
                     '${entry.value.round()} • ${feedbackForLoad(entry.value)}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: _accentVolcanic,
+                      color: AppColors.iceBlue,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -1183,8 +1172,8 @@ class _LastSetLoadCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14.0),
       decoration: BoxDecoration(
-        color: _cardSurface,
-        borderRadius: BorderRadius.circular(16.0),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14.0),
         border: Border.all(color: AppColors.border),
       ),
       child: Column(
@@ -1193,7 +1182,7 @@ class _LastSetLoadCard extends StatelessWidget {
           Text(
             'Last Set Impact',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: _textHigh,
+              color: AppColors.textHigh,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -1207,7 +1196,7 @@ class _LastSetLoadCard extends StatelessWidget {
                     child: Text(
                       entry.key,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: _textHigh,
+                        color: AppColors.textHigh,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -1215,7 +1204,7 @@ class _LastSetLoadCard extends StatelessWidget {
                   Text(
                     '+${entry.value.round()} (${indicatorForLoad(entry.value)})',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: _accentEmerald,
+                      color: AppColors.emerald,
                       fontWeight: FontWeight.w700,
                     ),
                   ),

@@ -62,8 +62,12 @@ class CustomProgramNotifier extends AsyncNotifier<List<CustomProgram>> {
 
       final pendingDeletes = await _loadPendingDeletes();
       for (final id in pendingDeletes.toList()) {
-        await service.deleteCustomProgram(id);
-        pendingDeletes.remove(id);
+        try {
+          await service.deleteCustomProgram(id);
+          pendingDeletes.remove(id);
+        } catch (_) {
+          // Ağ yoksa veya buluttan silme başarısız olduysa kuyrukta tutmaya devam et.
+        }
       }
       await _savePendingDeletes(pendingDeletes);
 
@@ -75,7 +79,9 @@ class CustomProgramNotifier extends AsyncNotifier<List<CustomProgram>> {
 
       final merged = [
         ...local,
-        ...cloud.where((p) => !localIds.contains(p.id)),
+        ...cloud.where(
+          (p) => !localIds.contains(p.id) && !pendingDeletes.contains(p.id),
+        ),
       ]..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
       for (final program in local) {

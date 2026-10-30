@@ -110,7 +110,10 @@ class AppRoutes {
           settings: settings,
         );
       case trainingDaySession:
-        final args = settings.arguments as TrainingDaySessionArgs;
+        final args = settings.arguments;
+        if (args is! TrainingDaySessionArgs) {
+          return _buildInvalidArgsRoute(settings);
+        }
         return _buildSlideRoute(
           page: TrainingDaySessionScreen(args: args),
           settings: settings,
@@ -121,19 +124,28 @@ class AppRoutes {
           settings: settings,
         );
       case detail:
-        final exercise = settings.arguments as Exercise;
+        final exercise = settings.arguments;
+        if (exercise is! Exercise) {
+          return _buildInvalidArgsRoute(settings);
+        }
         return _buildSlideRoute(
           page: ExerciseDetailScreen(exercise: exercise),
           settings: settings,
         );
       case workoutSession:
-        final exercise = settings.arguments as Exercise;
+        final exercise = settings.arguments;
+        if (exercise is! Exercise) {
+          return _buildInvalidArgsRoute(settings);
+        }
         return _buildSlideRoute(
           page: WorkoutSessionScreen(exercise: exercise),
           settings: settings,
         );
       case workoutSummary:
-        final args = settings.arguments as WorkoutSummaryArgs;
+        final args = settings.arguments;
+        if (args is! WorkoutSummaryArgs) {
+          return _buildInvalidArgsRoute(settings);
+        }
         return _buildSlideRoute(
           page: WorkoutSummaryScreen(args: args),
           settings: settings,
@@ -154,13 +166,19 @@ class AppRoutes {
           settings: settings,
         );
       case customProgramDetail:
-        final program = settings.arguments as CustomProgram;
+        final program = settings.arguments;
+        if (program is! CustomProgram) {
+          return _buildInvalidArgsRoute(settings);
+        }
         return _buildSlideRoute(
           page: CustomProgramDetailScreen(program: program),
           settings: settings,
         );
       case customProgramDaySession:
-        final args = settings.arguments as CustomProgramDaySessionArgs;
+        final args = settings.arguments;
+        if (args is! CustomProgramDaySessionArgs) {
+          return _buildInvalidArgsRoute(settings);
+        }
         return _buildSlideRoute(
           page: CustomProgramDaySessionScreen(args: args),
           settings: settings,
@@ -205,5 +223,51 @@ class AppRoutes {
           settings: settings,
         );
     }
+  }
+
+  static Route<dynamic> _buildInvalidArgsRoute(RouteSettings settings) {
+    return _buildSlideRoute(
+      page: Scaffold(
+        body: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.error_outline_rounded,
+                    size: 40.0,
+                    color: Colors.redAccent,
+                  ),
+                  const SizedBox(height: 12.0),
+                  Text(
+                    'Sayfa parametreleri eksik veya geçersiz (${settings.name}).',
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16.0),
+                  Builder(
+                    builder: (context) => FilledButton(
+                      onPressed: () {
+                        if (Navigator.of(context).canPop()) {
+                          Navigator.of(context).pop();
+                        } else {
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                            home,
+                            (route) => false,
+                          );
+                        }
+                      },
+                      child: const Text('Geri Dön'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+      settings: settings,
+    );
   }
 }

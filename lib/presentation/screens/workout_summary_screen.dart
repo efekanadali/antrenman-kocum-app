@@ -10,16 +10,6 @@ import 'package:calisthenics_app/domain/services/mli_calculator.dart';
 import 'package:calisthenics_app/domain/services/recovery_calculator.dart';
 import 'package:calisthenics_app/data/services/firestore_service.dart';
 
-// ─── Design Tokens (AppColors Üzerinden Beslenir) ────────────────────────────
-const Color _bg = AppColors.background;
-const Color _surface = AppColors.surface;
-const Color _card = AppColors.surface;
-const Color _stroke = AppColors.border;
-const Color _accent = AppColors.volcanic;
-const Color _emerald = AppColors.emerald;
-const Color _textPrimary = AppColors.textHigh;
-const Color _textMuted = AppColors.textMid;
-
 // ─── Model ───────────────────────────────────────────────────────────────────
 class WorkoutSummaryArgs {
   const WorkoutSummaryArgs({
@@ -129,12 +119,12 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          backgroundColor: AppColors.surfaceSoft,
+          backgroundColor: AppColors.surface,
           behavior: SnackBarBehavior.floating,
-          elevation: 4,
+          elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-            side: const BorderSide(color: AppColors.borderSubtle, width: 1),
+            borderRadius: BorderRadius.circular(14.0),
+            side: const BorderSide(color: AppColors.border, width: 1.0),
           ),
           content: const Row(
             children: [
@@ -167,7 +157,7 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
           backgroundColor: Colors.red.shade800,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14.0),
           ),
         ),
       );
@@ -192,7 +182,7 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
     );
 
     return Scaffold(
-      backgroundColor: _bg,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
@@ -265,29 +255,21 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
   Widget _buildHeader(BuildContext context) {
     return Column(
       children: [
-        // Trophy icon with subtle emerald ring
         Container(
           width: 88,
           height: 88,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: _card,
+            color: AppColors.surface,
             border: Border.all(
-              color: _emerald.withValues(alpha: 0.65),
-              width: 2.0,
+              color: AppColors.emerald.withValues(alpha: 0.65),
+              width: 1.5,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: _emerald.withValues(alpha: 0.18),
-                blurRadius: 20,
-                spreadRadius: 2,
-              ),
-            ],
           ),
           child: const Icon(
             Icons.emoji_events_rounded,
             size: 42,
-            color: _emerald,
+            color: AppColors.emerald,
           ),
         ),
         const SizedBox(height: 18),
@@ -295,7 +277,7 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
           'Antrenman Tamamlandı!',
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: _textPrimary,
+            color: AppColors.textHigh,
             fontSize: 24,
             fontWeight: FontWeight.w800,
             letterSpacing: -0.5,
@@ -306,7 +288,7 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
           widget.args.exerciseName,
           textAlign: TextAlign.center,
           style: const TextStyle(
-            color: _textMuted,
+            color: AppColors.textMid,
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
@@ -322,6 +304,7 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
         Expanded(
           child: _MetricCard(
             icon: Icons.timer_outlined,
+            iconColor: AppColors.iceBlue,
             label: 'Toplam Süre',
             value: _formatDuration(widget.args.totalTime),
           ),
@@ -330,6 +313,7 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
         Expanded(
           child: _MetricCard(
             icon: Icons.fitness_center_rounded,
+            iconColor: AppColors.emerald,
             label: 'Setler',
             value: '${widget.args.setsCompleted} / ${widget.args.totalSets}',
           ),
@@ -338,6 +322,7 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
         Expanded(
           child: _MetricCard(
             icon: Icons.bolt_rounded,
+            iconColor: AppColors.volcanic,
             label: 'Toplam Yük',
             value: '${widget.args.totalLoad.round()} MLI',
           ),
@@ -354,9 +339,9 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: _card,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _stroke),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14.0),
+        border: Border.all(color: AppColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -367,12 +352,12 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: _accent.withValues(alpha: 0.14),
+                  color: AppColors.iceBlue.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
                   Icons.analytics_outlined,
-                  color: _accent,
+                  color: AppColors.iceBlue,
                   size: 18,
                 ),
               ),
@@ -380,7 +365,7 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
               const Text(
                 'Kas Grubu Yük Dağılımı',
                 style: TextStyle(
-                  color: _textPrimary,
+                  color: AppColors.textHigh,
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                 ),
@@ -410,11 +395,11 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
       padding: EdgeInsets.symmetric(vertical: 12),
       child: Row(
         children: [
-          Icon(Icons.info_outline_rounded, color: _textMuted, size: 18),
+          Icon(Icons.info_outline_rounded, color: AppColors.textMid, size: 18),
           SizedBox(width: 8),
           Text(
             'Kas yükü verisi mevcut değil.',
-            style: TextStyle(color: _textMuted, fontSize: 13),
+            style: TextStyle(color: AppColors.textMid, fontSize: 13),
           ),
         ],
       ),
@@ -427,11 +412,13 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
 class _MetricCard extends StatelessWidget {
   const _MetricCard({
     required this.icon,
+    required this.iconColor,
     required this.label,
     required this.value,
   });
 
   final IconData icon;
+  final Color iconColor;
   final String label;
   final String value;
 
@@ -440,21 +427,21 @@ class _MetricCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
       decoration: BoxDecoration(
-        color: _card,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: _stroke),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14.0),
+        border: Border.all(color: AppColors.border),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: _accent, size: 22),
+          Icon(icon, color: iconColor, size: 22),
           const SizedBox(height: 10),
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
               value,
               style: const TextStyle(
-                color: _textPrimary,
+                color: AppColors.textHigh,
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
                 letterSpacing: -0.3,
@@ -466,7 +453,7 @@ class _MetricCard extends StatelessWidget {
             label,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              color: _textMuted,
+              color: AppColors.textMid,
               fontSize: 11,
               fontWeight: FontWeight.w500,
             ),
@@ -496,14 +483,14 @@ class _MuscleLoadRow extends StatelessWidget {
     final Color badgeFg;
     switch (evaluation.level) {
       case MliStimulusLevel.optimal:
-        badgeBg = _emerald.withValues(alpha: 0.16);
-        badgeFg = _emerald;
+        badgeBg = AppColors.emerald.withValues(alpha: 0.16);
+        badgeFg = AppColors.emerald;
       case MliStimulusLevel.understimulated:
-        badgeBg = AppColors.surfaceSoft;
-        badgeFg = _textMuted;
+        badgeBg = AppColors.iceBlue.withValues(alpha: 0.14);
+        badgeFg = AppColors.iceBlue;
       case MliStimulusLevel.overload:
-        badgeBg = _accent.withValues(alpha: 0.16);
-        badgeFg = _accent;
+        badgeBg = AppColors.volcanic.withValues(alpha: 0.16);
+        badgeFg = AppColors.volcanic;
     }
 
     return Padding(
@@ -517,13 +504,12 @@ class _MuscleLoadRow extends StatelessWidget {
                 child: Text(
                   muscleName,
                   style: const TextStyle(
-                    color: _textPrimary,
+                    color: AppColors.textHigh,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
-              // Stimulus badge
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
@@ -544,7 +530,7 @@ class _MuscleLoadRow extends StatelessWidget {
               Text(
                 '${load.round()} pts',
                 style: const TextStyle(
-                  color: _accent,
+                  color: AppColors.volcanic,
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                 ),
@@ -589,11 +575,11 @@ class _SaveButton extends StatelessWidget {
           ),
         ),
         style: ElevatedButton.styleFrom(
-          backgroundColor: _accent,
+          backgroundColor: AppColors.volcanic,
           foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(14.0),
           ),
         ),
       ),
@@ -627,11 +613,11 @@ class _OutlineActionButton extends StatelessWidget {
           ),
         ),
         style: OutlinedButton.styleFrom(
-          foregroundColor: _textMuted,
-          side: const BorderSide(color: _stroke),
-          backgroundColor: _surface,
+          foregroundColor: AppColors.textMid,
+          side: const BorderSide(color: AppColors.border),
+          backgroundColor: AppColors.surface,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(14.0),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 10),
         ),
