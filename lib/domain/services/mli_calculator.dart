@@ -52,12 +52,12 @@ double calculateStaticMLI({
       weightMultiplier;
 }
 
-/// Tek bir setin kas bazli dagilimini hesaplar.
-Map<String, double> calculateMuscleLoad({
+/// Tek bir setin ham MLI skorunu (kas ağırlıklarıyla çarpılmadan önce) hesaplar.
+double calculateSetMli({
   required Exercise exercise,
   required WorkoutSet set,
 }) {
-  final mli = set.durationInSeconds != null
+  return set.durationInSeconds != null
       ? calculateStaticMLI(
           durationInSeconds: set.durationInSeconds!,
           difficulty: exercise.difficulty,
@@ -70,6 +70,14 @@ Map<String, double> calculateMuscleLoad({
           rir: set.rir,
           weightMultiplier: set.weightMultiplier,
         );
+}
+
+/// Tek bir setin kas bazli dagilimini hesaplar.
+Map<String, double> calculateMuscleLoad({
+  required Exercise exercise,
+  required WorkoutSet set,
+}) {
+  final mli = calculateSetMli(exercise: exercise, set: set);
 
   final result = <String, double>{};
   exercise.muscles.forEach((muscleName, weight) {

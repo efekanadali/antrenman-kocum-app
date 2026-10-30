@@ -5,13 +5,19 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:calisthenics_app/domain/enums/difficulty_level.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:calisthenics_app/core/utils/enum_label.dart';
+import 'package:calisthenics_app/core/utils/exercise_unit.dart';
 import 'package:calisthenics_app/domain/enums/exercise_level.dart';
+import 'package:calisthenics_app/domain/models/custom_program.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart';
+import 'package:calisthenics_app/domain/models/mli_models.dart' as mli;
+import 'package:calisthenics_app/domain/services/exercise_mli_resolver.dart';
+import 'package:calisthenics_app/domain/services/mli_calculator.dart';
+import 'package:calisthenics_app/domain/services/recovery_calculator.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/presentation/screens/workout_summary_screen.dart';
 import 'package:calisthenics_app/presentation/theme/app_theme.dart';
-import 'package:calisthenics_app/core/utils/enum_label.dart';
 
 class WorkoutSessionScreen extends StatefulWidget {
   const WorkoutSessionScreen({super.key, required this.exercise});
@@ -23,6 +29,9 @@ class WorkoutSessionScreen extends StatefulWidget {
 }
 
 class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
+  static const int _defaultRir = 2;
+  static const double _defaultBodyWeightKg = 70.0;
+
   Timer? _workTimer;
   Timer? _restTimer;
   Duration _workElapsed = Duration.zero;
@@ -32,12 +41,34 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
   int _restPresetSeconds = 60;
   late int _totalSets;
   int _completedSets = 0;
+  double _lastBodyWeightKg = _defaultBodyWeightKg;
+  final List<mli.WorkoutSet> _recordedSets = <mli.WorkoutSet>[];
+
+  bool get _isTimed => isTimedExercise(
+    exerciseName: widget.exercise.name,
+    exerciseId: widget.exercise.id,
+  );
 
   @override
   void initState() {
     super.initState();
     _totalSets = _totalSetsForLevel(widget.exercise.level);
+    _loadBodyWeight();
     _startWorkTimer();
+  }
+
+  Future<void> _loadBodyWeight() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedWeight = prefs.getDouble('profile_weight_kg');
+      if (savedWeight != null && savedWeight > 0 && mounted) {
+        setState(() {
+          _lastBodyWeightKg = savedWeight;
+        });
+      }
+    } catch (_) {
+      // Varsayılan vücut ağırlığı kullanılır
+    }
   }
 
   @override
@@ -59,6 +90,16 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
   }
 
   String _repsForLevel(ExerciseLevel level) {
+    if (_isTimed) {
+      switch (level) {
+        case ExerciseLevel.beginner:
+          return '20-30 saniye';
+        case ExerciseLevel.intermediate:
+          return '30-45 saniye';
+        case ExerciseLevel.advanced:
+          return '45-60 saniye';
+      }
+    }
     switch (level) {
       case ExerciseLevel.beginner:
         return '8-10 tekrar';
@@ -69,7 +110,17 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
     }
   }
 
-  int _targetRepsForLevel(ExerciseLevel level) {
+  int _targetValueForLevel(ExerciseLevel level) {
+    if (_isTimed) {
+      switch (level) {
+        case ExerciseLevel.beginner:
+          return 30;
+        case ExerciseLevel.intermediate:
+          return 45;
+        case ExerciseLevel.advanced:
+          return 60;
+      }
+    }
     switch (level) {
       case ExerciseLevel.beginner:
         return 10;
@@ -83,7 +134,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
   void _startWorkTimer() {
     _workTimer?.cancel();
     _workTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (_isPaused || !mounted) {
+      if (_isPaused || _restRunning || !mounted) {
         return;
       }
       setState(() {
@@ -96,6 +147,9 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
     if (_restRunning) {
       return;
     }
+
+    // Dinlenme başladığında çalışma sayacını durdur (dinlenme süresi MLI veya aktif süreye eklenmez).
+    _workTimer?.cancel();
 
     setState(() {
       _restRemaining = Duration(seconds: _restPresetSeconds);
@@ -110,6 +164,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
           _restRemaining = Duration.zero;
           _restRunning = false;
         });
+        _startWorkTimer();
         HapticFeedback.heavyImpact();
         if (mounted) {
           ScaffoldMessenger.of(
@@ -132,6 +187,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
       _restRunning = false;
       _restRemaining = Duration.zero;
     });
+    _startWorkTimer();
   }
 
   void _togglePause() {
@@ -140,14 +196,216 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
     });
   }
 
-  void _completeSet() {
+  Future<_SingleSetEffortResult?> _askSetEffort({
+    required bool isTimed,
+    required int defaultTargetValue,
+  }) async {
+    var valueText = defaultTargetValue.toString();
+    var extraWeightText = '0';
+    var bodyWeightText = _lastBodyWeightKg.toStringAsFixed(1);
+
+    return showModalBottomSheet<_SingleSetEffortResult>(
+      isScrollControlled: true,
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+        side: BorderSide(color: AppColors.border, width: 1.0),
+      ),
+      builder: (context) {
+        var tempRir = _defaultRir;
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding:
+                  const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 20.0) +
+                  EdgeInsets.only(
+                    bottom: MediaQuery.viewInsetsOf(context).bottom,
+                  ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    isTimed
+                        ? 'Kaç saniye daha durabilirdin? (RIR)'
+                        : 'Kaç tekrar daha çıkarabilirdin? (RIR)',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: AppColors.textHigh,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 12.0),
+                  Wrap(
+                    spacing: 8.0,
+                    children: List.generate(isTimed ? 11 : 5, (rir) {
+                      final isSelected = tempRir == rir;
+                      return ChoiceChip(
+                        label: Text('$rir'),
+                        selected: isSelected,
+                        onSelected: (_) {
+                          HapticFeedback.selectionClick();
+                          setModalState(() {
+                            tempRir = rir;
+                          });
+                        },
+                        selectedColor: AppColors.iceBlue.withValues(
+                          alpha: 0.22,
+                        ),
+                        backgroundColor: AppColors.surfaceSoft,
+                        checkmarkColor: AppColors.iceBlue,
+                        side: BorderSide(
+                          color: isSelected
+                              ? AppColors.iceBlue
+                              : AppColors.border,
+                        ),
+                        labelStyle: TextStyle(
+                          color: isSelected
+                              ? AppColors.textHigh
+                              : AppColors.textMid,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 12.0),
+                  TextFormField(
+                    initialValue: valueText,
+                    onChanged: (value) {
+                      valueText = value;
+                    },
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: isTimed
+                          ? 'Tamamlanan süre (saniye)'
+                          : 'Tamamlanan tekrar sayısı',
+                    ),
+                  ),
+                  const SizedBox(height: 10.0),
+                  TextFormField(
+                    initialValue: extraWeightText,
+                    onChanged: (value) {
+                      extraWeightText = value;
+                    },
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: const InputDecoration(
+                      labelText: 'Ekstra ağırlık (kg)',
+                      hintText: '0',
+                    ),
+                  ),
+                  const SizedBox(height: 10.0),
+                  TextFormField(
+                    initialValue: bodyWeightText,
+                    onChanged: (value) {
+                      bodyWeightText = value;
+                    },
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: const InputDecoration(
+                      labelText: 'Vücut ağırlığı (kg)',
+                    ),
+                  ),
+                  const SizedBox(height: 12.0),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppColors.textMid,
+                          ),
+                          child: const Text('Vazgeç'),
+                        ),
+                      ),
+                      const SizedBox(width: 8.0),
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: () {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                            final parsedValue =
+                                int.tryParse(valueText.trim()) ??
+                                defaultTargetValue;
+                            final extraWeight =
+                                double.tryParse(
+                                  extraWeightText.trim().replaceAll(',', '.'),
+                                ) ??
+                                0.0;
+                            final bodyWeight = double.tryParse(
+                              bodyWeightText.trim().replaceAll(',', '.'),
+                            );
+
+                            if (parsedValue <= 0 ||
+                                extraWeight < 0 ||
+                                bodyWeight == null ||
+                                bodyWeight <= 0) {
+                              return;
+                            }
+
+                            Navigator.pop(
+                              context,
+                              _SingleSetEffortResult(
+                                actualValue: parsedValue,
+                                rir: tempRir,
+                                extraWeightKg: extraWeight,
+                                bodyWeightKg: bodyWeight,
+                              ),
+                            );
+                          },
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.volcanic,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text('Kaydet'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _completeSet() async {
     if (_completedSets >= _totalSets) {
       _finishWorkout();
       return;
     }
 
+    final targetValue = _targetValueForLevel(widget.exercise.level);
+    final effort = await _askSetEffort(
+      isTimed: _isTimed,
+      defaultTargetValue: targetValue,
+    );
+    if (!mounted || effort == null) {
+      return;
+    }
+
     HapticFeedback.selectionClick();
+    final setEntry = _isTimed
+        ? mli.WorkoutSet(
+            reps: 0,
+            rir: effort.rir,
+            durationInSeconds: effort.actualValue,
+            extraWeightKg: effort.extraWeightKg,
+            bodyWeightKg: effort.bodyWeightKg,
+          )
+        : mli.WorkoutSet(
+            reps: effort.actualValue,
+            rir: effort.rir,
+            extraWeightKg: effort.extraWeightKg,
+            bodyWeightKg: effort.bodyWeightKg,
+          );
+
     setState(() {
+      _lastBodyWeightKg = effort.bodyWeightKg;
+      _recordedSets.add(setEntry);
       _completedSets += 1;
     });
 
@@ -231,28 +489,59 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
     _workTimer?.cancel();
     _restTimer?.cancel();
 
-    final durationMinutes = (_workElapsed.inSeconds / 60).clamp(0.0, 1e9);
-    final difficultyFactor = switch (widget.exercise.difficulty) {
-      DifficultyLevel.easy => 1.0,
-      DifficultyLevel.medium => 1.25,
-      DifficultyLevel.hard => 1.5,
-    };
-    final totalLoad = durationMinutes * 100 * difficultyFactor;
+    final targetValue = _targetValueForLevel(widget.exercise.level);
+    final effectiveSets = List<mli.WorkoutSet>.from(_recordedSets);
 
-    final muscleLoad = <String, double>{};
-    final ratings = widget.exercise.muscleRatings;
-    final ratingSum = ratings.values.fold<int>(0, (sum, item) => sum + item);
-
-    if (ratingSum > 0) {
-      for (final entry in ratings.entries) {
-        muscleLoad[entry.key.name] = totalLoad * (entry.value / ratingSum);
-      }
-    } else if (widget.exercise.targetMuscleGroups.isNotEmpty) {
-      final perMuscle = totalLoad / widget.exercise.targetMuscleGroups.length;
-      for (final muscle in widget.exercise.targetMuscleGroups) {
-        muscleLoad[muscle.name] = perMuscle;
-      }
+    while (effectiveSets.length < _completedSets) {
+      effectiveSets.add(
+        _isTimed
+            ? mli.WorkoutSet(
+                reps: 0,
+                rir: _defaultRir,
+                durationInSeconds: targetValue,
+                extraWeightKg: 0.0,
+                bodyWeightKg: _lastBodyWeightKg,
+              )
+            : mli.WorkoutSet(
+                reps: targetValue,
+                rir: _defaultRir,
+                extraWeightKg: 0.0,
+                bodyWeightKg: _lastBodyWeightKg,
+              ),
+      );
     }
+
+    final resolver = ExerciseMliResolver(catalog: <Exercise>[widget.exercise]);
+    final mliExercise = resolver.build(
+      CustomProgramExercise(
+        exerciseId: widget.exercise.id,
+        exerciseName: widget.exercise.name,
+        sets: _totalSets,
+        value: targetValue,
+        isTimed: _isTimed,
+      ),
+      detail: widget.exercise,
+    );
+
+    final workoutEntries = effectiveSets.isEmpty
+        ? const <mli.ExerciseWorkoutEntry>[]
+        : <mli.ExerciseWorkoutEntry>[
+            mli.ExerciseWorkoutEntry(
+              exercise: mliExercise,
+              sets: effectiveSets,
+            ),
+          ];
+
+    final muscleLoad = calculateWorkoutLoad(workoutEntries);
+    final muscleRir = calculateWorkoutMuscleRir(workoutEntries);
+    final totalLoad = muscleLoad.values.fold<double>(
+      0.0,
+      (sum, val) => sum + val,
+    );
+    final averageRir = effectiveSets.isEmpty
+        ? null
+        : effectiveSets.map(effectiveRir).reduce((a, b) => a + b) /
+              effectiveSets.length;
 
     Navigator.pushNamedAndRemoveUntil(
       context,
@@ -265,6 +554,8 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
         totalSets: _totalSets,
         totalLoad: totalLoad,
         muscleLoad: muscleLoad,
+        muscleRir: muscleRir,
+        averageRir: averageRir,
       ),
     );
   }
@@ -276,7 +567,10 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
   @override
   Widget build(BuildContext context) {
     final setIndex = math.min(_completedSets + 1, _totalSets);
-    final target = _targetRepsForLevel(widget.exercise.level);
+    final target = _targetValueForLevel(widget.exercise.level);
+    final isTimed = _isTimed;
+    final unitTitle = isTimed ? 'Saniye' : 'Tekrar';
+    final unitBadge = isTimed ? 'SANİYE' : 'TEKRAR';
     final isWorkoutDone = _completedSets >= _totalSets;
     final restProgress = _restPresetSeconds == 0
         ? 0.0
@@ -358,7 +652,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
                         restRemainingText: _formatDuration(_restRemaining),
                         restProgress: restProgress,
                         nextSetText:
-                            'Sıradaki: Set $setIndex / $_totalSets · $target Tekrar',
+                            'Sıradaki: Set $setIndex / $_totalSets · $target $unitTitle',
                         onStopRest: _stopRest,
                       ),
                       const SizedBox(height: 18.0),
@@ -418,7 +712,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
                       ],
                       const SizedBox(height: 14.0),
 
-                      // Set ve Tekrar Çipleri
+                      // Set ve Tekrar / Süre Çipleri
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -430,7 +724,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
                           ),
                           const SizedBox(width: 10.0),
                           _TagChip(
-                            text: 'HEDEF: $target TEKRAR',
+                            text: 'HEDEF: $target $unitBadge',
                             textColor: AppColors.iceBlue,
                             background: AppColors.iceBlue.withValues(
                               alpha: 0.16,
@@ -592,6 +886,20 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
       ),
     );
   }
+}
+
+class _SingleSetEffortResult {
+  const _SingleSetEffortResult({
+    required this.actualValue,
+    required this.rir,
+    required this.extraWeightKg,
+    required this.bodyWeightKg,
+  });
+
+  final int actualValue;
+  final int rir;
+  final double extraWeightKg;
+  final double bodyWeightKg;
 }
 
 // ---------------------------------------------------------------------------

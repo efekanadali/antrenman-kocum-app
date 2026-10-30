@@ -1,6 +1,17 @@
 // lib/presentation/screens/training_day_session_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:calisthenics_app/core/utils/exercise_unit.dart';
+import 'package:calisthenics_app/domain/models/custom_program.dart';
+import 'package:calisthenics_app/domain/models/exercise.dart';
+import 'package:calisthenics_app/domain/models/mli_models.dart' as mli;
+import 'package:calisthenics_app/domain/services/exercise_mli_resolver.dart';
+import 'package:calisthenics_app/domain/services/mli_calculator.dart';
+import 'package:calisthenics_app/domain/services/recovery_calculator.dart';
+import 'package:calisthenics_app/presentation/providers/exercise_list_provider.dart';
+import 'package:calisthenics_app/presentation/routes/app_routes.dart';
+import 'package:calisthenics_app/presentation/screens/workout_summary_screen.dart';
 
 class TrainingDaySessionArgs {
   const TrainingDaySessionArgs({
@@ -14,23 +25,28 @@ class TrainingDaySessionArgs {
   final Map<String, dynamic> day;
 }
 
-class TrainingDaySessionScreen extends StatefulWidget {
+class TrainingDaySessionScreen extends ConsumerStatefulWidget {
   const TrainingDaySessionScreen({super.key, required this.args});
 
   final TrainingDaySessionArgs args;
 
   @override
-  State<TrainingDaySessionScreen> createState() =>
+  ConsumerState<TrainingDaySessionScreen> createState() =>
       _TrainingDaySessionScreenState();
 }
 
-class _TrainingDaySessionScreenState extends State<TrainingDaySessionScreen> {
+class _TrainingDaySessionScreenState
+    extends ConsumerState<TrainingDaySessionScreen> {
+  static const int _defaultRir = 2;
+
   late final List<_SessionStep> _steps;
   late final List<bool> _completed;
+  late final DateTime _startedAt;
 
   @override
   void initState() {
     super.initState();
+    _startedAt = DateTime.now();
     _steps = _buildSteps(widget.args.day);
     _completed = List<bool>.filled(_steps.length, false);
   }
@@ -61,6 +77,7 @@ class _TrainingDaySessionScreenState extends State<TrainingDaySessionScreen> {
           title: item["exercise"] as String,
           badge: 'Ana Antrenman',
           detail: '$detail\n$progression\n$regression',
+          workoutItem: item,
         ),
       );
     }
@@ -81,8 +98,135 @@ class _TrainingDaySessionScreenState extends State<TrainingDaySessionScreen> {
     });
   }
 
+  String _resolvePresetExerciseId(String rawName) {
+    final normalized = rawName.trim().toLowerCase();
+    const mapping = <String, String>{
+      'diz ustu sinav': 'knee_push_up',
+      'sandalyeye triceps dip': 'dips_parallel_bar',
+      'plank': 'plank',
+      'vucut agirligi squat': 'standard_squat',
+      'geri lunge': 'lunge',
+      'dead bug': 'hollow_body_hold',
+      'ters sinav (row)': 'australian_row',
+      'superman': 'glute_bridge',
+      'yan plank': 'side_plank',
+      'bench press': 'standard_push_up',
+      'incline dumbbell press': 'decline_push_up',
+      'cable triceps pushdown': 'diamond_push_up',
+      'leg press': 'standard_squat',
+      'romanian deadlift': 'nordic_curl',
+      'hanging knee raise': 'hollow_body_hold',
+      'lat pulldown': 'standard_pull_up',
+      'seated cable row': 'australian_row',
+      'face pull': 'australian_row',
+    };
+    return mapping[normalized] ?? normalized.replaceAll(RegExp(r'[^a-z0-9]+'), '_');
+  }
+
+  int _parseTargetValue(String rawRepsOrTime, {required bool isTimed}) {
+    final matches = RegExp(r'\d+').allMatches(rawRepsOrTime).toList();
+    if (matches.isEmpty) {
+      return isTimed ? 30 : 10;
+    }
+    final parsed = int.tryParse(matches.last.group(0) ?? '');
+    if (parsed == null || parsed <= 0) {
+      return isTimed ? 30 : 10;
+    }
+    return parsed;
+  }
+
+  void _completeDaySession() {
+    final day = widget.args.day;
+    final catalog =
+        ref.read(exerciseListProvider).valueOrNull ?? const <Exercise>[];
+    final resolver = ExerciseMliResolver(catalog: catalog);
+
+    final entries = <mli.ExerciseWorkoutEntry>[];
+    var totalSets = 0;
+    var setsCompleted = 0;
+
+    for (var i = 0; i < _steps.length; i++) {
+      final workoutItem = _steps[i].workoutItem;
+      if (workoutItem == null) {
+        continue;
+      }
+
+      final exerciseName = (workoutItem['exercise'] as String?) ?? _steps[i].title;
+      final setsCount = int.tryParse(workoutItem['sets']?.toString() ?? '') ?? 3;
+      final rawRepsOrTime = workoutItem['reps_or_time']?.toString() ?? '';
+      final exerciseId = _resolvePresetExerciseId(exerciseName);
+      final isTimed =
+          rawRepsOrTime.toLowerCase().contains('sn') ||
+          isTimedExercise(exerciseName: exerciseName, exerciseId: exerciseId);
+      final targetValue = _parseTargetValue(rawRepsOrTime, isTimed: isTimed);
+
+      totalSets += setsCount;
+      if (!_completed[i]) {
+        continue;
+      }
+      setsCompleted += setsCount;
+
+      final customExercise = CustomProgramExercise(
+        exerciseId: exerciseId,
+        exerciseName: exerciseName,
+        sets: setsCount,
+        value: targetValue,
+        isTimed: isTimed,
+      );
+      final mliExercise = resolver.build(customExercise);
+
+      final workoutSets = List<mli.WorkoutSet>.generate(
+        setsCount,
+        (_) => isTimed
+            ? mli.WorkoutSet(
+                reps: 0,
+                rir: _defaultRir,
+                durationInSeconds: targetValue,
+              )
+            : mli.WorkoutSet(
+                reps: targetValue,
+                rir: _defaultRir,
+              ),
+      );
+
+      entries.add(
+        mli.ExerciseWorkoutEntry(
+          exercise: mliExercise,
+          sets: workoutSets,
+        ),
+      );
+    }
+
+    final muscleLoad = calculateWorkoutLoad(entries);
+    final muscleRir = calculateWorkoutMuscleRir(entries);
+    final totalLoad = muscleLoad.values.fold<double>(
+      0.0,
+      (sum, val) => sum + val,
+    );
+    final elapsed = DateTime.now().difference(_startedAt);
+
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      AppRoutes.workoutSummary,
+      (route) => false,
+      arguments: WorkoutSummaryArgs(
+        exerciseName: '${day["name"]} - ${day["focus"]}',
+        totalTime: elapsed,
+        setsCompleted: setsCompleted,
+        totalSets: totalSets,
+        totalLoad: totalLoad,
+        muscleLoad: muscleLoad,
+        muscleRir: muscleRir,
+        averageRir: kDefaultRir,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Egzersiz kataloğunu seans boyunca önbellekte hazır tut
+    ref.watch(exerciseListProvider);
+
     final colorScheme = Theme.of(context).colorScheme;
     final day = widget.args.day;
     final completedCount = _completed.where((value) => value).length;
@@ -117,10 +261,10 @@ class _TrainingDaySessionScreenState extends State<TrainingDaySessionScreen> {
           padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
           child: FilledButton.icon(
             onPressed: completedCount == _steps.length
-                ? () => Navigator.pop(context)
+                ? _completeDaySession
                 : null,
             icon: const Icon(Icons.check_circle_rounded),
-            label: const Text('Antrenmani Tamamla'),
+            label: const Text('Günü Tamamla'),
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 14.0),
               backgroundColor: colorScheme.primary,
@@ -361,9 +505,11 @@ class _SessionStep {
     required this.title,
     required this.badge,
     this.detail,
+    this.workoutItem,
   });
 
   final String title;
   final String badge;
   final String? detail;
+  final Map<String, dynamic>? workoutItem;
 }

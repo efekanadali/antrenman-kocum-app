@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:calisthenics_app/core/utils/exercise_unit.dart';
 import 'package:calisthenics_app/core/local_storage/workout_summary_storage.dart';
+import 'package:calisthenics_app/domain/models/workout_session_summary.dart';
+import 'package:calisthenics_app/presentation/providers/workout_history_provider.dart';
 import 'package:calisthenics_app/presentation/screens/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -68,7 +70,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     'Front Lever Hold',
   ];
 
-  late Future<List<WorkoutSummaryEntry>> _summaryFuture;
   double _heightCm = 175.0;
   double _weightKg = 70.0;
   double _goalWeightKg = 68.0;
@@ -83,9 +84,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _summaryFuture = _loadSummaries();
     _loadBodyMetrics();
     _syncUserStreakAndStats();
+  }
+
+  List<WorkoutSummaryEntry> _mapSessionsToSummaries(
+    List<WorkoutSessionSummary> sessions,
+  ) {
+    return sessions
+        .map(
+          (session) => WorkoutSummaryEntry(
+            date: session.completedAt,
+            totalLoad: session.totalMliWorkload,
+            muscleLoad: session.muscleWorkloads,
+            duration: session.durationSeconds,
+          ),
+        )
+        .toList();
   }
 
   Future<void> _syncUserStreakAndStats() async {
@@ -116,19 +131,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
-  Future<List<WorkoutSummaryEntry>> _loadSummaries() async {
-    final storage = WorkoutSummaryStorage();
-    final summaries = await storage.loadSummaries();
-    if (summaries.isNotEmpty) {
-      return summaries;
-    }
-    return buildMockWorkoutSummaries();
-  }
-
   Future<void> _refreshSummaries() async {
-    setState(() {
-      _summaryFuture = _loadSummaries();
-    });
+    ref.invalidate(workoutHistoryProvider);
     await _syncUserStreakAndStats();
   }
 
@@ -173,6 +177,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     } else {
       await prefs.remove(_birthDateKey);
     }
+
+    try {
+      await ref.read(firestoreServiceProvider).syncUserProfile({
+        'heightCm': _heightCm,
+        'weightKg': _weightKg,
+        'goalWeightKg': _goalWeightKg,
+        'targetWorkoutsPerWeek': _targetWorkoutsPerWeek,
+        'gender': _gender,
+        'birthDate': _birthDate?.toIso8601String(),
+      });
+    } catch (_) {
+      // Ağ veya Firestore hatasında yerel veriler korunur, UI akışı kesilmez.
+    }
   }
 
   Future<void> _savePersonalRecords() async {
@@ -210,215 +227,210 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   borderRadius: BorderRadius.circular(16.0),
                   border: Border.all(color: _border, width: 1.0),
                 ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Kisisel Rekor Ekle',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: _textHigh,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 12.0),
+                    DropdownButtonFormField<String>(
+                      initialValue: selectedExercise,
+                      dropdownColor: _cardSurfaceSoft,
+                      decoration: _dialogInputDecoration(label: 'Hareket'),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.copyWith(color: _textHigh),
+                      items: _recordExerciseOptions
+                          .map(
+                            (exercise) => DropdownMenuItem<String>(
+                              value: exercise,
+                              child: Text(exercise),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) {
+                        if (value == null) {
+                          return;
+                        }
+                        setDialogState(() {
+                          selectedExercise = value;
+                          selectedIsTimed = isTimedExercise(
+                            exerciseName: selectedExercise,
+                          );
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 10.0),
+                    TextField(
+                      controller: repsController,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: false,
+                      ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(3),
+                      ],
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.copyWith(color: _textHigh),
+                      decoration: _dialogInputDecoration(
+                        label: selectedIsTimed
+                            ? 'Rekor (saniye)'
+                            : 'Rekor (tekrar)',
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+                    SwitchListTile.adaptive(
+                      value: hasExtraWeight,
+                      activeThumbColor: _accentBlue,
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        'Ekstra agirlik var',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: _textHigh,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      onChanged: (value) {
+                        setDialogState(() {
+                          hasExtraWeight = value;
+                          if (!hasExtraWeight) {
+                            extraWeightController.clear();
+                          }
+                        });
+                      },
+                    ),
+                    if (hasExtraWeight) ...[
+                      TextField(
+                        controller: extraWeightController,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(5),
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r'^\d{0,3}([\.,]\d{0,1})?$'),
+                          ),
+                        ],
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(color: _textHigh),
+                        decoration: _dialogInputDecoration(
+                          label: 'Ekstra agirlik (kg)',
+                        ),
+                      ),
+                    ],
+                    if (errorText != null) ...[
+                      const SizedBox(height: 8.0),
+                      Text(
+                        errorText!,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: const Color(0xFFFF8E8E),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 12.0),
+                    Row(
                       children: [
-                        Text(
-                          'Kisisel Rekor Ekle',
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(
-                                color: _textHigh,
-                                fontWeight: FontWeight.w700,
-                              ),
-                        ),
-                        const SizedBox(height: 12.0),
-                        DropdownButtonFormField<String>(
-                          initialValue: selectedExercise,
-                          dropdownColor: _cardSurfaceSoft,
-                          decoration: _dialogInputDecoration(label: 'Hareket'),
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodyMedium?.copyWith(color: _textHigh),
-                          items: _recordExerciseOptions
-                              .map(
-                                (exercise) => DropdownMenuItem<String>(
-                                  value: exercise,
-                                  child: Text(exercise),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (value) {
-                            if (value == null) {
-                              return;
-                            }
-                            setDialogState(() {
-                              selectedExercise = value;
-                              selectedIsTimed = isTimedExercise(
-                                exerciseName: selectedExercise,
-                              );
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 10.0),
-                        TextField(
-                          controller: repsController,
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: false,
-                          ),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(3),
-                          ],
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodyMedium?.copyWith(color: _textHigh),
-                          decoration: _dialogInputDecoration(
-                            label: selectedIsTimed
-                                ? 'Rekor (saniye)'
-                                : 'Rekor (tekrar)',
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: _textMid,
+                              side: const BorderSide(color: _border),
+                            ),
+                            child: const Text('İptal'),
                           ),
                         ),
-                        const SizedBox(height: 8.0),
-                        SwitchListTile.adaptive(
-                          value: hasExtraWeight,
-                          activeThumbColor: _accentBlue,
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(
-                            'Ekstra agirlik var',
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(
-                                  color: _textHigh,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                          ),
-                          onChanged: (value) {
-                            setDialogState(() {
-                              hasExtraWeight = value;
-                              if (!hasExtraWeight) {
-                                extraWeightController.clear();
+                        const SizedBox(width: 10.0),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              final repsText = repsController.text.trim();
+                              final extraWeightText = extraWeightController.text
+                                  .trim()
+                                  .replaceAll(',', '.');
+                              final reps = int.tryParse(repsText);
+                              final extraWeight =
+                                  hasExtraWeight && extraWeightText.isNotEmpty
+                                  ? double.tryParse(extraWeightText)
+                                  : null;
+
+                              if (reps == null) {
+                                setDialogState(() {
+                                  errorText = selectedIsTimed
+                                      ? 'Rekor suresini sadece sayi olarak gir.'
+                                      : 'Rekor tekrarini sadece sayi olarak gir.';
+                                });
+                                return;
                               }
-                            });
-                          },
-                        ),
-                        if (hasExtraWeight) ...[
-                          TextField(
-                            controller: extraWeightController,
-                            keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true,
+
+                              if (reps < _minRecordValue ||
+                                  reps > _maxRecordValue) {
+                                setDialogState(() {
+                                  errorText = selectedIsTimed
+                                      ? 'Rekor suresi $_minRecordValue-$_maxRecordValue saniye araliginda olmali.'
+                                      : 'Rekor tekrari $_minRecordValue-$_maxRecordValue araliginda olmali.';
+                                });
+                                return;
+                              }
+
+                              if (hasExtraWeight && extraWeight == null) {
+                                setDialogState(() {
+                                  errorText =
+                                      'Ekstra agirlik degerini girmelisin (ornek: 12.5).';
+                                });
+                                return;
+                              }
+
+                              if (hasExtraWeight &&
+                                  (extraWeight! < _minExtraWeightKg ||
+                                      extraWeight > _maxExtraWeightKg)) {
+                                setDialogState(() {
+                                  errorText =
+                                      'Ekstra agirlik $_minExtraWeightKg-$_maxExtraWeightKg kg araliginda olmali.';
+                                });
+                                return;
+                              }
+
+                              Navigator.of(context).pop(
+                                PersonalRecordEntry(
+                                  exerciseName: selectedExercise,
+                                  recordValue: reps,
+                                  isTimed: selectedIsTimed,
+                                  hasExtraWeight: hasExtraWeight,
+                                  extraWeightKg: hasExtraWeight
+                                      ? double.parse(
+                                          extraWeight!.toStringAsFixed(1),
+                                        )
+                                      : null,
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _accentPurple,
+                              foregroundColor: _textHigh,
                             ),
-                            inputFormatters: [
-                              LengthLimitingTextInputFormatter(5),
-                              FilteringTextInputFormatter.allow(
-                                RegExp(r'^\d{0,3}([\.,]\d{0,1})?$'),
-                              ),
-                            ],
-                            style: Theme.of(
-                              context,
-                            ).textTheme.bodyMedium?.copyWith(color: _textHigh),
-                            decoration: _dialogInputDecoration(
-                              label: 'Ekstra agirlik (kg)',
-                            ),
+                            child: const Text('Kaydet'),
                           ),
-                        ],
-                        if (errorText != null) ...[
-                          const SizedBox(height: 8.0),
-                          Text(
-                            errorText!,
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(
-                                  color: const Color(0xFFFF8E8E),
-                                  fontWeight: FontWeight.w600,
-                                ),
-                          ),
-                        ],
-                        const SizedBox(height: 12.0),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: _textMid,
-                                  side: const BorderSide(color: _border),
-                                ),
-                                child: const Text('İptal'),
-                              ),
-                            ),
-                            const SizedBox(width: 10.0),
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  final repsText = repsController.text.trim();
-                                  final extraWeightText = extraWeightController
-                                      .text
-                                      .trim()
-                                      .replaceAll(',', '.');
-                                  final reps = int.tryParse(repsText);
-                                  final extraWeight =
-                                      hasExtraWeight &&
-                                          extraWeightText.isNotEmpty
-                                      ? double.tryParse(extraWeightText)
-                                      : null;
-
-                                  if (reps == null) {
-                                    setDialogState(() {
-                                      errorText = selectedIsTimed
-                                          ? 'Rekor suresini sadece sayi olarak gir.'
-                                          : 'Rekor tekrarini sadece sayi olarak gir.';
-                                    });
-                                    return;
-                                  }
-
-                                  if (reps < _minRecordValue ||
-                                      reps > _maxRecordValue) {
-                                    setDialogState(() {
-                                      errorText = selectedIsTimed
-                                          ? 'Rekor suresi $_minRecordValue-$_maxRecordValue saniye araliginda olmali.'
-                                          : 'Rekor tekrari $_minRecordValue-$_maxRecordValue araliginda olmali.';
-                                    });
-                                    return;
-                                  }
-
-                                  if (hasExtraWeight && extraWeight == null) {
-                                    setDialogState(() {
-                                      errorText =
-                                          'Ekstra agirlik degerini girmelisin (ornek: 12.5).';
-                                    });
-                                    return;
-                                  }
-
-                                  if (hasExtraWeight &&
-                                      (extraWeight! < _minExtraWeightKg ||
-                                          extraWeight > _maxExtraWeightKg)) {
-                                    setDialogState(() {
-                                      errorText =
-                                          'Ekstra agirlik $_minExtraWeightKg-$_maxExtraWeightKg kg araliginda olmali.';
-                                    });
-                                    return;
-                                  }
-
-                                  Navigator.of(context).pop(
-                                    PersonalRecordEntry(
-                                      exerciseName: selectedExercise,
-                                      recordValue: reps,
-                                      isTimed: selectedIsTimed,
-                                      hasExtraWeight: hasExtraWeight,
-                                      extraWeightKg: hasExtraWeight
-                                          ? double.parse(
-                                              extraWeight!.toStringAsFixed(1),
-                                            )
-                                          : null,
-                                    ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: _accentPurple,
-                                  foregroundColor: _textHigh,
-                                ),
-                                child: const Text('Kaydet'),
-                              ),
-                            ),
-                          ],
                         ),
                       ],
                     ),
-                  ),
-                );
-              },
+                  ],
+                ),
+              ),
             );
           },
         );
+      },
+    );
 
     if (result == null) {
       return;
@@ -553,17 +565,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     groupValue: _gender,
                     onChanged: (value) => Navigator.of(context).pop(value),
                     child: RadioListTile<String>(
-                    value: item,
-
-                    dense: true,
-                    contentPadding: EdgeInsets.zero,
-                    activeColor: _accentPurple,
-                    title: Text(
-                      item,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodyMedium?.copyWith(color: _textHigh),
-                    ),
+                      value: item,
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                      activeColor: _accentPurple,
+                      title: Text(
+                        item,
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(color: _textHigh),
+                      ),
                     ),
                   ),
                 ),
@@ -702,11 +713,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   children: [
                     Text(
                       title,
-                      style: Theme.of(context).textTheme.titleMedium
-                          ?.copyWith(
-                            color: _textHigh,
-                            fontWeight: FontWeight.w600,
-                          ),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: _textHigh,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 12.0),
                     TextField(
@@ -715,11 +725,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                       ),
-                      style: Theme.of(context).textTheme.bodyLarge
-                          ?.copyWith(
-                            color: _textHigh,
-                            fontWeight: FontWeight.w600,
-                          ),
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: _textHigh,
+                        fontWeight: FontWeight.w600,
+                      ),
                       decoration: InputDecoration(
                         hintText: unit,
                         hintStyle: Theme.of(
@@ -765,44 +774,44 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             child: const Text('İptal'),
                           ),
                         ),
-                            const SizedBox(width: 10.0),
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  final parsed = double.tryParse(
-                                    controller.text.trim().replaceAll(',', '.'),
-                                  );
-                                  if (parsed == null || parsed <= 0) {
-                                    setDialogState(() {
-                                      errorText = 'Gecerli bir deger gir.';
-                                    });
-                                    return;
-                                  }
-                                  Navigator.of(context).pop(parsed);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: _accentPurple,
-                                  foregroundColor: _textHigh,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12.0,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
-                                ),
-                                child: const Text('Kaydet'),
+                        const SizedBox(width: 10.0),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              final parsed = double.tryParse(
+                                controller.text.trim().replaceAll(',', '.'),
+                              );
+                              if (parsed == null || parsed <= 0) {
+                                setDialogState(() {
+                                  errorText = 'Gecerli bir deger gir.';
+                                });
+                                return;
+                              }
+                              Navigator.of(context).pop(parsed);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _accentPurple,
+                              foregroundColor: _textHigh,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12.0,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.0),
                               ),
                             ),
-                          ],
+                            child: const Text('Kaydet'),
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                );
-              },
+                  ],
+                ),
+              ),
             );
           },
         );
+      },
+    );
 
     if (value == null) {
       return;
@@ -847,22 +856,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   children: [
                     Text(
                       title,
-                      style: Theme.of(context).textTheme.titleMedium
-                          ?.copyWith(
-                            color: _textHigh,
-                            fontWeight: FontWeight.w600,
-                          ),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: _textHigh,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 12.0),
                     TextField(
                       controller: controller,
                       autofocus: true,
                       keyboardType: TextInputType.number,
-                      style: Theme.of(context).textTheme.bodyLarge
-                          ?.copyWith(
-                            color: _textHigh,
-                            fontWeight: FontWeight.w600,
-                          ),
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: _textHigh,
+                        fontWeight: FontWeight.w600,
+                      ),
                       decoration: InputDecoration(
                         hintText: unit,
                         hintStyle: Theme.of(
@@ -908,44 +915,44 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             child: const Text('İptal'),
                           ),
                         ),
-                            const SizedBox(width: 10.0),
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  final parsed = int.tryParse(
-                                    controller.text.trim(),
-                                  );
-                                  if (parsed == null || parsed <= 0) {
-                                    setDialogState(() {
-                                      errorText = 'Gecerli bir deger gir.';
-                                    });
-                                    return;
-                                  }
-                                  Navigator.of(context).pop(parsed);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: _accentPurple,
-                                  foregroundColor: _textHigh,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12.0,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
-                                ),
-                                child: const Text('Kaydet'),
+                        const SizedBox(width: 10.0),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              final parsed = int.tryParse(
+                                controller.text.trim(),
+                              );
+                              if (parsed == null || parsed <= 0) {
+                                setDialogState(() {
+                                  errorText = 'Gecerli bir deger gir.';
+                                });
+                                return;
+                              }
+                              Navigator.of(context).pop(parsed);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _accentPurple,
+                              foregroundColor: _textHigh,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12.0,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.0),
                               ),
                             ),
-                          ],
+                            child: const Text('Kaydet'),
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                );
-              },
+                  ],
+                ),
+              ),
             );
           },
         );
+      },
+    );
 
     if (value == null) {
       return;
@@ -992,7 +999,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       }
     }
     if (message != null && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
@@ -1036,9 +1045,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       );
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Giris basarisiz oldu.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Giris basarisiz oldu.')));
     }
   }
 
@@ -1048,154 +1057,170 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ref.watch(authUserProvider).valueOrNull ??
         FirebaseAuth.instance.currentUser;
     final isGoogleLinked =
-        authUser?.providerData.any((p) => p.providerId == 'google.com') ?? false;
-    final headerName = (isGoogleLinked &&
-            (authUser?.displayName?.trim().isNotEmpty ?? false))
+        authUser?.providerData.any((p) => p.providerId == 'google.com') ??
+        false;
+    final headerName =
+        (isGoogleLinked && (authUser?.displayName?.trim().isNotEmpty ?? false))
         ? authUser!.displayName!.trim()
         : 'Calisthenics Athlete';
+
+    final historyAsync = ref.watch(workoutHistoryProvider);
+
     return Scaffold(
       backgroundColor: _bgBottom,
       body: SafeArea(
-        child: FutureBuilder<List<WorkoutSummaryEntry>>(
-              future: _summaryFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+        child: historyAsync.isLoading && !historyAsync.hasValue
+            ? const Center(child: CircularProgressIndicator())
+            : Builder(
+                builder: (context) {
+                  final sessions =
+                      historyAsync.valueOrNull ??
+                      const <WorkoutSessionSummary>[];
+                  final summaries = _mapSessionsToSummaries(sessions);
 
-                final summaries =
-                    snapshot.data ?? const <WorkoutSummaryEntry>[];
-                if (summaries.isEmpty) {
-                  return Center(
-                    child: Text(
-                      'Henuz antrenman verisi yok.',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodyMedium?.copyWith(color: _textMid),
-                    ),
+                  final totalWorkouts = calculateTotalWorkouts(summaries);
+                  final lastWorkoutDate = summaries.isEmpty
+                      ? null
+                      : calculateLastWorkoutDate(summaries);
+                  final lastWorkoutDateLabel = lastWorkoutDate != null
+                      ? formatDate(lastWorkoutDate)
+                      : 'Henüz yok';
+                  final lastWorkoutRelativeLabel = lastWorkoutDate != null
+                      ? relativeDayLabel(lastWorkoutDate)
+                      : '-';
+                  final trend = calculateSevenDayTrend(summaries);
+                  final muscleDistribution = calculateMuscleDistribution(
+                    summaries,
                   );
-                }
+                  final balanceText = summaries.isEmpty
+                      ? 'Henüz yeterli antrenman verisi yok.'
+                      : calculateBalanceText(muscleDistribution);
 
-                final totalWorkouts = calculateTotalWorkouts(summaries);
-                final lastWorkoutDate = calculateLastWorkoutDate(summaries);
-                final lastWorkoutRelativeLabel = relativeDayLabel(
-                  lastWorkoutDate,
-                );
-                final trend = calculateSevenDayTrend(summaries);
-                final muscleDistribution = calculateMuscleDistribution(
-                  summaries,
-                );
-                final balanceText = calculateBalanceText(muscleDistribution);
-                return RefreshIndicator(
-                  onRefresh: _refreshSummaries,
-                  child: ListView(
-                    padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 24.0),
-                    children: [
-                      _UserHeader(
-                        username: headerName,
-                        email: isGoogleLinked ? authUser?.email : null,
-                        photoUrl: isGoogleLinked ? authUser?.photoURL : null,
+                  return RefreshIndicator(
+                    onRefresh: _refreshSummaries,
+                    child: ListView(
+                      padding: const EdgeInsets.fromLTRB(
+                        20.0,
+                        20.0,
+                        20.0,
+                        24.0,
                       ),
-                      const SizedBox(height: 16.0),
-                      _GoogleLinkCard(
-                        isLinked: isGoogleLinked,
-                        isLoading: _isLinkingGoogle,
-                        onPressed: _linkGoogleAccount,
-                      ),
-                      const SizedBox(height: 12.0),
-                      BodyMetricsCard(
-                        heightCm: _heightCm,
-                        weightKg: _weightKg,
-                        gender: _gender,
-                        birthDateLabel: _birthDate == null
-                            ? 'Secilmedi'
-                            : '${formatDate(_birthDate!)} (${calculateAge(_birthDate!)} yas)',
-                        onEditHeight: () => _editMetric(
-                          title: 'Boy (cm)',
-                          unit: 'cm',
-                          currentValue: _heightCm,
-                          onApply: (value) => _heightCm = value,
+                      children: [
+                        _UserHeader(
+                          username: headerName,
+                          email: isGoogleLinked ? authUser?.email : null,
+                          photoUrl: isGoogleLinked ? authUser?.photoURL : null,
                         ),
-                        onEditWeight: () => _editMetric(
-                          title: 'Kilo (kg)',
-                          unit: 'kg',
-                          currentValue: _weightKg,
-                          onApply: (value) => _weightKg = value,
-                        ),
-                        onEditGender: _editGender,
-                        onEditBirthDate: _editBirthDate,
-                      ),
-                      const SizedBox(height: 12.0),
-                      GoalsCard(
-                        goalWeightKg: _goalWeightKg,
-                        targetWorkoutsPerWeek: _targetWorkoutsPerWeek,
-                        onEditGoalWeight: () => _editMetric(
-                          title: 'Hedef Kilo (kg)',
-                          unit: 'kg',
-                          currentValue: _goalWeightKg,
-                          onApply: (value) => _goalWeightKg = value,
-                        ),
-                        onEditTargetWorkouts: () => _editIntMetric(
-                          title: 'Haftalik Hedef Antrenman',
-                          unit: 'adet',
-                          currentValue: _targetWorkoutsPerWeek,
-                          onApply: (value) => _targetWorkoutsPerWeek = value,
-                        ),
-                      ),
-                      const SizedBox(height: 12.0),
-                      StatsCard(
-                        totalWorkouts: _syncedTotalWorkouts > totalWorkouts
-                            ? _syncedTotalWorkouts
-                            : totalWorkouts,
-                        streak: _syncedStreak > calculateWorkoutStreak(summaries)
-                            ? _syncedStreak
-                            : calculateWorkoutStreak(summaries),
-                        lastWorkoutDate: formatDate(lastWorkoutDate),
-                        lastWorkoutRelativeLabel: lastWorkoutRelativeLabel,
-                        onStreakTap: () {
-                          Navigator.pushNamed(context, AppRoutes.streakDetails);
-                        },
-                        onHistoryTap: () {
-                          Navigator.pushNamed(context, AppRoutes.workoutHistory);
-                        },
-                      ),
-                      const SizedBox(height: 12.0),
-                      _WorkoutHistoryProfileCard(
-                        totalWorkouts: _syncedTotalWorkouts > totalWorkouts
-                            ? _syncedTotalWorkouts
-                            : totalWorkouts,
-                        onTap: () {
-                          Navigator.pushNamed(context, AppRoutes.workoutHistory);
-                        },
-                      ),
-                      const SizedBox(height: 12.0),
-                      const MuscleRecoveryCard(),
-                      const SizedBox(height: 12.0),
-                      TrendCard(
-                        currentSevenDayLoad: trend.current,
-                        previousSevenDayLoad: trend.previous,
-                      ),
-                      const SizedBox(height: 12.0),
-                      if (muscleDistribution.isNotEmpty) ...[
-                        MuscleDistributionCard(
-                          distribution: muscleDistribution,
+                        const SizedBox(height: 16.0),
+                        _GoogleLinkCard(
+                          isLinked: isGoogleLinked,
+                          isLoading: _isLinkingGoogle,
+                          onPressed: _linkGoogleAccount,
                         ),
                         const SizedBox(height: 12.0),
+                        BodyMetricsCard(
+                          heightCm: _heightCm,
+                          weightKg: _weightKg,
+                          gender: _gender,
+                          birthDateLabel: _birthDate == null
+                              ? 'Secilmedi'
+                              : '${formatDate(_birthDate!)} (${calculateAge(_birthDate!)} yas)',
+                          onEditHeight: () => _editMetric(
+                            title: 'Boy (cm)',
+                            unit: 'cm',
+                            currentValue: _heightCm,
+                            onApply: (value) => _heightCm = value,
+                          ),
+                          onEditWeight: () => _editMetric(
+                            title: 'Kilo (kg)',
+                            unit: 'kg',
+                            currentValue: _weightKg,
+                            onApply: (value) => _weightKg = value,
+                          ),
+                          onEditGender: _editGender,
+                          onEditBirthDate: _editBirthDate,
+                        ),
+                        const SizedBox(height: 12.0),
+                        GoalsCard(
+                          goalWeightKg: _goalWeightKg,
+                          targetWorkoutsPerWeek: _targetWorkoutsPerWeek,
+                          onEditGoalWeight: () => _editMetric(
+                            title: 'Hedef Kilo (kg)',
+                            unit: 'kg',
+                            currentValue: _goalWeightKg,
+                            onApply: (value) => _goalWeightKg = value,
+                          ),
+                          onEditTargetWorkouts: () => _editIntMetric(
+                            title: 'Haftalik Hedef Antrenman',
+                            unit: 'adet',
+                            currentValue: _targetWorkoutsPerWeek,
+                            onApply: (value) => _targetWorkoutsPerWeek = value,
+                          ),
+                        ),
+                        const SizedBox(height: 12.0),
+                        StatsCard(
+                          totalWorkouts: _syncedTotalWorkouts > totalWorkouts
+                              ? _syncedTotalWorkouts
+                              : totalWorkouts,
+                          streak:
+                              _syncedStreak > calculateWorkoutStreak(summaries)
+                              ? _syncedStreak
+                              : calculateWorkoutStreak(summaries),
+                          lastWorkoutDate: lastWorkoutDateLabel,
+                          lastWorkoutRelativeLabel: lastWorkoutRelativeLabel,
+                          onStreakTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.streakDetails,
+                            );
+                          },
+                          onHistoryTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.workoutHistory,
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 12.0),
+                        _WorkoutHistoryProfileCard(
+                          totalWorkouts: _syncedTotalWorkouts > totalWorkouts
+                              ? _syncedTotalWorkouts
+                              : totalWorkouts,
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.workoutHistory,
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 12.0),
+                        const MuscleRecoveryCard(),
+                        const SizedBox(height: 12.0),
+                        TrendCard(
+                          currentSevenDayLoad: trend.current,
+                          previousSevenDayLoad: trend.previous,
+                        ),
+                        const SizedBox(height: 12.0),
+                        if (muscleDistribution.isNotEmpty) ...[
+                          MuscleDistributionCard(
+                            distribution: muscleDistribution,
+                          ),
+                          const SizedBox(height: 12.0),
+                        ],
+                        BalanceCard(message: balanceText),
+                        const SizedBox(height: 12.0),
+                        PersonalRecordsCard(
+                          records: _personalRecords,
+                          onAddRecord: _showAddPersonalRecordDialog,
+                          onDeleteRecord: _deletePersonalRecord,
+                        ),
+                        const SizedBox(height: 24.0),
                       ],
-                      BalanceCard(message: balanceText),
-                      const SizedBox(height: 12.0),
-                      PersonalRecordsCard(
-                        records: _personalRecords,
-                        onAddRecord: _showAddPersonalRecordDialog,
-                        onDeleteRecord: _deletePersonalRecord,
-                      ),
-                      const SizedBox(height: 24.0),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
+                    ),
+                  );
+                },
+              ),
+      ),
       bottomNavigationBar: widget.showBottomNav
           ? const AppBottomNav(selectedIndex: 3)
           : null,
@@ -1366,7 +1391,10 @@ class _GoogleLinkCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(14.0),
           onTap: disabled ? null : onPressed,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 13.0, horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(
+              vertical: 13.0,
+              horizontal: 16.0,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -1523,15 +1551,19 @@ class StatsCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                     onTap: onStreakTap,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       child: Row(
                         children: [
                           Text(
                             'Detaylar',
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: _ProfileScreenState._accentBlue,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: Theme.of(context).textTheme.labelSmall
+                                ?.copyWith(
+                                  color: _ProfileScreenState._accentBlue,
+                                  fontWeight: FontWeight.w600,
+                                ),
                           ),
                           const SizedBox(width: 2),
                           const Icon(
@@ -1550,7 +1582,9 @@ class StatsCard extends StatelessWidget {
               label: 'Mevcut Seri (Streak)',
               value: '$streak gün 🔥',
               labelColor: _ProfileScreenState._textMid,
-              valueColor: streak > 0 ? const Color(0xFFFF9800) : _ProfileScreenState._textHigh,
+              valueColor: streak > 0
+                  ? const Color(0xFFFF9800)
+                  : _ProfileScreenState._textHigh,
             ),
             InkWell(
               borderRadius: BorderRadius.circular(8),
@@ -1564,7 +1598,9 @@ class StatsCard extends StatelessWidget {
             ),
             _StatRow(
               label: 'Son antrenman',
-              value: '$lastWorkoutDate ($lastWorkoutRelativeLabel)',
+              value: lastWorkoutRelativeLabel == '-'
+                  ? lastWorkoutDate
+                  : '$lastWorkoutDate ($lastWorkoutRelativeLabel)',
               labelColor: _ProfileScreenState._textMid,
               valueColor: _ProfileScreenState._textHigh,
             ),
@@ -1594,7 +1630,10 @@ class _WorkoutHistoryProfileCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(22.0),
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 14.0,
+            ),
             child: Row(
               children: [
                 Container(
@@ -1617,9 +1656,9 @@ class _WorkoutHistoryProfileCard extends StatelessWidget {
                       Text(
                         'Antrenman Geçmişi',
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              color: _ProfileScreenState._textHigh,
-                              fontWeight: FontWeight.w700,
-                            ),
+                          color: _ProfileScreenState._textHigh,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                       const SizedBox(height: 2),
                       Text(
@@ -1627,9 +1666,9 @@ class _WorkoutHistoryProfileCard extends StatelessWidget {
                             ? '$totalWorkouts tamamlanan seans ve MLI puanları'
                             : 'Tamamlanan seansların dökümü',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: _ProfileScreenState._textMid,
-                              fontSize: 12,
-                            ),
+                          color: _ProfileScreenState._textMid,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
@@ -2198,43 +2237,4 @@ String muscleDisplayName(String key) {
     default:
       return key;
   }
-}
-
-List<WorkoutSummaryEntry> buildMockWorkoutSummaries() {
-  final now = DateTime.now();
-  return [
-    WorkoutSummaryEntry(
-      date: now.subtract(const Duration(days: 1)),
-      totalLoad: 680,
-      muscleLoad: const {
-        'chest': 210,
-        'triceps': 120,
-        'shoulders': 140,
-        'core': 60,
-      },
-      duration: 2100,
-    ),
-    WorkoutSummaryEntry(
-      date: now.subtract(const Duration(days: 3)),
-      totalLoad: 740,
-      muscleLoad: const {
-        'back': 280,
-        'biceps': 170,
-        'shoulders': 110,
-        'core': 80,
-      },
-      duration: 2400,
-    ),
-    WorkoutSummaryEntry(
-      date: now.subtract(const Duration(days: 9)),
-      totalLoad: 520,
-      muscleLoad: const {
-        'quads': 170,
-        'glutes': 140,
-        'hamstrings': 120,
-        'calves': 90,
-      },
-      duration: 1900,
-    ),
-  ];
 }
