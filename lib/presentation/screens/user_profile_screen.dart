@@ -224,7 +224,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         ),
                         const SizedBox(height: 12.0),
                         DropdownButtonFormField<String>(
-                          value: selectedExercise,
+                          initialValue: selectedExercise,
                           dropdownColor: _cardSurfaceSoft,
                           decoration: _dialogInputDecoration(label: 'Hareket'),
                           style: Theme.of(
@@ -272,7 +272,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         const SizedBox(height: 8.0),
                         SwitchListTile.adaptive(
                           value: hasExtraWeight,
-                          activeColor: _accentBlue,
+                          activeThumbColor: _accentBlue,
                           contentPadding: EdgeInsets.zero,
                           title: Text(
                             'Ekstra agirlik var',
@@ -549,9 +549,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
                 const SizedBox(height: 10.0),
                 ...genders.map(
-                  (item) => RadioListTile<String>(
-                    value: item,
+                  (item) => RadioGroup<String>(
                     groupValue: _gender,
+                    onChanged: (value) => Navigator.of(context).pop(value),
+                    child: RadioListTile<String>(
+                    value: item,
+
                     dense: true,
                     contentPadding: EdgeInsets.zero,
                     activeColor: _accentPurple,
@@ -561,7 +564,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         context,
                       ).textTheme.bodyMedium?.copyWith(color: _textHigh),
                     ),
-                    onChanged: (value) => Navigator.of(context).pop(value),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8.0),
@@ -1597,12 +1600,12 @@ class _WorkoutHistoryProfileCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFC2F13A).withAlpha(35),
+                    color: AppColors.volcanic.withAlpha(35),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
                     Icons.history_rounded,
-                    color: Color(0xFFC2F13A),
+                    color: AppColors.volcanic,
                     size: 22,
                   ),
                 ),

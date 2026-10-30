@@ -10,6 +10,7 @@ import 'package:calisthenics_app/domain/enums/exercise_level.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/presentation/screens/workout_summary_screen.dart';
+import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 import 'package:calisthenics_app/core/utils/enum_label.dart';
 
 class WorkoutSessionScreen extends StatefulWidget {
@@ -32,19 +33,16 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
   late int _totalSets;
   int _completedSets = 0;
 
-  // Premium Sportif & Koyu Tema Renkleri
-  static const Color _pageBackground = Color(0xFF0C101B);
-  static const Color _cardSurface = Color(0xFF161C2C);
-  static const Color _cardSurfaceSoft = Color(0xFF1E263B);
-  static const Color _cardBorder = Color(0xFF28324C);
-  static const Color _accentLime = Color(0xFFC2F13A);
-  static const Color _textPrimary = Color(0xFFFFFFFF);
-  static const Color _textSecondary = Color(0xFF94A3B8);
-  static const Color _textMuted = Color(0xFF64748B);
-  static const Color _ink = Color(0xFF090D16);
-  static const Color _dangerSurface = Color(0xFF1F1722);
-  static const Color _dangerBorder = Color(0xFF382330);
-  static const Color _dangerText = Color(0xFFE26D7D);
+  // Resmi Tasarım Sistemi Renkleri (AppColors)
+  static const Color _pageBackground = AppColors.background;
+  static const Color _cardSurface = AppColors.surface;
+  static const Color _cardSurfaceSoft = AppColors.surfaceSoft;
+  static const Color _cardBorder = AppColors.border;
+  static const Color _accentVolcanic = AppColors.volcanic;
+  static const Color _accentEmerald = AppColors.emerald;
+  static const Color _textPrimary = AppColors.textHigh;
+  static const Color _textSecondary = AppColors.textMid;
+  static const Color _textMuted = AppColors.textMuted;
 
   @override
   void initState() {
@@ -179,6 +177,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
       backgroundColor: _cardSurface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24.0)),
+        side: BorderSide(color: AppColors.borderSubtle, width: 1.0),
       ),
       builder: (context) {
         final options = <int>[30, 45, 60, 90];
@@ -332,7 +331,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
                           width: 8.0,
                           height: 8.0,
                           decoration: const BoxDecoration(
-                            color: _accentLime,
+                            color: _accentVolcanic,
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -391,9 +390,9 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
                                 height: 4.5,
                                 decoration: BoxDecoration(
                                   color: isCompleted
-                                      ? _accentLime
+                                      ? _accentEmerald
                                       : isCurrent
-                                      ? _accentLime.withValues(alpha: 0.9)
+                                      ? _accentVolcanic
                                       : _cardSurfaceSoft,
                                   borderRadius: BorderRadius.circular(999.0),
                                 ),
@@ -443,8 +442,9 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
                           const SizedBox(width: 10.0),
                           _TagChip(
                             text: 'HEDEF: $target TEKRAR',
-                            textColor: _ink,
-                            background: _accentLime,
+                            textColor: AppColors.emeraldSoft,
+                            background: _accentEmerald.withValues(alpha: 0.16),
+                            borderColor: _accentEmerald.withValues(alpha: 0.45),
                           ),
                         ],
                       ),
@@ -456,8 +456,8 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
                         child: FilledButton.icon(
                           onPressed: _completeSet,
                           style: FilledButton.styleFrom(
-                            backgroundColor: _accentLime,
-                            foregroundColor: _ink,
+                            backgroundColor: _accentVolcanic,
+                            foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 18.0),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20.0),
@@ -502,13 +502,11 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
                               decoration: BoxDecoration(
                                 color: _cardSurfaceSoft,
                                 shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.06),
-                                ),
+                                border: Border.all(color: AppColors.borderSubtle),
                               ),
                               child: const Icon(
                                 Icons.fitness_center_rounded,
-                                color: _textSecondary,
+                                color: _accentVolcanic,
                                 size: 19.0,
                               ),
                             ),
@@ -585,9 +583,9 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
                     child: _ActionPillButton(
                       label: 'BİTİR',
                       icon: Icons.stop_rounded,
-                      backgroundColor: _dangerSurface,
-                      foregroundColor: _dangerText,
-                      borderColor: _dangerBorder,
+                      backgroundColor: _accentVolcanic,
+                      foregroundColor: Colors.white,
+                      borderColor: _accentVolcanic,
                       onPressed: _finishWorkout,
                     ),
                   ),
@@ -660,11 +658,11 @@ class _ExerciseHeroCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(26.0),
         border: Border.all(
           color: isRestRunning
-              ? _WorkoutSessionScreenState._accentLime.withValues(alpha: 0.3)
-              : Colors.white.withValues(alpha: 0.08),
+              ? _WorkoutSessionScreenState._accentVolcanic.withValues(alpha: 0.4)
+              : AppColors.border,
         ),
         gradient: const LinearGradient(
-          colors: [Color(0xFF1B2236), Color(0xFF0F1321)],
+          colors: [AppColors.surfaceSoft, AppColors.surface],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
@@ -682,28 +680,27 @@ class _ExerciseHeroCard extends StatelessWidget {
                       vertical: 5.0,
                     ),
                     decoration: BoxDecoration(
-                      color: _WorkoutSessionScreenState._accentLime.withValues(
-                        alpha: 0.15,
-                      ),
+                      color: _WorkoutSessionScreenState._accentVolcanic
+                          .withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(999.0),
                       border: Border.all(
-                        color: _WorkoutSessionScreenState._accentLime
-                            .withValues(alpha: 0.35),
+                        color: _WorkoutSessionScreenState._accentVolcanic
+                            .withValues(alpha: 0.4),
                       ),
                     ),
-                    child: Row(
+                    child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.timer_outlined,
                           size: 14.0,
-                          color: _WorkoutSessionScreenState._accentLime,
+                          color: _WorkoutSessionScreenState._accentVolcanic,
                         ),
-                        const SizedBox(width: 6.0),
-                        const Text(
+                        SizedBox(width: 6.0),
+                        Text(
                           'DİNLENME',
                           style: TextStyle(
-                            color: _WorkoutSessionScreenState._accentLime,
+                            color: _WorkoutSessionScreenState._accentVolcanic,
                             fontWeight: FontWeight.w800,
                             fontSize: 12.0,
                             letterSpacing: 1.0,
@@ -715,12 +712,12 @@ class _ExerciseHeroCard extends StatelessWidget {
                   const SizedBox(height: 14.0),
                   Text(
                     restRemainingText,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: _WorkoutSessionScreenState._textPrimary,
                       fontSize: 54.0,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1.5,
-                      fontFeatures: const [FontFeature.tabularFigures()],
+                      fontFeatures: [FontFeature.tabularFigures()],
                     ),
                   ),
                   const SizedBox(height: 16.0),
@@ -732,7 +729,7 @@ class _ExerciseHeroCard extends StatelessWidget {
                       backgroundColor:
                           _WorkoutSessionScreenState._cardSurfaceSoft,
                       valueColor: const AlwaysStoppedAnimation<Color>(
-                        _WorkoutSessionScreenState._accentLime,
+                        _WorkoutSessionScreenState._accentVolcanic,
                       ),
                     ),
                   ),
@@ -751,12 +748,12 @@ class _ExerciseHeroCard extends StatelessWidget {
                     icon: const Icon(
                       Icons.skip_next_rounded,
                       size: 18.0,
-                      color: _WorkoutSessionScreenState._accentLime,
+                      color: _WorkoutSessionScreenState._accentVolcanic,
                     ),
                     label: const Text(
                       'DİNLENMEYİ BİTİR',
                       style: TextStyle(
-                        color: _WorkoutSessionScreenState._accentLime,
+                        color: _WorkoutSessionScreenState._accentVolcanic,
                         fontWeight: FontWeight.w800,
                         fontSize: 13.0,
                         letterSpacing: 0.5,
@@ -782,11 +779,9 @@ class _ExerciseHeroCard extends StatelessWidget {
                         vertical: 5.0,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.55),
+                        color: AppColors.background.withValues(alpha: 0.75),
                         borderRadius: BorderRadius.circular(999.0),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.12),
-                        ),
+                        border: Border.all(color: AppColors.borderSubtle),
                       ),
                       child: Text(
                         exercise.level.label.toUpperCase(),
@@ -813,7 +808,6 @@ class _HeroVisual extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Egzersize özel asset kontrolü (mevcut veya ileride eklenebilecek görseller)
     final isMatchingAsset = exercise.name.toLowerCase().contains('incline');
     final assetPath = isMatchingAsset
         ? 'assets/images/Incline-pushup.png'
@@ -843,12 +837,12 @@ class _HeroFallbackIcon extends StatelessWidget {
             alpha: 0.6,
           ),
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+          border: Border.all(color: AppColors.borderSubtle),
         ),
         child: Icon(
           Icons.accessibility_new_rounded,
           size: 58.0,
-          color: Colors.white.withValues(alpha: 0.85),
+          color: _WorkoutSessionScreenState._textPrimary.withValues(alpha: 0.85),
         ),
       ),
     );
@@ -909,12 +903,12 @@ class _RestPresetChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 9.0),
         decoration: BoxDecoration(
           color: selected
-              ? _WorkoutSessionScreenState._accentLime
+              ? _WorkoutSessionScreenState._accentVolcanic
               : _WorkoutSessionScreenState._cardSurfaceSoft,
           borderRadius: BorderRadius.circular(999.0),
           border: Border.all(
             color: selected
-                ? _WorkoutSessionScreenState._accentLime
+                ? _WorkoutSessionScreenState._accentVolcanic
                 : _WorkoutSessionScreenState._cardBorder,
           ),
         ),
@@ -922,7 +916,7 @@ class _RestPresetChip extends StatelessWidget {
           '${seconds}s',
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
             color: selected
-                ? _WorkoutSessionScreenState._ink
+                ? Colors.white
                 : _WorkoutSessionScreenState._textPrimary,
             fontWeight: FontWeight.w800,
           ),

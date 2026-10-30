@@ -241,13 +241,13 @@ class _ProfileHeaderCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(20.0),
-        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.4)),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
       ),
       child: Row(
         children: [
           CircleAvatar(
             radius: 30.0,
-            backgroundColor: colorScheme.primary.withOpacity(0.12),
+            backgroundColor: colorScheme.primary.withValues(alpha: 0.12),
             child: Icon(Icons.person, color: colorScheme.primary, size: 30.0),
           ),
           const SizedBox(width: 12.0),
@@ -302,7 +302,7 @@ class _StatPill extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(999.0),
-        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.4)),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
       ),
       child: Text(
         '$label: $value',
@@ -341,7 +341,7 @@ class _TagRow extends StatelessWidget {
                 vertical: 8.0,
               ),
               decoration: BoxDecoration(
-                color: colorScheme.primary.withOpacity(0.12),
+                color: colorScheme.primary.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(999.0),
               ),
               child: Row(
@@ -385,12 +385,12 @@ class _SectionCard extends StatelessWidget {
   const _SectionCard({
     required this.title,
     required this.child,
-    this.initiallyExpanded = false,
+
   });
 
   final String title;
   final Widget child;
-  final bool initiallyExpanded;
+
 
   @override
   Widget build(BuildContext context) {
@@ -399,7 +399,7 @@ class _SectionCard extends StatelessWidget {
     return Theme(
       data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
       child: ExpansionTile(
-        initiallyExpanded: initiallyExpanded,
+
         tilePadding: const EdgeInsets.symmetric(horizontal: 16.0),
         childrenPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
         title: Text(
@@ -410,11 +410,11 @@ class _SectionCard extends StatelessWidget {
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18.0),
-          side: BorderSide(color: colorScheme.outlineVariant.withOpacity(0.4)),
+          side: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
         ),
         collapsedShape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18.0),
-          side: BorderSide(color: colorScheme.outlineVariant.withOpacity(0.4)),
+          side: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
         ),
         backgroundColor: colorScheme.surfaceContainerLow,
         collapsedBackgroundColor: colorScheme.surfaceContainerLow,
@@ -444,14 +444,14 @@ class _ProfileSummaryCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(18.0),
-        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.4)),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10.0),
             decoration: BoxDecoration(
-              color: colorScheme.primary.withOpacity(0.12),
+              color: colorScheme.primary.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(14.0),
             ),
             child: Icon(Icons.badge, color: colorScheme.primary),
@@ -516,7 +516,7 @@ class _SimpleListCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(18.0),
-        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.4)),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
       ),
       child: Column(
         children: [
@@ -600,7 +600,7 @@ class _ProgressListCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(18.0),
-        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.4)),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
       ),
       child: Column(
         children: [
@@ -680,7 +680,7 @@ class _MetricGridCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(18.0),
-        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.4)),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
       ),
       child: Wrap(
         spacing: 12.0,
@@ -712,7 +712,7 @@ class _MetricTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: colorScheme.surface,
           borderRadius: BorderRadius.circular(14.0),
-          border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.4)),
+          border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -758,7 +758,7 @@ class _ScheduleCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(18.0),
-        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.4)),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
       ),
       child: Column(
         children: items
@@ -773,7 +773,7 @@ class _ScheduleCard extends StatelessWidget {
                         vertical: 6.0,
                       ),
                       decoration: BoxDecoration(
-                        color: colorScheme.primary.withOpacity(0.12),
+                        color: colorScheme.primary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(999.0),
                       ),
                       child: Text(
@@ -824,7 +824,7 @@ class _BadgeRowCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(18.0),
-        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.4)),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
       ),
       child: Wrap(
         spacing: 12.0,
@@ -840,7 +840,7 @@ class _BadgeRowCard extends StatelessWidget {
                   color: colorScheme.surface,
                   borderRadius: BorderRadius.circular(999.0),
                   border: Border.all(
-                    color: colorScheme.outlineVariant.withOpacity(0.4),
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.4),
                   ),
                 ),
                 child: Row(
@@ -884,7 +884,7 @@ class _PhotoRowCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(18.0),
-        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.4)),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
       ),
       child: Row(
         children: items
@@ -898,7 +898,7 @@ class _PhotoRowCard extends StatelessWidget {
                       color: colorScheme.surface,
                       borderRadius: BorderRadius.circular(14.0),
                       border: Border.all(
-                        color: colorScheme.outlineVariant.withOpacity(0.4),
+                        color: colorScheme.outlineVariant.withValues(alpha: 0.4),
                       ),
                     ),
                     child: Column(
@@ -941,7 +941,7 @@ class _NotesCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(18.0),
-        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.4)),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
       ),
       child: Text(
         notes,
@@ -1005,7 +1005,7 @@ class _MiniBarChart extends StatelessWidget {
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerLow,
           borderRadius: BorderRadius.circular(18.0),
-          border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.4)),
+          border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,

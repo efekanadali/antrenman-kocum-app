@@ -38,14 +38,14 @@ double calculateMLI({
       weightMultiplier;
 }
 
-/// Statik model: (sure / 3) x C x M_SIR
+/// Statik model: (sure * 0.5) x C x M_SIR
 double calculateStaticMLI({
   required int durationInSeconds,
   required double difficulty,
   required int secondsInReserve,
   double weightMultiplier = 1.0,
 }) {
-  final volume = durationInSeconds / 3.0;
+  final volume = durationInSeconds * 0.5;
   return volume *
       difficulty *
       _staticMsirFactor(secondsInReserve) *

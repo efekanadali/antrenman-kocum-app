@@ -123,7 +123,8 @@ class _MuscleSvgMapState extends State<MuscleSvgMap> {
   }
 
   String _colorToHex(Color color) {
-    final rgb = color.value.toRadixString(16).padLeft(8, '0').substring(2);
+    final rgb =
+        color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2);
     return '#${rgb.toUpperCase()}';
   }
 
@@ -133,7 +134,7 @@ class _MuscleSvgMapState extends State<MuscleSvgMap> {
     double lowOpacity,
     Color highlightColor,
   ) {
-    return '${assetPath}_${selectedId ?? 'none'}_${lowOpacity.toStringAsFixed(2)}_${highlightColor.value}';
+    return '${assetPath}_${selectedId ?? 'none'}_${lowOpacity.toStringAsFixed(2)}_${highlightColor.toARGB32()}';
   }
 
   @override
@@ -144,7 +145,7 @@ class _MuscleSvgMapState extends State<MuscleSvgMap> {
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: widget.glowColor.withOpacity(0.25),
+              color: widget.glowColor.withValues(alpha: 0.25),
               blurRadius: widget.glowBlur,
               spreadRadius: widget.glowSpread,
             ),

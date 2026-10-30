@@ -92,36 +92,6 @@ class AppRoutes {
     );
   }
 
-  static PageRouteBuilder _buildFadeSlideRoute({
-    required Widget page,
-    required RouteSettings settings,
-  }) {
-    return PageRouteBuilder(
-      settings: settings,
-      pageBuilder: (context, animation, secondaryAnimation) => page,
-      transitionDuration: const Duration(milliseconds: 260),
-      reverseTransitionDuration: const Duration(milliseconds: 220),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        final curve = CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeOutCubic,
-          reverseCurve: Curves.easeInCubic,
-        );
-
-        return FadeTransition(
-          opacity: curve,
-          child: SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(0.0, 0.04),
-              end: Offset.zero,
-            ).animate(curve),
-            child: child,
-          ),
-        );
-      },
-    );
-  }
-
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case home:
@@ -197,22 +167,22 @@ class AppRoutes {
         );
       case athleteProfile:
         return _buildSlideRoute(
-            page: const AthleteProfileScreen(),
+          page: const AthleteProfileScreen(),
           settings: settings,
         );
       case streakDetails:
         return _buildSlideRoute(
-            page: const StreakDetailsScreen(),
+          page: const StreakDetailsScreen(),
           settings: settings,
         );
       case weeklyGoal:
         return _buildSlideRoute(
-            page: const WeeklyGoalScreen(),
+          page: const WeeklyGoalScreen(),
           settings: settings,
         );
       case totalTime:
         return _buildSlideRoute(
-            page: const TotalTimeScreen(),
+          page: const TotalTimeScreen(),
           settings: settings,
         );
       case workoutHistory:

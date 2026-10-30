@@ -2,7 +2,7 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:state_notifier/state_notifier.dart';
+
 
 import 'package:calisthenics_app/domain/enums/exercise_level.dart';
 import 'package:calisthenics_app/domain/enums/muscle_group.dart';

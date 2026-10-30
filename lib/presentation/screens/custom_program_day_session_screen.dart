@@ -14,19 +14,21 @@ import 'package:calisthenics_app/domain/services/recovery_calculator.dart';
 import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/presentation/screens/workout_summary_screen.dart';
+import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 
-const Color _bgTop = Color(0xFF1A1230);
-const Color _bgBottom = Color(0xFF120A22);
-const Color _cardSurface = Color(0xFF231A3B);
-const Color _cardSurfaceSoft = Color(0xFF2A2048);
-const Color _accentPurple = Color(0xFFC2F13A);
-const Color _accentBlue = Color(0xFF4FC3F7);
-const Color _textHigh = Color(0xFFEDE9FF);
-const Color _textMid = Color(0xFFC1B8E0);
-const Color _sessionPageBg = _bgBottom;
-const Color _sessionInk = _textHigh;
-const Color _sessionSoft = _cardSurfaceSoft;
-const Color _sessionMuted = _textMid;
+const Color _bgTop = AppColors.surfaceSoft;
+const Color _bgBottom = AppColors.background;
+const Color _cardSurface = AppColors.surface;
+const Color _cardSurfaceSoft = AppColors.surfaceSoft;
+const Color _accentVolcanic = AppColors.volcanic;
+const Color _accentEmerald = AppColors.emerald;
+const Color _accentBlue = AppColors.nordicIce;
+const Color _textHigh = AppColors.textHigh;
+const Color _textMid = AppColors.textMid;
+const Color _sessionPageBg = AppColors.background;
+const Color _sessionInk = AppColors.textHigh;
+const Color _sessionSoft = AppColors.surfaceSoft;
+const Color _sessionMuted = AppColors.textMuted;
 const String _sessionHeroImageAsset = 'assets/images/Incline-pushup.png';
 
 class CustomProgramDaySessionArgs {
@@ -216,32 +218,6 @@ class _CustomProgramDaySessionScreenState
     });
   }
 
-  Future<void> _skipCurrentExercise(CustomProgramDay day) async {
-    if (day.exercises.isEmpty || _isWorkoutComplete(day)) {
-      return;
-    }
-
-    final index = _currentExerciseIndex(day);
-    final exercise = day.exercises[index];
-
-    final effort = await _askSetEffort(isTimed: exercise.isTimed);
-    if (!mounted || effort == null) {
-      return;
-    }
-
-    setState(() {
-      for (var i = 0; i < _actualValues[index].length; i++) {
-        _actualValues[index][i] ??= exercise.value;
-        _actualRirs[index][i] ??= effort.rir;
-        _actualExtraWeights[index][i] ??= effort.extraWeightKg;
-        _actualBodyWeights[index][i] ??= effort.bodyWeightKg;
-      }
-      _lastBodyWeightKg = effort.bodyWeightKg;
-    });
-
-    _recalculateWorkoutLoad(day);
-  }
-
   int _currentExerciseIndex(CustomProgramDay day) {
     for (var i = 0; i < day.exercises.length; i++) {
       if (_completedForExercise(i) < day.exercises[i].sets) {
@@ -281,17 +257,22 @@ class _CustomProgramDaySessionScreenState
     var bodyWeightText = _lastBodyWeightKg.toStringAsFixed(1);
 
     final selected = await showModalBottomSheet<_SetEffortResult>(
+      isScrollControlled: true,
       context: context,
-      backgroundColor: _cardSurface,
+      backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+        side: BorderSide(color: AppColors.borderSubtle, width: 1.0),
       ),
       builder: (context) {
         var tempRir = _defaultRir;
         return StatefulBuilder(
           builder: (context, setModalState) {
             return Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 20.0),
+              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 20.0) +
+                  EdgeInsets.only(
+                    bottom: MediaQuery.viewInsetsOf(context).bottom,
+                  ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -309,19 +290,26 @@ class _CustomProgramDaySessionScreenState
                   Wrap(
                     spacing: 8.0,
                     children: List.generate(isTimed ? 11 : 5, (rir) {
+                      final isSelected = tempRir == rir;
                       return ChoiceChip(
                         label: Text('$rir'),
-                        selected: tempRir == rir,
+                        selected: isSelected,
                         onSelected: (_) {
                           HapticFeedback.selectionClick();
                           setModalState(() {
                             tempRir = rir;
                           });
                         },
-                        selectedColor: _accentPurple.withValues(alpha: 0.35),
+                        selectedColor: _accentVolcanic.withValues(alpha: 0.22),
                         backgroundColor: _cardSurfaceSoft,
+                        checkmarkColor: _accentVolcanic,
+                        side: BorderSide(
+                          color: isSelected
+                              ? _accentVolcanic
+                              : AppColors.borderSubtle,
+                        ),
                         labelStyle: TextStyle(
-                          color: tempRir == rir ? _textHigh : _textMid,
+                          color: isSelected ? Colors.white : _textMid,
                           fontWeight: FontWeight.w700,
                         ),
                       );
@@ -360,6 +348,9 @@ class _CustomProgramDaySessionScreenState
                       Expanded(
                         child: TextButton(
                           onPressed: () => Navigator.pop(context),
+                          style: TextButton.styleFrom(
+                            foregroundColor: _textMid,
+                          ),
                           child: const Text('Vazgec'),
                         ),
                       ),
@@ -393,7 +384,7 @@ class _CustomProgramDaySessionScreenState
                             );
                           },
                           style: FilledButton.styleFrom(
-                            backgroundColor: _accentPurple,
+                            backgroundColor: _accentVolcanic,
                             foregroundColor: Colors.white,
                           ),
                           child: const Text('Kaydet'),
@@ -502,8 +493,7 @@ class _CustomProgramDaySessionScreenState
       AppRoutes.workoutSummary,
       (route) => false,
       arguments: WorkoutSummaryArgs(
-        exerciseName:
-            '${widget.args.programName} - ${day.name}',
+        exerciseName: '${widget.args.programName} - ${day.name}',
         totalTime: _workElapsed,
         setsCompleted: completedSetsCount,
         totalSets: totalSetsCount,
@@ -512,170 +502,6 @@ class _CustomProgramDaySessionScreenState
         muscleRir: _workoutRirByMuscle,
       ),
     );
-  }
-
-  void _applyQuickAdjust(CustomProgramDay day, int delta) {
-    if (day.exercises.isEmpty) {
-      return;
-    }
-    final index = _currentExerciseIndex(day);
-    final values = _actualValues[index];
-    var targetIndex = values.lastIndexWhere((value) => value != null);
-    if (targetIndex == -1) {
-      targetIndex = values.indexWhere((value) => value == null);
-      if (targetIndex == -1) {
-        return;
-      }
-      values[targetIndex] = day.exercises[index].value;
-    }
-
-    setState(() {
-      final current = values[targetIndex] ?? day.exercises[index].value;
-      values[targetIndex] = (current + delta).clamp(1, 999);
-    });
-  }
-
-  Future<void> _openSetEditor({
-    required CustomProgramExercise exercise,
-    required CustomProgramDay day,
-    required int exerciseIndex,
-    required int setIndex,
-  }) async {
-    final repsController = TextEditingController(
-      text: (_actualValues[exerciseIndex][setIndex] ?? exercise.value)
-          .toString(),
-    );
-    final rirController = TextEditingController(
-      text: (_actualRirs[exerciseIndex][setIndex] ?? _defaultRir).toString(),
-    );
-    final extraWeightController = TextEditingController(
-      text: (_actualExtraWeights[exerciseIndex][setIndex] ?? 0.0)
-          .toStringAsFixed(1),
-    );
-    final bodyWeightController = TextEditingController(
-      text: (_actualBodyWeights[exerciseIndex][setIndex] ?? _lastBodyWeightKg)
-          .toStringAsFixed(1),
-    );
-
-    final result = await showDialog<_SetEditorResult?>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Set duzenle'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: repsController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: exercise.isTimed ? 'Saniye' : 'Tekrar',
-                ),
-              ),
-              const SizedBox(height: 10.0),
-              TextField(
-                controller: rirController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'RIR'),
-              ),
-              const SizedBox(height: 10.0),
-              TextField(
-                controller: extraWeightController,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                decoration: const InputDecoration(
-                  labelText: 'Ekstra agirlik (kg)',
-                ),
-              ),
-              const SizedBox(height: 10.0),
-              TextField(
-                controller: bodyWeightController,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                decoration: const InputDecoration(
-                  labelText: 'Vucut agirligi (kg)',
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, null),
-              child: const Text('Iptal'),
-            ),
-            TextButton(
-              onPressed: () =>
-                  Navigator.pop(context, const _SetEditorResult.delete()),
-              child: const Text('Sil'),
-            ),
-            FilledButton(
-              onPressed: () {
-                final reps = int.tryParse(repsController.text.trim());
-                final rir = int.tryParse(rirController.text.trim());
-                final extraWeight =
-                    double.tryParse(
-                      extraWeightController.text.trim().replaceAll(',', '.'),
-                    ) ??
-                    0.0;
-                final bodyWeight = double.tryParse(
-                  bodyWeightController.text.trim().replaceAll(',', '.'),
-                );
-
-                if (reps == null ||
-                    reps <= 0 ||
-                    rir == null ||
-                    rir < 0 ||
-                    extraWeight < 0 ||
-                    bodyWeight == null ||
-                    bodyWeight <= 0) {
-                  Navigator.pop(context, null);
-                  return;
-                }
-
-                Navigator.pop(
-                  context,
-                  _SetEditorResult(
-                    reps: reps,
-                    rir: rir,
-                    extraWeightKg: extraWeight,
-                    bodyWeightKg: bodyWeight,
-                  ),
-                );
-              },
-              child: const Text('Kaydet'),
-            ),
-          ],
-        );
-      },
-    );
-
-    repsController.dispose();
-    rirController.dispose();
-    extraWeightController.dispose();
-    bodyWeightController.dispose();
-
-    if (!mounted || result == null) {
-      return;
-    }
-
-    setState(() {
-      if (result.delete) {
-        _actualValues[exerciseIndex][setIndex] = null;
-        _actualRirs[exerciseIndex][setIndex] = null;
-        _actualExtraWeights[exerciseIndex][setIndex] = null;
-        _actualBodyWeights[exerciseIndex][setIndex] = null;
-      } else {
-        _actualValues[exerciseIndex][setIndex] = result.reps;
-        _actualRirs[exerciseIndex][setIndex] = result.rir;
-        _actualExtraWeights[exerciseIndex][setIndex] = result.extraWeightKg;
-        _actualBodyWeights[exerciseIndex][setIndex] = result.bodyWeightKg;
-        _lastBodyWeightKg = result.bodyWeightKg;
-      }
-    });
-
-    _recalculateWorkoutLoad(day);
   }
 
   void _startRestTimer() {
@@ -731,25 +557,13 @@ class _CustomProgramDaySessionScreenState
     return '$minutes:$seconds';
   }
 
-  int _timePart(Duration duration, String unit) {
-    switch (unit) {
-      case 'hour':
-        return duration.inHours;
-      case 'minute':
-        return duration.inMinutes.remainder(60);
-      case 'second':
-        return duration.inSeconds.remainder(60);
-      default:
-        return 0;
-    }
-  }
-
   Future<void> _openRestSheet() async {
     final selected = await showModalBottomSheet<int>(
       context: context,
-      backgroundColor: _cardSurface,
+      backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24.0)),
+        side: BorderSide(color: AppColors.borderSubtle, width: 1.0),
       ),
       builder: (context) {
         var tempValue = _restDurationSeconds.toDouble();
@@ -780,6 +594,8 @@ class _CustomProgramDaySessionScreenState
                     min: 30.0,
                     max: 180.0,
                     divisions: 15,
+                    activeColor: _accentVolcanic,
+                    inactiveColor: AppColors.borderSubtle,
                     label: '${tempValue.toInt()} sn',
                     onChanged: (value) {
                       setModalState(() {
@@ -795,8 +611,8 @@ class _CustomProgramDaySessionScreenState
                         Navigator.pop(context, tempValue.toInt());
                       },
                       style: FilledButton.styleFrom(
-                        backgroundColor: _accentPurple,
-                        foregroundColor: const Color(0xFF1A132E),
+                        backgroundColor: _accentVolcanic,
+                        foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 12.0),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14.0),
@@ -877,7 +693,7 @@ class _CustomProgramDaySessionScreenState
                     decoration: BoxDecoration(
                       color: _cardSurface,
                       borderRadius: BorderRadius.circular(999.0),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+                      border: Border.all(color: AppColors.borderSubtle),
                     ),
                     child: Row(
                       children: [
@@ -885,7 +701,7 @@ class _CustomProgramDaySessionScreenState
                           width: 10.0,
                           height: 10.0,
                           decoration: const BoxDecoration(
-                            color: _accentPurple,
+                            color: _accentVolcanic,
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -932,12 +748,14 @@ class _CustomProgramDaySessionScreenState
                                 : 'Set $activeSet of ${activeExercise.sets}',
                             background: _sessionSoft,
                             textColor: _sessionInk,
+                            borderColor: AppColors.borderSubtle,
                           ),
                           const SizedBox(width: 8.0),
                           _SessionTagChip(
                             text: 'Target: $targetLabel',
-                            background: _accentPurple,
-                            textColor: _sessionInk,
+                            background: _accentEmerald.withValues(alpha: 0.16),
+                            textColor: AppColors.emeraldSoft,
+                            borderColor: _accentEmerald.withValues(alpha: 0.45),
                           ),
                         ],
                       ),
@@ -956,8 +774,8 @@ class _CustomProgramDaySessionScreenState
                             style: const TextStyle(fontWeight: FontWeight.w900),
                           ),
                           style: FilledButton.styleFrom(
-                            backgroundColor: _accentPurple,
-                            foregroundColor: _sessionInk,
+                            backgroundColor: _accentVolcanic,
+                            foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 18.0),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(22.0),
@@ -975,20 +793,20 @@ class _CustomProgramDaySessionScreenState
                         decoration: BoxDecoration(
                           color: _cardSurface,
                           borderRadius: BorderRadius.circular(20.0),
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+                          border: Border.all(color: AppColors.border),
                         ),
                         child: Row(
                           children: [
                             Container(
                               width: 42.0,
                               height: 42.0,
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 color: _cardSurfaceSoft,
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(
                                 Icons.fitness_center_rounded,
-                                color: _accentBlue,
+                                color: _accentVolcanic,
                                 size: 20.0,
                               ),
                             ),
@@ -1064,7 +882,9 @@ class _CustomProgramDaySessionScreenState
                     value: restProgress,
                     minHeight: 8.0,
                     backgroundColor: _cardSurfaceSoft,
-                    valueColor: const AlwaysStoppedAnimation<Color>(_accentPurple),
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      _accentVolcanic,
+                    ),
                   ),
                 ),
               ],
@@ -1087,8 +907,8 @@ class _CustomProgramDaySessionScreenState
                     child: _SessionActionPill(
                       label: 'STOP',
                       icon: Icons.stop_circle_rounded,
-                      backgroundColor: _accentPurple,
-                      foregroundColor: _sessionInk,
+                      backgroundColor: _accentVolcanic,
+                      foregroundColor: Colors.white,
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
@@ -1103,7 +923,7 @@ class _CustomProgramDaySessionScreenState
                       child: Text(
                         'Dinlenmeyi bitir',
                         style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                              color: _accentBlue,
+                              color: _accentVolcanic,
                               fontWeight: FontWeight.w700,
                             ),
                       ),
@@ -1146,7 +966,7 @@ class _SessionTopIconButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: _cardSurface,
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+          border: Border.all(color: AppColors.borderSubtle),
         ),
         child: Icon(icon, color: _sessionInk, size: 19.0),
       ),
@@ -1165,6 +985,7 @@ class _SessionHeroCard extends StatelessWidget {
       padding: const EdgeInsets.all(10.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30.0),
+        border: Border.all(color: AppColors.border),
         gradient: const LinearGradient(
           colors: [_bgTop, _bgBottom],
           begin: Alignment.topCenter,
@@ -1194,7 +1015,7 @@ class _SessionHeroFrame extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18.0),
         gradient: const LinearGradient(
-          colors: [Color(0xFF2C3144), Color(0xFF181C2A)],
+          colors: [AppColors.surfaceSubtle, AppColors.surface],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -1225,11 +1046,13 @@ class _SessionTagChip extends StatelessWidget {
     required this.text,
     required this.background,
     required this.textColor,
+    this.borderColor,
   });
 
   final String text;
   final Color background;
   final Color textColor;
+  final Color? borderColor;
 
   @override
   Widget build(BuildContext context) {
@@ -1238,6 +1061,7 @@ class _SessionTagChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: background,
         borderRadius: BorderRadius.circular(999.0),
+        border: borderColor != null ? Border.all(color: borderColor!) : null,
       ),
       child: Text(
         text,
@@ -1273,175 +1097,14 @@ class _SessionActionPill extends StatelessWidget {
         backgroundColor: backgroundColor,
         foregroundColor: foregroundColor,
         padding: const EdgeInsets.symmetric(vertical: 16.0),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999.0)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(999.0),
+        ),
       ),
       icon: Icon(icon, size: 18.0),
       label: Text(
         label,
         style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: 0.5),
-      ),
-    );
-  }
-}
-
-class _TimeUnitCard extends StatelessWidget {
-  const _TimeUnitCard({required this.value, required this.label});
-
-  final String value;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
-      decoration: BoxDecoration(
-        color: _cardSurface,
-        borderRadius: BorderRadius.circular(14.0),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
-      ),
-      child: Column(
-        children: [
-          Text(
-            value,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              color: _textHigh,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 2.0),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: _textMid,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.6,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SessionInfoTile extends StatelessWidget {
-  const _SessionInfoTile({required this.title, required this.value});
-
-  final String title;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12.0),
-      decoration: BoxDecoration(
-        color: _cardSurface,
-        borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: _textMid,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.4,
-            ),
-          ),
-          const SizedBox(height: 4.0),
-          Text(
-            value,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: _textHigh,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ExerciseInsightCard extends StatelessWidget {
-  const _ExerciseInsightCard({
-    required this.description,
-    required this.muscleLabels,
-  });
-
-  final String description;
-  final List<String> muscleLabels;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14.0),
-      decoration: BoxDecoration(
-        color: _cardSurface,
-        borderRadius: BorderRadius.circular(18.0),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Hareket Aciklamasi',
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: _textMid,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 6.0),
-          Text(
-            description,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: _textHigh, height: 1.35),
-          ),
-          const SizedBox(height: 12.0),
-          Text(
-            'Calistirdigi Bolgeler',
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: _textMid,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 8.0),
-          if (muscleLabels.isEmpty)
-            Text(
-              'Bolge bilgisi bulunamadi.',
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: _textMid),
-            )
-          else
-            Wrap(
-              spacing: 8.0,
-              runSpacing: 8.0,
-              children: [
-                for (final label in muscleLabels)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10.0,
-                      vertical: 6.0,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _cardSurfaceSoft,
-                      borderRadius: BorderRadius.circular(999.0),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
-                    ),
-                    child: Text(
-                      label,
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: _accentBlue,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-        ],
       ),
     );
   }
@@ -1463,7 +1126,7 @@ class _WorkoutLoadCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: _cardSurface,
         borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+        border: Border.all(color: AppColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1493,7 +1156,7 @@ class _WorkoutLoadCard extends StatelessWidget {
                   Text(
                     '${entry.value.round()} • ${feedbackForLoad(entry.value)}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: _accentBlue,
+                      color: _accentVolcanic,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -1522,7 +1185,7 @@ class _LastSetLoadCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: _cardSurface,
         borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+        border: Border.all(color: AppColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1552,7 +1215,7 @@ class _LastSetLoadCard extends StatelessWidget {
                   Text(
                     '+${entry.value.round()} (${indicatorForLoad(entry.value)})',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: _accentBlue,
+                      color: _accentEmerald,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -1565,28 +1228,6 @@ class _LastSetLoadCard extends StatelessWidget {
   }
 }
 
-class _SetEditorResult {
-  const _SetEditorResult({
-    required this.reps,
-    required this.rir,
-    required this.extraWeightKg,
-    required this.bodyWeightKg,
-  }) : delete = false;
-
-  const _SetEditorResult.delete()
-    : reps = 0,
-      rir = 0,
-      extraWeightKg = 0,
-      bodyWeightKg = 0,
-      delete = true;
-
-  final int reps;
-  final int rir;
-  final double extraWeightKg;
-  final double bodyWeightKg;
-  final bool delete;
-}
-
 class _SetEffortResult {
   const _SetEffortResult({
     required this.rir,
@@ -1597,470 +1238,4 @@ class _SetEffortResult {
   final int rir;
   final double extraWeightKg;
   final double bodyWeightKg;
-}
-
-class _ProgressHeader extends StatelessWidget {
-  const _ProgressHeader({
-    required this.programName,
-    required this.dayIndex,
-    required this.completed,
-    required this.total,
-    required this.progress,
-  });
-
-  final String programName;
-  final int dayIndex;
-  final int completed;
-  final int total;
-  final double progress;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20.0),
-        color: _cardSurface,
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            programName,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: _textMid,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 6.0),
-          Text(
-            'Gun $dayIndex',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: _textHigh,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 12.0),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10.0),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 8.0,
-              backgroundColor: _cardSurfaceSoft,
-              valueColor: const AlwaysStoppedAnimation<Color>(_accentBlue),
-            ),
-          ),
-          const SizedBox(height: 6.0),
-          Text(
-            '$completed / $total set tamamlandi',
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: _textMid),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ActiveExerciseCard extends StatelessWidget {
-  const _ActiveExerciseCard({
-    required this.exercise,
-    required this.completedSets,
-  });
-
-  final CustomProgramExercise exercise;
-  final int completedSets;
-
-  @override
-  Widget build(BuildContext context) {
-    final detail = exercise.isTimed
-        ? '${exercise.sets} set x ${exercise.value} sn'
-        : '${exercise.sets} set x ${exercise.value} tekrar';
-
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: _cardSurface,
-        borderRadius: BorderRadius.circular(20.0),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
-            blurRadius: 16.0,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Aktif Egzersiz',
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: _textMid,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 6.0),
-          Text(
-            exercise.exerciseName,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: _textHigh,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 6.0),
-          Text(
-            'Hedef: $detail',
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: _textMid),
-          ),
-          const SizedBox(height: 12.0),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Tamamlanan set: $completedSets / ${exercise.sets}',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: _textHigh,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10.0,
-                  vertical: 6.0,
-                ),
-                decoration: BoxDecoration(
-                  color: _accentPurple.withValues(alpha: 0.18),
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: Text(
-                  exercise.isTimed ? 'Sure' : 'Set-rep',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: _accentPurple,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _NextUpCard extends StatelessWidget {
-  const _NextUpCard({required this.exercise});
-
-  final CustomProgramExercise exercise;
-
-  @override
-  Widget build(BuildContext context) {
-    final detail = exercise.isTimed
-        ? '${exercise.sets} set x ${exercise.value} sn'
-        : '${exercise.sets} set x ${exercise.value} tekrar';
-
-    return Container(
-      padding: const EdgeInsets.all(14.0),
-      decoration: BoxDecoration(
-        color: _cardSurfaceSoft,
-        borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.arrow_forward_rounded, color: _accentBlue),
-          const SizedBox(width: 10.0),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Sonraki',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: _textMid,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4.0),
-                Text(
-                  exercise.exerciseName,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: _textHigh,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 2.0),
-                Text(
-                  detail,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(color: _textMid),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ExerciseOverviewList extends StatelessWidget {
-  const _ExerciseOverviewList({
-    required this.exercises,
-    required this.completedSets,
-  });
-
-  final List<CustomProgramExercise> exercises;
-  final List<int> completedSets;
-
-  @override
-  Widget build(BuildContext context) {
-    if (exercises.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Egzersiz Listesi',
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            color: _textHigh,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        const SizedBox(height: 10.0),
-        for (var i = 0; i < exercises.length; i++)
-          _ExerciseMiniRow(exercise: exercises[i], completed: completedSets[i]),
-      ],
-    );
-  }
-}
-
-class _ExerciseMiniRow extends StatelessWidget {
-  const _ExerciseMiniRow({required this.exercise, required this.completed});
-
-  final CustomProgramExercise exercise;
-  final int completed;
-
-  @override
-  Widget build(BuildContext context) {
-    final detail = exercise.isTimed
-        ? '${exercise.sets} set x ${exercise.value} sn'
-        : '${exercise.sets} set x ${exercise.value} tekrar';
-    final isDone = completed >= exercise.sets;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Row(
-        children: [
-          Icon(
-            isDone ? Icons.check_circle_rounded : Icons.circle_outlined,
-            color: isDone ? _accentBlue : _textMid,
-            size: 18.0,
-          ),
-          const SizedBox(width: 10.0),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  exercise.exerciseName,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: _textHigh,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Text(
-                  detail,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(color: _textMid),
-                ),
-              ],
-            ),
-          ),
-          Text(
-            '$completed/${exercise.sets}',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: _textMid,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _EmptyWorkoutCard extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: _cardSurface,
-        borderRadius: BorderRadius.circular(20.0),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-      ),
-      child: Text(
-        'Bu gun icin egzersiz yok.',
-        style: Theme.of(
-          context,
-        ).textTheme.bodyMedium?.copyWith(color: _textMid),
-      ),
-    );
-  }
-}
-
-class _SetPanel extends StatelessWidget {
-  const _SetPanel({
-    required this.exercise,
-    required this.exerciseIndex,
-    required this.values,
-    required this.onEdit,
-  });
-
-  final CustomProgramExercise exercise;
-  final int exerciseIndex;
-  final List<int?> values;
-  final ValueChanged<int> onEdit;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14.0),
-      decoration: BoxDecoration(
-        color: _cardSurfaceSoft,
-        borderRadius: BorderRadius.circular(18.0),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Set Paneli',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: _textHigh,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 10.0),
-          Wrap(
-            spacing: 8.0,
-            runSpacing: 8.0,
-            children: List.generate(exercise.sets, (index) {
-              final value = values[index];
-              final label = value == null
-                  ? 'Set ${index + 1}'
-                  : '$value${exercise.isTimed ? ' sn' : ''}';
-              return InkWell(
-                onTap: () => onEdit(index),
-                borderRadius: BorderRadius.circular(12.0),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10.0,
-                    vertical: 8.0,
-                  ),
-                  decoration: BoxDecoration(
-                    color: value == null
-                        ? _cardSurface
-                        : _accentBlue.withValues(alpha: 0.20),
-                    borderRadius: BorderRadius.circular(12.0),
-                    border: Border.all(
-                      color: value == null
-                          ? Colors.white.withValues(alpha: 0.08)
-                          : _accentBlue.withValues(alpha: 0.50),
-                    ),
-                  ),
-                  child: Text(
-                    label,
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: value == null ? _textMid : _accentBlue,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              );
-            }),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _QuickAdjustButton extends StatelessWidget {
-  const _QuickAdjustButton({required this.label, required this.onTap});
-
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: OutlinedButton(
-        onPressed: onTap,
-        style: OutlinedButton.styleFrom(
-          foregroundColor: _textHigh,
-          side: BorderSide(color: Colors.white.withValues(alpha: 0.20)),
-          padding: const EdgeInsets.symmetric(vertical: 12.0),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14.0),
-          ),
-        ),
-        child: Text(label),
-      ),
-    );
-  }
-}
-
-class _RestOverlay extends StatelessWidget {
-  const _RestOverlay({required this.remaining, required this.onStop});
-
-  final String remaining;
-  final VoidCallback onStop;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
-      decoration: BoxDecoration(
-        color: _cardSurface,
-        borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.30),
-            blurRadius: 16.0,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.timer_rounded, color: _accentBlue),
-          const SizedBox(width: 10.0),
-          Expanded(
-            child: Text(
-              'Dinlenme: $remaining',
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: _textHigh,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          TextButton(onPressed: onStop, child: const Text('Bitir')),
-        ],
-      ),
-    );
-  }
 }

@@ -162,8 +162,8 @@ class _HeaderCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20.0),
         gradient: LinearGradient(
           colors: [
-            colorScheme.primary.withOpacity(0.18),
-            colorScheme.secondary.withOpacity(0.16),
+            colorScheme.primary.withValues(alpha: 0.18),
+            colorScheme.secondary.withValues(alpha: 0.16),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -180,7 +180,7 @@ class _HeaderCard extends StatelessWidget {
                   vertical: 6.0,
                 ),
                 decoration: BoxDecoration(
-                  color: colorScheme.primary.withOpacity(0.2),
+                  color: colorScheme.primary.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12.0),
                 ),
                 child: Text(
@@ -213,7 +213,7 @@ class _HeaderCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 8.0,
-              backgroundColor: colorScheme.surface.withOpacity(0.6),
+              backgroundColor: colorScheme.surface.withValues(alpha: 0.6),
               valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
             ),
           ),
@@ -259,8 +259,8 @@ class _StepCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(18.0),
             border: Border.all(
               color: completed
-                  ? colorScheme.primary.withOpacity(0.5)
-                  : colorScheme.outlineVariant.withOpacity(0.35),
+                  ? colorScheme.primary.withValues(alpha: 0.5)
+                  : colorScheme.outlineVariant.withValues(alpha: 0.35),
             ),
           ),
           child: Row(
@@ -272,7 +272,7 @@ class _StepCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: completed
                       ? colorScheme.primary
-                      : colorScheme.primary.withOpacity(0.12),
+                      : colorScheme.primary.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -300,7 +300,7 @@ class _StepCard extends StatelessWidget {
                             vertical: 4.0,
                           ),
                           decoration: BoxDecoration(
-                            color: colorScheme.primary.withOpacity(0.12),
+                            color: colorScheme.primary.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                           child: Text(

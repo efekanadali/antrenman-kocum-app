@@ -33,7 +33,7 @@ class FavoritesScreen extends ConsumerWidget {
           decoration: BoxDecoration(
             color: Color.lerp(
               Colors.transparent,
-              colorScheme.primary.withOpacity(0.12),
+              colorScheme.primary.withValues(alpha: 0.12),
               value,
             ),
             borderRadius: BorderRadius.circular(12.0),
@@ -41,7 +41,7 @@ class FavoritesScreen extends ConsumerWidget {
                 ? []
                 : [
                     BoxShadow(
-                      color: colorScheme.primary.withOpacity(0.25 * value),
+                      color: colorScheme.primary.withValues(alpha: 0.25 * value),
                       blurRadius: 12.0,
                       spreadRadius: 1.0,
                     ),
@@ -61,12 +61,6 @@ class FavoritesScreen extends ConsumerWidget {
     );
   }
 
-  void _showSoonSnack(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
-
   Widget _buildBottomNavBar(BuildContext context, {required int selectedIndex}) {
     return SafeArea(
       top: false,
@@ -77,7 +71,9 @@ class FavoritesScreen extends ConsumerWidget {
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24.0)),
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).colorScheme.shadow.withOpacity(0.08),
+              color: Theme.of(
+                context,
+              ).colorScheme.shadow.withValues(alpha: 0.08),
               blurRadius: 16.0,
               offset: const Offset(0, -6),
             ),

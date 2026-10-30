@@ -1,5 +1,7 @@
 // lib/domain/services/recovery_calculator.dart
 
+import 'dart:math' as math;
+
 import 'package:calisthenics_app/domain/models/mli_models.dart';
 import 'package:calisthenics_app/domain/models/muscle_recovery.dart';
 import 'package:calisthenics_app/domain/services/mli_calculator.dart';
@@ -99,22 +101,53 @@ Map<RecoveryMuscle, MuscleRecoveryRecord> buildSessionRecovery({
   return records;
 }
 
-/// Kas henüz toparlanmadan tekrar çalıştırıldıysa, daha geç biten toparlanma
-/// süresi korunur (kümülatif yorgunluk).
+/// Kas henüz toparlanmadan tekrar çalıştırıldıysa, kalan sürenin %30'u
+/// kümülatif yorgunluk cezası olarak eklenir ve geçmiş toparlanma ilerlemesi
+/// korunarak toplam süre 24–96 saat bandında sınırlandırılır.
 MuscleRecoveryRecord mergeRecovery(
   MuscleRecoveryRecord? existing,
   MuscleRecoveryRecord incoming,
 ) {
-  if (existing == null || !existing.readyAt.isAfter(incoming.readyAt)) {
+  if (existing == null) {
     return incoming;
   }
-  final hours =
-      existing.readyAt.difference(incoming.lastTrainedAt).inMinutes / 60.0;
+
+  final now = incoming.lastTrainedAt;
+  final remainingMinutes = existing.readyAt.difference(now).inMinutes;
+  if (remainingMinutes <= 0) {
+    return incoming;
+  }
+
+  final remainingHours = remainingMinutes / 60.0;
+  final elapsedMinutes = math.max(
+    0,
+    now.difference(existing.lastTrainedAt).inMinutes,
+  );
+  final elapsedHours = elapsedMinutes / 60.0;
+
+  // Kalan sürenin %30'u kümülatif yorgunluk cezası olarak eklenir (24–96 sa bandı)
+  const cumulativePenaltyFactor = 0.30;
+  final newRemainingHours =
+      (math.max(remainingHours, incoming.recoveryHours) +
+              (remainingHours * cumulativePenaltyFactor))
+          .clamp(24.0, 96.0)
+          .toDouble();
+
+  final targetReadyAt = now.add(
+    Duration(minutes: (newRemainingHours * 60).round()),
+  );
+  final totalRecoveryHours = (elapsedHours + newRemainingHours)
+      .clamp(24.0, 96.0)
+      .toDouble();
+  final preservedLastTrainedAt = targetReadyAt.subtract(
+    Duration(minutes: (totalRecoveryHours * 60).round()),
+  );
+
   return MuscleRecoveryRecord(
     muscle: incoming.muscle,
-    lastTrainedAt: incoming.lastTrainedAt,
-    recoveryHours: hours,
-    averageRir: incoming.averageRir,
-    load: incoming.load,
+    lastTrainedAt: preservedLastTrainedAt,
+    recoveryHours: totalRecoveryHours,
+    averageRir: math.min(existing.averageRir, incoming.averageRir),
+    load: existing.load + incoming.load,
   );
 }

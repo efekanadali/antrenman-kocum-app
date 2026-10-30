@@ -25,10 +25,10 @@ class WorkoutSet {
   final double extraWeightKg;
   final double? bodyWeightKg;
 
-  // Dynamic hareketlerde reps, statik hareketlerde saniye/3 kullanilir.
+  // Dynamic hareketlerde reps, statik hareketlerde saniye * 0.5 kullanilir.
   double get volume {
     if (durationInSeconds != null) {
-      return durationInSeconds! / 3.0;
+      return durationInSeconds! * 0.5;
     }
     return reps.toDouble();
   }

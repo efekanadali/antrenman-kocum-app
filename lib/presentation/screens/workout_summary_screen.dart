@@ -3,20 +3,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
+import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 import 'package:calisthenics_app/core/local_storage/workout_history_storage.dart';
 import 'package:calisthenics_app/core/local_storage/workout_summary_storage.dart';
 import 'package:calisthenics_app/domain/services/mli_calculator.dart';
 import 'package:calisthenics_app/domain/services/recovery_calculator.dart';
 import 'package:calisthenics_app/data/services/firestore_service.dart';
 
-// ─── Design Tokens ───────────────────────────────────────────────────────────
-const Color _bg = Color(0xFF0C101B);
-const Color _surface = Color(0xFF161C2C);
-const Color _card = Color(0xFF1E263B);
-const Color _stroke = Color(0xFF28324C);
-const Color _accent = Color(0xFFC2F13A);
-const Color _textPrimary = Color(0xFFFFFFFF);
-const Color _textMuted = Color(0xFF8E9BAE);
+// ─── Design Tokens (AppColors Üzerinden Beslenir) ────────────────────────────
+const Color _bg = AppColors.background;
+const Color _surface = AppColors.surface;
+const Color _card = AppColors.surface;
+const Color _stroke = AppColors.border;
+const Color _accent = AppColors.volcanic;
+const Color _emerald = AppColors.emerald;
+const Color _textPrimary = AppColors.textHigh;
+const Color _textMuted = AppColors.textMid;
 
 // ─── Model ───────────────────────────────────────────────────────────────────
 class WorkoutSummaryArgs {
@@ -55,22 +57,12 @@ class WorkoutSummaryScreen extends ConsumerStatefulWidget {
 class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
   bool _firestoreSynced = false;
 
-  @override
-  void initState() {
-    super.initState();
-    // Antrenman tamamlandığında Firestore senkronizasyonunu arka planda sessizce tetikle
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _syncToFirestore();
-    });
-  }
-
-  void _syncToFirestore() {
+  Future<void> _syncToFirestore({required DateTime completedAt}) async {
     if (_firestoreSynced) return;
-    _firestoreSynced = true;
 
     try {
       final sessionData = <String, dynamic>{
-        'completedAt': DateTime.now().toIso8601String(),
+        'completedAt': completedAt.toIso8601String(),
         'durationSeconds': widget.args.totalTime.inSeconds,
         'exercisesDone': [widget.args.exerciseName],
         'totalMliWorkload': widget.args.totalLoad,
@@ -91,26 +83,26 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
       };
 
       final firestore = ref.read(firestoreServiceProvider);
-      firestore.saveWorkoutSession(sessionData).catchError((_) {});
-
       final recovery = buildSessionRecovery(
         muscleLoad: widget.args.muscleLoad,
         muscleRir: widget.args.muscleRir,
-        completedAt: DateTime.now(),
+        completedAt: completedAt,
         defaultRir: widget.args.averageRir ?? kDefaultRir,
       );
-      if (recovery.isNotEmpty) {
-        firestore.saveSessionRecovery(recovery).catchError((_) {});
-      }
+
+      await Future.wait([
+        firestore.saveWorkoutSession(sessionData),
+        if (recovery.isNotEmpty) firestore.saveSessionRecovery(recovery),
+      ]);
+      _firestoreSynced = true;
     } catch (_) {
-      // Sessiz hata yakalama: UI akışını engellemez
+      // Sessiz hata yakalama: UI akışını engellemez, _firestoreSynced false kalır
     }
   }
 
   // ── Business Logic ──────────────────────────────────────────────────────────
   Future<void> _saveSession(BuildContext context) async {
-    _syncToFirestore();
-
+    final completedAt = DateTime.now();
     final storage = WorkoutHistoryStorage();
     final summaryStorage = WorkoutSummaryStorage();
     final entry = WorkoutSessionEntry(
@@ -118,27 +110,49 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
       totalTimeSeconds: widget.args.totalTime.inSeconds,
       setsCompleted: widget.args.setsCompleted,
       totalSets: widget.args.totalSets,
-      completedAt: DateTime.now(),
+      completedAt: completedAt,
     );
 
     final summaryEntry = WorkoutSummaryEntry(
-      date: DateTime.now(),
+      date: completedAt,
       totalLoad: widget.args.totalLoad,
       muscleLoad: widget.args.muscleLoad,
       duration: widget.args.totalTime.inSeconds,
     );
 
     try {
-      await storage.saveSession(entry);
-      await summaryStorage.saveSummary(summaryEntry);
+      await Future.wait([
+        storage.saveSession(entry),
+        summaryStorage.saveSummary(summaryEntry),
+        _syncToFirestore(completedAt: completedAt),
+      ]);
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Seans kaydedildi'),
-          backgroundColor: _accent.withAlpha(220),
+          backgroundColor: AppColors.surfaceSoft,
           behavior: SnackBarBehavior.floating,
+          elevation: 4,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
+            side: const BorderSide(color: AppColors.borderSubtle, width: 1),
+          ),
+          content: const Row(
+            children: [
+              Icon(
+                Icons.check_circle_rounded,
+                color: AppColors.emerald,
+                size: 20,
+              ),
+              SizedBox(width: 10),
+              Text(
+                'Seans kaydedildi',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+            ],
           ),
         ),
       );
@@ -146,7 +160,10 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Kaydetme başarısız'),
+          content: const Text(
+            'Kaydetme başarısız',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          ),
           backgroundColor: Colors.red.shade800,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -248,26 +265,29 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
   Widget _buildHeader(BuildContext context) {
     return Column(
       children: [
-        // Trophy icon with glow ring
+        // Trophy icon with subtle emerald ring
         Container(
           width: 88,
           height: 88,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: _card,
-            border: Border.all(color: _accent, width: 2.5),
+            border: Border.all(
+              color: _emerald.withValues(alpha: 0.65),
+              width: 2.0,
+            ),
             boxShadow: [
               BoxShadow(
-                color: _accent.withAlpha(60),
-                blurRadius: 24,
-                spreadRadius: 4,
+                color: _emerald.withValues(alpha: 0.18),
+                blurRadius: 20,
+                spreadRadius: 2,
               ),
             ],
           ),
           child: const Icon(
             Icons.emoji_events_rounded,
             size: 42,
-            color: _accent,
+            color: _emerald,
           ),
         ),
         const SizedBox(height: 18),
@@ -347,7 +367,7 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: _accent.withAlpha(28),
+                  color: _accent.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
@@ -476,14 +496,14 @@ class _MuscleLoadRow extends StatelessWidget {
     final Color badgeFg;
     switch (evaluation.level) {
       case MliStimulusLevel.optimal:
-        badgeBg = const Color(0xFFC2F13A).withAlpha(38);
-        badgeFg = const Color(0xFFC2F13A);
+        badgeBg = _emerald.withValues(alpha: 0.16);
+        badgeFg = _emerald;
       case MliStimulusLevel.understimulated:
-        badgeBg = Colors.white10;
-        badgeFg = const Color(0xFF8E9BAE);
+        badgeBg = AppColors.surfaceSoft;
+        badgeFg = _textMuted;
       case MliStimulusLevel.overload:
-        badgeBg = Colors.orange.withAlpha(38);
-        badgeFg = Colors.orangeAccent;
+        badgeBg = _accent.withValues(alpha: 0.16);
+        badgeFg = _accent;
     }
 
     return Padding(
@@ -537,10 +557,8 @@ class _MuscleLoadRow extends StatelessWidget {
             child: LinearProgressIndicator(
               value: ratio.clamp(0.0, 1.0),
               minHeight: 7,
-              backgroundColor: _stroke,
-              valueColor: AlwaysStoppedAnimation<Color>(
-                badgeFg == const Color(0xFFC2F13A) ? _accent : badgeFg,
-              ),
+              backgroundColor: AppColors.surfaceSoft,
+              valueColor: AlwaysStoppedAnimation<Color>(badgeFg),
             ),
           ),
         ],
@@ -572,7 +590,7 @@ class _SaveButton extends StatelessWidget {
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: _accent,
-          foregroundColor: const Color(0xFF0C101B),
+          foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),

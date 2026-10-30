@@ -16,7 +16,8 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = Theme.of(context).colorScheme.onSurface.withOpacity(0.6);
+    final color =
+        Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6);
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,

@@ -59,12 +59,16 @@ class ExerciseMliResolver {
     CustomProgramExercise source, {
     domain.Exercise? detail,
   }) {
+    final libraryExercise = _resolveLibrary(source);
     final resolvedDetail = detail ?? resolveDetail(source);
     if (resolvedDetail != null) {
-      return _fromDetail(source, resolvedDetail);
+      return _fromDetail(
+        source,
+        resolvedDetail,
+        libraryFallback: libraryExercise,
+      );
     }
 
-    final libraryExercise = _resolveLibrary(source);
     if (libraryExercise != null) {
       return mli.Exercise(
         name: source.exerciseName,
@@ -150,8 +154,9 @@ class ExerciseMliResolver {
 
   mli.Exercise _fromDetail(
     CustomProgramExercise source,
-    domain.Exercise detail,
-  ) {
+    domain.Exercise detail, {
+    mli.Exercise? libraryFallback,
+  }) {
     final muscles = <String, double>{};
 
     if (detail.muscleRatings.isNotEmpty) {
@@ -178,11 +183,21 @@ class ExerciseMliResolver {
       for (var i = 0; i < groups.length; i++) {
         muscles[groups[i].label] = i == 0 ? 1.0 : 0.5;
       }
+    } else if (libraryFallback != null) {
+      muscles.addAll(libraryFallback.muscles);
     }
+
+    final resolvedLibrary =
+        libraryFallback ??
+        library_data.exerciseDatabase[detail.id] ??
+        _library[_normalize(detail.id)] ??
+        _library[_normalize(detail.name)];
+    final leverageFactor =
+        resolvedLibrary?.difficulty ?? _difficultyCoefficient(detail);
 
     return mli.Exercise(
       name: source.exerciseName,
-      difficulty: _difficultyCoefficient(detail),
+      difficulty: leverageFactor,
       muscles: muscles,
     );
   }
