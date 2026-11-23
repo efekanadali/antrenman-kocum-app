@@ -1,12 +1,14 @@
 // lib/domain/services/exercise_mli_resolver.dart
 
-import 'package:calisthenics_app/core/utils/enum_label.dart';
 import 'package:calisthenics_app/domain/enums/difficulty_level.dart';
+import 'package:calisthenics_app/domain/enums/exercise_type.dart';
+import 'package:calisthenics_app/domain/enums/muscle_compartment.dart';
 import 'package:calisthenics_app/domain/models/custom_program.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart' as domain;
 import 'package:calisthenics_app/domain/models/exercise_database.dart'
     as library_data;
 import 'package:calisthenics_app/domain/models/mli_models.dart' as mli;
+import 'package:calisthenics_app/domain/services/muscle_key_mapper.dart';
 
 /// Bir [CustomProgramExercise] kaydını MLI hesaplamasında kullanılan
 /// biyomekanik modele (`leverageFactor`/zorluk katsayısı + kas ağırlıkları)
@@ -73,44 +75,51 @@ class ExerciseMliResolver {
       return mli.Exercise(
         name: source.exerciseName,
         difficulty: libraryExercise.difficulty,
-        muscles: libraryExercise.muscles,
+        compartments: libraryExercise.compartments,
+        type: libraryExercise.type,
       );
     }
 
     return _inferFromName(source);
   }
 
+  static mli.Exercise _template(
+    String name,
+    Map<MuscleCompartment, double> compartments,
+  ) {
+    return mli.Exercise(name: name, difficulty: 1.0, compartments: compartments);
+  }
+
+  /// Kütüphanede bulunmayan hareketler için ada göre 17 kompartımanlı şablon
+  /// (her şablonun toplamı 1.00).
   mli.Exercise _inferFromName(CustomProgramExercise source) {
     final normalized = _normalize(source.exerciseName);
 
-    // omega: Ana kas=1.0, Yardimci=0.5, Stabilizator=0.2
     if (normalized.contains('push') || normalized.contains('dip')) {
-      return mli.Exercise(
-        name: source.exerciseName,
-        difficulty: 1.0,
-        muscles: {
-          'chest': 1.0,
-          'triceps': 0.5,
-          'shoulders': 0.5,
-          'core': 0.2,
-        },
-      );
+      // Yatay/dikey itiş: standart şınav dağılımı.
+      return _template(source.exerciseName, const {
+        MuscleCompartment.midChest: 0.35,
+        MuscleCompartment.upperChest: 0.10,
+        MuscleCompartment.lowerChest: 0.10,
+        MuscleCompartment.triceps: 0.20,
+        MuscleCompartment.anteriorDeltoid: 0.15,
+        MuscleCompartment.core: 0.10,
+      });
     }
 
     if (normalized.contains('pull') ||
         normalized.contains('row') ||
         normalized.contains('chin') ||
         normalized.contains('lever')) {
-      return mli.Exercise(
-        name: source.exerciseName,
-        difficulty: 1.0,
-        muscles: {
-          'back': 1.0,
-          'biceps': 0.5,
-          'shoulders': 0.5,
-          'core': 0.2,
-        },
-      );
+      // Çekiş: standart barfiks dağılımı.
+      return _template(source.exerciseName, const {
+        MuscleCompartment.lats: 0.40,
+        MuscleCompartment.upperBackTraps: 0.10,
+        MuscleCompartment.biceps: 0.20,
+        MuscleCompartment.forearms: 0.08,
+        MuscleCompartment.posteriorDeltoid: 0.10,
+        MuscleCompartment.core: 0.12,
+      });
     }
 
     if (normalized.contains('squat') ||
@@ -121,24 +130,24 @@ class ExerciseMliResolver {
         normalized.contains('calf') ||
         normalized.contains('bridge') ||
         normalized.contains('curl')) {
-      return mli.Exercise(
-        name: source.exerciseName,
-        difficulty: 1.0,
-        muscles: {
-          'quads': 1.0,
-          'glutes': 0.5,
-          'hamstrings': 0.5,
-          'calves': 0.2,
-        },
-      );
+      // Bacak: standart squat dağılımı.
+      return _template(source.exerciseName, const {
+        MuscleCompartment.quads: 0.50,
+        MuscleCompartment.glutes: 0.25,
+        MuscleCompartment.hamstrings: 0.08,
+        MuscleCompartment.calves: 0.05,
+        MuscleCompartment.lowerBack: 0.05,
+        MuscleCompartment.core: 0.07,
+      });
     }
 
     // Genel/core egzersiz
-    return mli.Exercise(
-      name: source.exerciseName,
-      difficulty: 1.0,
-      muscles: {'core': 1.0, 'shoulders': 0.5, 'back': 0.5},
-    );
+    return _template(source.exerciseName, const {
+      MuscleCompartment.core: 0.60,
+      MuscleCompartment.anteriorDeltoid: 0.15,
+      MuscleCompartment.lats: 0.10,
+      MuscleCompartment.lowerBack: 0.15,
+    });
   }
 
   double _difficultyCoefficient(domain.Exercise detail) {
@@ -157,15 +166,16 @@ class ExerciseMliResolver {
     domain.Exercise detail, {
     mli.Exercise? libraryFallback,
   }) {
-    final muscles = <String, double>{};
+    var compartments = normalizeCompartmentWeights(detail.compartmentWeights);
 
-    if (detail.muscleRatings.isNotEmpty) {
+    if (compartments.isEmpty && detail.muscleRatings.isNotEmpty) {
       // omega ataması: maxRating -> 1.0 (Ana kas)
       //                max/2 ve üstü -> 0.5 (Yardimci kas)
       //                diğerleri     -> 0.2 (Stabilizatör)
+      // Ardından kompartımanlara bölünüp toplam 1.00'a normalize edilir.
       final maxRating =
           detail.muscleRatings.values.fold<int>(0, (m, v) => v > m ? v : m);
-
+      final omegas = <String, double>{};
       detail.muscleRatings.forEach((group, rating) {
         final double omega;
         if (rating >= maxRating) {
@@ -175,16 +185,19 @@ class ExerciseMliResolver {
         } else {
           omega = 0.2;
         }
-        muscles[group.label] = omega;
+        omegas[group.name] = omega;
       });
-    } else if (detail.targetMuscleGroups.isNotEmpty) {
-      // İlk kas birincil (1.0), diğerleri yardimci (0.5)
+      compartments = compartmentWeightsFromLegacy(omegas);
+    }
+
+    if (compartments.isEmpty && detail.targetMuscleGroups.isNotEmpty) {
+      // İlk kas birincil (1.0), diğerleri yardimci (0.5); toplam 1.00'a normalize.
       final groups = detail.targetMuscleGroups;
+      final omegas = <String, double>{};
       for (var i = 0; i < groups.length; i++) {
-        muscles[groups[i].label] = i == 0 ? 1.0 : 0.5;
+        omegas[groups[i].name] = i == 0 ? 1.0 : 0.5;
       }
-    } else if (libraryFallback != null) {
-      muscles.addAll(libraryFallback.muscles);
+      compartments = compartmentWeightsFromLegacy(omegas);
     }
 
     final resolvedLibrary =
@@ -192,13 +205,22 @@ class ExerciseMliResolver {
         library_data.exerciseDatabase[detail.id] ??
         _library[_normalize(detail.id)] ??
         _library[_normalize(detail.name)];
+
+    if (compartments.isEmpty && resolvedLibrary != null) {
+      compartments = resolvedLibrary.compartments;
+    }
+    if (compartments.isEmpty) {
+      compartments = _inferFromName(source).compartments;
+    }
+
     final leverageFactor =
         resolvedLibrary?.difficulty ?? _difficultyCoefficient(detail);
 
     return mli.Exercise(
       name: source.exerciseName,
       difficulty: leverageFactor,
-      muscles: muscles,
+      compartments: compartments,
+      type: resolvedLibrary?.type ?? ExerciseType.calisthenics,
     );
   }
 }

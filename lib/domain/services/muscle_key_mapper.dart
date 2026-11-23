@@ -241,3 +241,40 @@ Map<MuscleRegion, double> aggregateToRegions(
   });
   return result;
 }
+
+/// Ağırlıkları toplamı 1.00 olacak şekilde ölçekler. Pozitif olmayan
+/// değerler atılır; toplam 0 ise boş harita döner.
+Map<MuscleCompartment, double> normalizeCompartmentWeights(
+  Map<MuscleCompartment, double> weights,
+) {
+  final positive = {
+    for (final e in weights.entries)
+      if (e.value > 0) e.key: e.value,
+  };
+  final sum = positive.values.fold<double>(0, (a, b) => a + b);
+  if (sum <= 0) return const {};
+  return {for (final e in positive.entries) e.key: e.value / sum};
+}
+
+/// Eski anahtar → ağırlık haritasını (`muscles`, ör. `{chest: 1.0,
+/// triceps: 0.5}` veya `{Göğüs: 5}`) 1.00'a normalize edilmiş kompartıman
+/// ağırlıklarına çevirir. Eşlenemeyen anahtarlar (ör. `Genel`) yok sayılır.
+Map<MuscleCompartment, double> compartmentWeightsFromLegacy(
+  Map<String, double> legacyWeights,
+) {
+  return normalizeCompartmentWeights(splitLoad(legacyWeights).loads);
+}
+
+/// Firestore'daki `compartments` alanını (`firestoreKey` veya kompartıman
+/// adı/etiketi → sayı) okur ve 1.00'a normalize eder. Geçersiz giriş için
+/// boş harita döner.
+Map<MuscleCompartment, double> parseCompartmentWeights(Object? raw) {
+  if (raw is! Map) return const {};
+  final result = <MuscleCompartment, double>{};
+  raw.forEach((key, value) {
+    final c = compartmentFromKey(key.toString());
+    if (c == null || value is! num) return;
+    result[c] = (result[c] ?? 0) + value.toDouble();
+  });
+  return normalizeCompartmentWeights(result);
+}

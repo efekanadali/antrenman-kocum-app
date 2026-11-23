@@ -7,20 +7,25 @@ class CustomProgramExercise {
   final int value;
   final bool isTimed;
 
+  /// Vücut geliştirme hareketlerinde hedef dış yük (kg). Kalistenikte `null`.
+  final double? loadKg;
+
   const CustomProgramExercise({
     required this.exerciseId,
     required this.exerciseName,
     required this.sets,
     required this.value,
     required this.isTimed,
+    this.loadKg,
   });
 
   Map<String, dynamic> toJson() => {
         'exerciseId': exerciseId,
         'exerciseName': exerciseName,
         'sets': sets,
-      'value': value,
-      'isTimed': isTimed,
+        'value': value,
+        'isTimed': isTimed,
+        if (loadKg != null) 'loadKg': loadKg,
       };
 
   factory CustomProgramExercise.fromJson(Map<String, dynamic> json) {
@@ -30,7 +35,15 @@ class CustomProgramExercise {
       sets: json['sets'] as int,
       value: (json['value'] ?? json['reps']) as int,
       isTimed: (json['isTimed'] ?? false) as bool,
+      loadKg: _parseLoadKg(json['loadKg']),
     );
+  }
+
+  /// Eksik / int / double / sayısal metin değerlerini tolere eder.
+  static double? _parseLoadKg(Object? raw) {
+    if (raw is num) return raw.toDouble();
+    if (raw is String) return double.tryParse(raw);
+    return null;
   }
 }
 

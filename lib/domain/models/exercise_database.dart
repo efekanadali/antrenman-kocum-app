@@ -1,378 +1,511 @@
+// lib/domain/models/exercise_database.dart
+
+import 'package:calisthenics_app/domain/enums/muscle_compartment.dart';
 import 'package:calisthenics_app/domain/models/mli_models.dart';
 
+/// Egzersiz kütüphanesi: 17 kas kompartımanı üzerinde ağırlık dağılımı.
+///
+/// * Her egzersizin kompartıman ağırlıkları toplamı tam olarak 1.00'dır.
+/// * `difficulty` (Lf) değerleri kompartıman göçünden önceki değerlerle aynıdır.
+/// * Anahtarlar (egzersiz id'leri) kalıcı veride kullanıldığı için DEĞİŞTİRİLMEZ.
 final Map<String, Exercise> exerciseDatabase = {
   // ==================== İTİŞ (PUSH) ====================
-  'incline_push_up': const Exercise(
+  // Eller yüksekte: itiş açısı aşağı yönlü → alt/orta göğüs baskın.
+  'incline_push_up': Exercise(
     name: 'Incline Push-up',
     difficulty: 0.65, // GRF %41-45 vücut ağırlığı
-    muscles: {
-      'chest': 1.0,
-      'triceps': 0.5,
-      'shoulders': 0.5,
-      'core': 0.2,
+    compartments: {
+      MuscleCompartment.midChest: 0.30,
+      MuscleCompartment.lowerChest: 0.20,
+      MuscleCompartment.upperChest: 0.05,
+      MuscleCompartment.triceps: 0.20,
+      MuscleCompartment.anteriorDeltoid: 0.15,
+      MuscleCompartment.core: 0.10,
     },
   ),
-  'knee_push_up': const Exercise(
+  // Kısaltılmış kaldıraç; standart şınavla aynı kas dağılımı.
+  'knee_push_up': Exercise(
     name: 'Knee Push-up',
     difficulty: 0.75, // GRF %53 vücut ağırlığı
-    muscles: {
-      'chest': 1.0,
-      'triceps': 0.5,
-      'shoulders': 0.5,
-      'core': 0.2,
+    compartments: {
+      MuscleCompartment.midChest: 0.35,
+      MuscleCompartment.upperChest: 0.10,
+      MuscleCompartment.lowerChest: 0.10,
+      MuscleCompartment.triceps: 0.20,
+      MuscleCompartment.anteriorDeltoid: 0.15,
+      MuscleCompartment.core: 0.10,
     },
   ),
-  'standard_push_up': const Exercise(
+  // Yatay itiş: orta göğüs ana kas, triseps + ön omuz yardımcı, karın anti-ekstansiyon.
+  'standard_push_up': Exercise(
     name: 'Standard Push-up',
     difficulty: 1.00, // Taban referans (GRF %64)
-    muscles: {
-      'chest': 1.0,
-      'triceps': 0.5,
-      'shoulders': 0.5,
-      'core': 0.2,
+    compartments: {
+      MuscleCompartment.midChest: 0.35,
+      MuscleCompartment.upperChest: 0.10,
+      MuscleCompartment.lowerChest: 0.10,
+      MuscleCompartment.triceps: 0.20,
+      MuscleCompartment.anteriorDeltoid: 0.15,
+      MuscleCompartment.core: 0.10,
     },
   ),
-  'wide_push_up': const Exercise(
+  // Geniş tutuş: horizontal addüksiyon artar → göğüs payı yükselir, triseps azalır.
+  'wide_push_up': Exercise(
     name: 'Wide Push-up',
     difficulty: 1.10,
-    muscles: {
-      'chest': 1.0,
-      'shoulders': 0.5,
-      'triceps': 0.3,
-      'core': 0.2,
+    compartments: {
+      MuscleCompartment.midChest: 0.40,
+      MuscleCompartment.upperChest: 0.10,
+      MuscleCompartment.lowerChest: 0.10,
+      MuscleCompartment.anteriorDeltoid: 0.18,
+      MuscleCompartment.triceps: 0.12,
+      MuscleCompartment.core: 0.10,
     },
   ),
-  'diamond_push_up': const Exercise(
+  // Dar tutuş: dirsek ekstansiyonu baskın → triseps ana kas.
+  'diamond_push_up': Exercise(
     name: 'Diamond Push-up',
     difficulty: 1.25,
-    muscles: {
-      'triceps': 1.0,
-      'chest': 0.7,
-      'shoulders': 0.5,
-      'core': 0.2,
+    compartments: {
+      MuscleCompartment.triceps: 0.40,
+      MuscleCompartment.midChest: 0.20,
+      MuscleCompartment.upperChest: 0.05,
+      MuscleCompartment.lowerChest: 0.05,
+      MuscleCompartment.anteriorDeltoid: 0.20,
+      MuscleCompartment.core: 0.10,
     },
   ),
-  'decline_push_up': const Exercise(
+  // Ayaklar yüksekte: itiş açısı yukarı → en baskın kompartıman üst göğüs; bölge olarak omuz önde.
+  'decline_push_up': Exercise(
     name: 'Decline Push-up',
     difficulty: 1.20, // GRF %74 vücut ağırlığı
-    muscles: {
-      'shoulders': 1.0,
-      'chest': 0.8,
-      'triceps': 0.5,
-      'core': 0.2,
+    compartments: {
+      MuscleCompartment.upperChest: 0.30,
+      MuscleCompartment.midChest: 0.05,
+      MuscleCompartment.anteriorDeltoid: 0.28,
+      MuscleCompartment.lateralDeltoid: 0.08,
+      MuscleCompartment.triceps: 0.19,
+      MuscleCompartment.core: 0.10,
     },
   ),
-  'pike_push_up': const Exercise(
+  // Dikey itiş: ön omuz + triseps, trapez skapula yukarı rotasyonu.
+  'pike_push_up': Exercise(
     name: 'Pike Push-up',
     difficulty: 1.55,
-    muscles: {
-      'shoulders': 1.0,
-      'triceps': 0.8,
-      'chest': 0.2,
-      'core': 0.5,
+    compartments: {
+      MuscleCompartment.anteriorDeltoid: 0.35,
+      MuscleCompartment.lateralDeltoid: 0.10,
+      MuscleCompartment.triceps: 0.25,
+      MuscleCompartment.upperBackTraps: 0.10,
+      MuscleCompartment.upperChest: 0.05,
+      MuscleCompartment.core: 0.15,
     },
   ),
-  'dips_parallel_bar': const Exercise(
+  // Öne eğik dikey itiş: alt göğüs + triseps; bar kavrama ön kol.
+  'dips_parallel_bar': Exercise(
     name: 'Parallel Bar Dips',
     difficulty: 1.55, // %100 vücut ağırlığı serbest asılı
-    muscles: {
-      'chest': 1.0,
-      'triceps': 1.0,
-      'shoulders': 0.5,
-      'core': 0.2,
+    compartments: {
+      MuscleCompartment.lowerChest: 0.30,
+      MuscleCompartment.midChest: 0.10,
+      MuscleCompartment.triceps: 0.33,
+      MuscleCompartment.forearms: 0.05,
+      MuscleCompartment.anteriorDeltoid: 0.17,
+      MuscleCompartment.core: 0.05,
     },
   ),
-  'pseudo_planche_push_up': const Exercise(
+  // Omuzlar ellerin önünde: ön omuz çok baskın; düz kol yükü biseps/ön kol, karın güçlü stabilizasyon.
+  'pseudo_planche_push_up': Exercise(
     name: 'Pseudo Planche Push-up',
     difficulty: 2.10,
-    muscles: {
-      'shoulders': 1.0,
-      'chest': 0.5,
-      'triceps': 0.5,
-      'core': 0.8,
+    compartments: {
+      MuscleCompartment.anteriorDeltoid: 0.35,
+      MuscleCompartment.lateralDeltoid: 0.05,
+      MuscleCompartment.midChest: 0.10,
+      MuscleCompartment.upperChest: 0.05,
+      MuscleCompartment.triceps: 0.15,
+      MuscleCompartment.biceps: 0.05,
+      MuscleCompartment.forearms: 0.05,
+      MuscleCompartment.upperBackTraps: 0.05,
+      MuscleCompartment.core: 0.15,
     },
   ),
-  'handstand_push_up': const Exercise(
+  // Tam dikey itiş: ön/yan omuz + triseps, trapez yukarı rotasyon.
+  'handstand_push_up': Exercise(
     name: 'Handstand Push-up',
     difficulty: 2.70,
-    muscles: {
-      'shoulders': 1.0,
-      'triceps': 0.8,
-      'core': 0.5,
-      'back': 0.2,
+    compartments: {
+      MuscleCompartment.anteriorDeltoid: 0.35,
+      MuscleCompartment.lateralDeltoid: 0.12,
+      MuscleCompartment.triceps: 0.25,
+      MuscleCompartment.upperBackTraps: 0.13,
+      MuscleCompartment.upperChest: 0.05,
+      MuscleCompartment.core: 0.10,
     },
   ),
-  '90_degree_push_up': const Exercise(
+  // Yatay vücutta dikey itiş: ön omuz + triseps, bilek yükü ön kol, gövde kilidi karın/bel.
+  '90_degree_push_up': Exercise(
     name: '90 Degree Push-up',
     difficulty: 3.40,
-    muscles: {
-      'shoulders': 1.0,
-      'triceps': 1.0,
-      'core': 0.8,
-      'back': 0.5,
+    compartments: {
+      MuscleCompartment.anteriorDeltoid: 0.30,
+      MuscleCompartment.lateralDeltoid: 0.05,
+      MuscleCompartment.triceps: 0.22,
+      MuscleCompartment.forearms: 0.08,
+      MuscleCompartment.core: 0.20,
+      MuscleCompartment.upperBackTraps: 0.05,
+      MuscleCompartment.lowerBack: 0.05,
+      MuscleCompartment.upperChest: 0.05,
     },
   ),
 
   // ==================== ÇEKİŞ (PULL) ====================
-  'australian_row': const Exercise(
+  // Yatay çekiş: lats + üst sırt eşit, arka omuz ve biseps yardımcı.
+  'australian_row': Exercise(
     name: 'Australian Row (Horizontal Pull)',
     difficulty: 0.85,
-    muscles: {
-      'back': 1.0,
-      'biceps': 0.5,
-      'shoulders': 0.5,
-      'core': 0.2,
+    compartments: {
+      MuscleCompartment.lats: 0.25,
+      MuscleCompartment.upperBackTraps: 0.25,
+      MuscleCompartment.lowerBack: 0.05,
+      MuscleCompartment.posteriorDeltoid: 0.15,
+      MuscleCompartment.biceps: 0.15,
+      MuscleCompartment.forearms: 0.05,
+      MuscleCompartment.core: 0.10,
     },
   ),
-  'chin_up_hold_top': const Exercise(
+  // Supine tutuşla tepede izometrik: biseps ana kas, lats yardımcı, bar tutuşu ön kol.
+  'chin_up_hold_top': Exercise(
     name: 'Chin-up Hold Top',
     difficulty: 1.15,
-    muscles: {
-      'biceps': 1.0,
-      'back': 0.8,
-      'core': 0.2,
+    compartments: {
+      MuscleCompartment.biceps: 0.35,
+      MuscleCompartment.forearms: 0.12,
+      MuscleCompartment.lats: 0.25,
+      MuscleCompartment.upperBackTraps: 0.08,
+      MuscleCompartment.posteriorDeltoid: 0.05,
+      MuscleCompartment.core: 0.15,
     },
   ),
-  'pull_up_hold_top': const Exercise(
+  // Pronasyon tutuşla tepede izometrik: lats ana kas, bar tutuşu ön kol.
+  'pull_up_hold_top': Exercise(
     name: 'Pull-up Hold Top',
     difficulty: 1.20,
-    muscles: {
-      'back': 1.0,
-      'biceps': 0.5,
-      'shoulders': 0.5,
-      'core': 0.2,
+    compartments: {
+      MuscleCompartment.lats: 0.35,
+      MuscleCompartment.upperBackTraps: 0.12,
+      MuscleCompartment.biceps: 0.18,
+      MuscleCompartment.forearms: 0.12,
+      MuscleCompartment.posteriorDeltoid: 0.08,
+      MuscleCompartment.core: 0.15,
     },
   ),
-  'standard_pull_up': const Exercise(
+  // Dikey çekiş: lats ana kas, biseps + arka omuz yardımcı.
+  'standard_pull_up': Exercise(
     name: 'Standard Pull-up',
     difficulty: 1.55, // %100 vücut ağırlığı
-    muscles: {
-      'back': 1.0,
-      'biceps': 0.5,
-      'shoulders': 0.5,
-      'core': 0.2,
+    compartments: {
+      MuscleCompartment.lats: 0.40,
+      MuscleCompartment.upperBackTraps: 0.10,
+      MuscleCompartment.biceps: 0.20,
+      MuscleCompartment.forearms: 0.08,
+      MuscleCompartment.posteriorDeltoid: 0.10,
+      MuscleCompartment.core: 0.12,
     },
   ),
-  'chin_up': const Exercise(
+  // Supine dikey çekiş: lats ≈ biseps; alt göğüs (sternal) omuz ekstansiyonuna katkı.
+  'chin_up': Exercise(
     name: 'Chin-up',
     difficulty: 1.45,
-    muscles: {
-      'biceps': 1.0,
-      'back': 1.0,
-      'core': 0.2,
+    compartments: {
+      MuscleCompartment.lats: 0.35,
+      MuscleCompartment.upperBackTraps: 0.05,
+      MuscleCompartment.biceps: 0.30,
+      MuscleCompartment.forearms: 0.07,
+      MuscleCompartment.posteriorDeltoid: 0.05,
+      MuscleCompartment.lowerChest: 0.05,
+      MuscleCompartment.core: 0.13,
     },
   ),
-  'wide_grip_pull_up': const Exercise(
+  // Geniş tutuş: lats + arka omuz baskın, biseps payı düşer.
+  'wide_grip_pull_up': Exercise(
     name: 'Wide Grip Pull-up',
     difficulty: 1.70,
-    muscles: {
-      'back': 1.0,
-      'shoulders': 0.5,
-      'biceps': 0.3,
-      'core': 0.2,
+    compartments: {
+      MuscleCompartment.lats: 0.45,
+      MuscleCompartment.upperBackTraps: 0.12,
+      MuscleCompartment.posteriorDeltoid: 0.13,
+      MuscleCompartment.biceps: 0.12,
+      MuscleCompartment.forearms: 0.06,
+      MuscleCompartment.core: 0.12,
     },
   ),
-  'archer_pull_up': const Exercise(
+  // Tek tarafa ağırlıklı dikey çekiş: lats + biseps, anti-rotasyon karın.
+  'archer_pull_up': Exercise(
     name: 'Archer Pull-up',
     difficulty: 2.20,
-    muscles: {
-      'back': 1.0,
-      'biceps': 0.8,
-      'core': 0.5,
-      'shoulders': 0.5,
+    compartments: {
+      MuscleCompartment.lats: 0.40,
+      MuscleCompartment.upperBackTraps: 0.08,
+      MuscleCompartment.biceps: 0.20,
+      MuscleCompartment.forearms: 0.08,
+      MuscleCompartment.posteriorDeltoid: 0.08,
+      MuscleCompartment.core: 0.16,
     },
   ),
-  'tuck_front_lever': const Exercise(
+  // Düz kol omuz ekstansiyonu: lats + triseps uzun başı; karın ve bel gövde kilidi.
+  'tuck_front_lever': Exercise(
     name: 'Tuck Front Lever',
     difficulty: 2.10,
-    muscles: {
-      'back': 1.0,
-      'core': 0.8,
-      'shoulders': 0.5,
-      'biceps': 0.3,
+    compartments: {
+      MuscleCompartment.lats: 0.35,
+      MuscleCompartment.upperBackTraps: 0.05,
+      MuscleCompartment.lowerBack: 0.05,
+      MuscleCompartment.core: 0.25,
+      MuscleCompartment.posteriorDeltoid: 0.08,
+      MuscleCompartment.biceps: 0.08,
+      MuscleCompartment.forearms: 0.07,
+      MuscleCompartment.triceps: 0.07,
     },
   ),
-  'front_lever_raise': const Exercise(
+  // Dinamik front lever: lats ana kas, karın yüksek yük, bel ekstansiyonu.
+  'front_lever_raise': Exercise(
     name: 'Front Lever Raise',
     difficulty: 2.70,
-    muscles: {
-      'back': 1.0,
-      'core': 1.0,
-      'shoulders': 0.5,
-      'triceps': 0.2,
+    compartments: {
+      MuscleCompartment.lats: 0.38,
+      MuscleCompartment.upperBackTraps: 0.05,
+      MuscleCompartment.lowerBack: 0.07,
+      MuscleCompartment.core: 0.25,
+      MuscleCompartment.posteriorDeltoid: 0.08,
+      MuscleCompartment.triceps: 0.07,
+      MuscleCompartment.biceps: 0.05,
+      MuscleCompartment.forearms: 0.05,
     },
   ),
-  'muscle_up': const Exercise(
+  // Çekiş + geçiş + dip: kol bölgesi (biseps çekiş, triseps itiş) baskın; lats, alt göğüs.
+  'muscle_up': Exercise(
     name: 'Muscle-up',
     difficulty: 2.90,
-    muscles: {
-      'back': 1.0,
-      'triceps': 0.8,
-      'chest': 0.8,
-      'biceps': 0.5,
-      'core': 0.5,
+    compartments: {
+      MuscleCompartment.lats: 0.28,
+      MuscleCompartment.upperBackTraps: 0.07,
+      MuscleCompartment.triceps: 0.18,
+      MuscleCompartment.biceps: 0.12,
+      MuscleCompartment.forearms: 0.08,
+      MuscleCompartment.lowerChest: 0.12,
+      MuscleCompartment.anteriorDeltoid: 0.05,
+      MuscleCompartment.core: 0.10,
     },
   ),
-  'one_arm_pull_up': const Exercise(
+  // Tek kol dikey çekiş: lats + biseps, yüksek kavrama yükü, anti-rotasyon karın.
+  'one_arm_pull_up': Exercise(
     name: 'One Arm Pull-up',
     difficulty: 4.20,
-    muscles: {
-      'back': 1.0,
-      'biceps': 1.0,
-      'core': 0.8,
-      'shoulders': 0.5,
+    compartments: {
+      MuscleCompartment.lats: 0.38,
+      MuscleCompartment.upperBackTraps: 0.07,
+      MuscleCompartment.biceps: 0.20,
+      MuscleCompartment.forearms: 0.10,
+      MuscleCompartment.posteriorDeltoid: 0.07,
+      MuscleCompartment.core: 0.18,
     },
   ),
 
   // ==================== BACAK (LEGS) ====================
-  'wall_sit': const Exercise(
+  // Diz 90° izometrik: quadriceps baskın.
+  'wall_sit': Exercise(
     name: 'Wall Sit',
     difficulty: 0.70,
-    muscles: {
-      'quads': 1.0,
-      'glutes': 0.5,
-      'calves': 0.2,
+    compartments: {
+      MuscleCompartment.quads: 0.70,
+      MuscleCompartment.glutes: 0.17,
+      MuscleCompartment.hamstrings: 0.05,
+      MuscleCompartment.calves: 0.08,
     },
   ),
-  'glute_bridge': const Exercise(
+  // Kalça ekstansiyonu: kalça ana kas, hamstring yardımcı, bel/karın stabilizasyon.
+  'glute_bridge': Exercise(
     name: 'Glute Bridge',
     difficulty: 0.75,
-    muscles: {
-      'glutes': 1.0,
-      'hamstrings': 0.5,
-      'core': 0.2,
+    compartments: {
+      MuscleCompartment.glutes: 0.55,
+      MuscleCompartment.hamstrings: 0.25,
+      MuscleCompartment.quads: 0.05,
+      MuscleCompartment.lowerBack: 0.08,
+      MuscleCompartment.core: 0.07,
     },
   ),
-  'calf_raise': const Exercise(
+  // Plantar fleksiyon: izole baldır.
+  'calf_raise': Exercise(
     name: 'Calf Raise',
     difficulty: 0.65,
-    muscles: {
-      'calves': 1.0,
+    compartments: {
+      MuscleCompartment.calves: 1.00,
     },
   ),
-  'standard_squat': const Exercise(
+  // Diz + kalça ekstansiyonu: quadriceps ana kas, kalça yardımcı.
+  'standard_squat': Exercise(
     name: 'Standard Squat',
     difficulty: 0.90,
-    muscles: {
-      'quads': 1.0,
-      'glutes': 0.5,
-      'hamstrings': 0.2,
-      'calves': 0.2,
+    compartments: {
+      MuscleCompartment.quads: 0.50,
+      MuscleCompartment.glutes: 0.25,
+      MuscleCompartment.hamstrings: 0.08,
+      MuscleCompartment.calves: 0.05,
+      MuscleCompartment.lowerBack: 0.05,
+      MuscleCompartment.core: 0.07,
     },
   ),
-  'lunge': const Exercise(
+  // Tek bacak ağırlıklı: quadriceps + kalça, denge için karın.
+  'lunge': Exercise(
     name: 'Lunge',
     difficulty: 1.15,
-    muscles: {
-      'quads': 1.0,
-      'glutes': 0.8,
-      'hamstrings': 0.5,
-      'calves': 0.2,
+    compartments: {
+      MuscleCompartment.quads: 0.42,
+      MuscleCompartment.glutes: 0.30,
+      MuscleCompartment.hamstrings: 0.12,
+      MuscleCompartment.calves: 0.06,
+      MuscleCompartment.core: 0.10,
     },
   ),
-  'bulgarian_split_squat': const Exercise(
+  // Arka ayak yüksekte: ön bacak quadriceps + kalça, denge karın.
+  'bulgarian_split_squat': Exercise(
     name: 'Bulgarian Split Squat',
     difficulty: 1.45,
-    muscles: {
-      'quads': 1.0,
-      'glutes': 0.8,
-      'hamstrings': 0.5,
-      'core': 0.2,
+    compartments: {
+      MuscleCompartment.quads: 0.42,
+      MuscleCompartment.glutes: 0.32,
+      MuscleCompartment.hamstrings: 0.10,
+      MuscleCompartment.calves: 0.04,
+      MuscleCompartment.core: 0.12,
     },
   ),
-  'box_jump': const Exercise(
+  // Patlayıcı üçlü ekstansiyon: quadriceps, kalça ve baldır.
+  'box_jump': Exercise(
     name: 'Box Jump',
     difficulty: 1.50,
-    muscles: {
-      'quads': 1.0,
-      'glutes': 0.8,
-      'calves': 0.8,
-      'hamstrings': 0.5,
+    compartments: {
+      MuscleCompartment.quads: 0.38,
+      MuscleCompartment.glutes: 0.25,
+      MuscleCompartment.calves: 0.22,
+      MuscleCompartment.hamstrings: 0.10,
+      MuscleCompartment.core: 0.05,
     },
   ),
-  'nordic_curl': const Exercise(
+  // Eksantrik diz fleksiyonu: hamstring baskın, gastroknemius yardımcı.
+  'nordic_curl': Exercise(
     name: 'Nordic Hamstring Curl',
     difficulty: 2.40,
-    muscles: {
-      'hamstrings': 1.0,
-      'glutes': 0.5,
-      'calves': 0.5,
-      'core': 0.2,
+    compartments: {
+      MuscleCompartment.hamstrings: 0.70,
+      MuscleCompartment.glutes: 0.12,
+      MuscleCompartment.calves: 0.08,
+      MuscleCompartment.lowerBack: 0.05,
+      MuscleCompartment.core: 0.05,
     },
   ),
-  'shrimp_squat': const Exercise(
+  // Tek bacak derin squat: quadriceps baskın, kalça, denge karın.
+  'shrimp_squat': Exercise(
     name: 'Shrimp Squat',
     difficulty: 2.20,
-    muscles: {
-      'quads': 1.0,
-      'glutes': 0.8,
-      'core': 0.5,
-      'calves': 0.2,
+    compartments: {
+      MuscleCompartment.quads: 0.52,
+      MuscleCompartment.glutes: 0.28,
+      MuscleCompartment.hamstrings: 0.05,
+      MuscleCompartment.calves: 0.03,
+      MuscleCompartment.core: 0.12,
     },
   ),
-  'pistol_squat': const Exercise(
+  // Tek bacak squat: quadriceps + kalça; serbest bacak için kalça fleksörü/karın.
+  'pistol_squat': Exercise(
     name: 'Pistol Squat',
     difficulty: 2.30,
-    muscles: {
-      'quads': 1.0,
-      'glutes': 0.8,
-      'core': 0.5,
-      'calves': 0.5,
+    compartments: {
+      MuscleCompartment.quads: 0.48,
+      MuscleCompartment.glutes: 0.25,
+      MuscleCompartment.hamstrings: 0.04,
+      MuscleCompartment.calves: 0.08,
+      MuscleCompartment.core: 0.15,
     },
   ),
 
   // ==================== STATİK & CORE ====================
-  'plank': const Exercise(
+  // Anti-ekstansiyon: karın baskın, ön omuz ve kalça stabilizasyon.
+  'plank': Exercise(
     name: 'Plank',
     difficulty: 0.70,
-    muscles: {
-      'core': 1.0,
-      'shoulders': 0.2,
-      'glutes': 0.2,
+    compartments: {
+      MuscleCompartment.core: 0.72,
+      MuscleCompartment.anteriorDeltoid: 0.12,
+      MuscleCompartment.glutes: 0.08,
+      MuscleCompartment.quads: 0.08,
     },
   ),
-  'side_plank': const Exercise(
+  // Anti-lateral fleksiyon: oblikler + quadratus lumborum (bel), glute medius.
+  'side_plank': Exercise(
     name: 'Side Plank',
     difficulty: 0.80,
-    muscles: {
-      'core': 1.0,
-      'shoulders': 0.2,
-      'glutes': 0.2,
+    compartments: {
+      MuscleCompartment.core: 0.68,
+      MuscleCompartment.lowerBack: 0.10,
+      MuscleCompartment.lateralDeltoid: 0.10,
+      MuscleCompartment.glutes: 0.12,
     },
   ),
-  'hollow_body_hold': const Exercise(
+  // Anti-ekstansiyon: karın neredeyse izole; kalça fleksörü (rectus femoris).
+  'hollow_body_hold': Exercise(
     name: 'Hollow Body Hold',
     difficulty: 1.10,
-    muscles: {
-      'core': 1.0,
+    compartments: {
+      MuscleCompartment.core: 0.90,
+      MuscleCompartment.quads: 0.05,
+      MuscleCompartment.anteriorDeltoid: 0.05,
     },
   ),
-  'support_hold_parallel_bar': const Exercise(
+  // Barda kilitli destek: omuz stabilizasyonu, triseps kilidi, kavrama ön kol, skapula depresyonu.
+  'support_hold_parallel_bar': Exercise(
     name: 'Support Hold',
     difficulty: 0.95,
-    muscles: {
-      'shoulders': 0.8,
-      'triceps': 0.5,
-      'core': 0.5,
+    compartments: {
+      MuscleCompartment.anteriorDeltoid: 0.22,
+      MuscleCompartment.lateralDeltoid: 0.08,
+      MuscleCompartment.posteriorDeltoid: 0.05,
+      MuscleCompartment.triceps: 0.20,
+      MuscleCompartment.forearms: 0.10,
+      MuscleCompartment.upperBackTraps: 0.10,
+      MuscleCompartment.lowerChest: 0.10,
+      MuscleCompartment.core: 0.15,
     },
   ),
-  'l_sit_hold': const Exercise(
+  // Kalça fleksiyonu + omuz depresyonu: karın baskın, triseps kilidi, trapez/alt göğüs depresyon.
+  'l_sit_hold': Exercise(
     name: 'L-Sit Hold',
     difficulty: 1.80,
-    muscles: {
-      'core': 1.0,
-      'triceps': 0.5,
-      'shoulders': 0.5,
+    compartments: {
+      MuscleCompartment.core: 0.50,
+      MuscleCompartment.quads: 0.10,
+      MuscleCompartment.triceps: 0.15,
+      MuscleCompartment.forearms: 0.05,
+      MuscleCompartment.anteriorDeltoid: 0.05,
+      MuscleCompartment.lowerChest: 0.05,
+      MuscleCompartment.upperBackTraps: 0.10,
     },
   ),
-  'tuck_planche': const Exercise(
+  // Düz kol öne eğilme: ön omuz çok baskın; karın, bel ve skapula protraksiyonu.
+  'tuck_planche': Exercise(
     name: 'Tuck Planche',
     difficulty: 2.80,
-    muscles: {
-      'shoulders': 1.0,
-      'triceps': 0.5,
-      'core': 0.8,
-      'back': 0.5,
+    compartments: {
+      MuscleCompartment.anteriorDeltoid: 0.35,
+      MuscleCompartment.lateralDeltoid: 0.03,
+      MuscleCompartment.core: 0.18,
+      MuscleCompartment.lowerBack: 0.07,
+      MuscleCompartment.upperBackTraps: 0.10,
+      MuscleCompartment.triceps: 0.10,
+      MuscleCompartment.biceps: 0.05,
+      MuscleCompartment.forearms: 0.07,
+      MuscleCompartment.upperChest: 0.05,
     },
   ),
 };

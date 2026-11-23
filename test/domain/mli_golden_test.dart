@@ -1,84 +1,81 @@
 // test/domain/mli_golden_test.dart
 //
-// Kas kompartımanı göçü süresince MLI / Recovery sonuçlarının değişmediğini
-// doğrular. Fixture: test/fixtures/mli_golden_v1.json
-// (üretici: tool/generate_mli_golden.dart).
+// Göç öncesi modelin dondurulmuş referansına (test/fixtures/mli_golden_v1.json)
+// karşı, kompartıman göçünde DEĞİŞMEMESİ gerekenleri doğrular:
+//  * egzersiz id'leri, adları ve Lf (difficulty) değerleri,
+//  * her vakanın ham set MLI'ı (kas ağırlıklarından bağımsız),
+//  * her vakanın birincil bölgesi (eşitlikte eski birincil bölgelerden biri).
 
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:calisthenics_app/domain/enums/muscle_compartment.dart';
+import 'package:calisthenics_app/domain/models/exercise_database.dart';
+import 'package:calisthenics_app/domain/services/mli_calculator.dart';
+import 'package:calisthenics_app/domain/services/muscle_key_mapper.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../support/mli_golden_builder.dart';
+import '../support/mli_golden_v2_builder.dart';
 
 const double _tolerance = 1e-9;
 
-void _expectDeepClose(Object? actual, Object? expected, String path) {
-  if (expected is num && actual is num) {
-    expect(
-      (actual - expected).abs() <= _tolerance,
-      isTrue,
-      reason: '$path: expected $expected, got $actual',
-    );
-    return;
-  }
-  if (expected is Map) {
-    expect(actual, isA<Map>(), reason: '$path should be a map');
-    final actualMap = actual! as Map;
-    expect(
-      actualMap.keys.toSet(),
-      expected.keys.toSet(),
-      reason: '$path: key set differs',
-    );
-    for (final key in expected.keys) {
-      _expectDeepClose(actualMap[key], expected[key], '$path.$key');
-    }
-    return;
-  }
-  if (expected is List) {
-    expect(actual, isA<List>(), reason: '$path should be a list');
-    final actualList = actual! as List;
-    expect(actualList.length, expected.length, reason: '$path: length differs');
-    for (var i = 0; i < expected.length; i++) {
-      _expectDeepClose(actualList[i], expected[i], '$path[$i]');
-    }
-    return;
-  }
-  expect(actual, expected, reason: path);
-}
-
 void main() {
-  final fixture = jsonDecode(File(kMliGoldenFixturePath).readAsStringSync())
+  final v1 = jsonDecode(File(kMliGoldenV1FixturePath).readAsStringSync())
       as Map<String, dynamic>;
-  // JSON round-trip, üretici ile aynı sayı temsiline normalize eder.
-  final actual =
-      jsonDecode(jsonEncode(buildMliGolden())) as Map<String, dynamic>;
+  final cases = (v1['cases'] as List).cast<Map<String, dynamic>>();
 
-  test('fixture header matches current exercise database', () {
-    expect(actual['schemaVersion'], fixture['schemaVersion']);
-    expect(actual['completedAt'], fixture['completedAt']);
-    expect(actual['exerciseCount'], fixture['exerciseCount']);
-    expect(actual['exerciseIds'], fixture['exerciseIds']);
-    expect(
-      (actual['cases'] as List).length,
-      (fixture['cases'] as List).length,
-    );
+  test('v1 fixture is the frozen 48-case reference', () {
+    expect(v1['schemaVersion'], 1);
+    expect(cases, hasLength(48));
   });
 
-  final expectedCases = (fixture['cases'] as List).cast<Map<String, dynamic>>();
-  final actualCases = {
-    for (final c in (actual['cases'] as List).cast<Map<String, dynamic>>())
-      '${c['exerciseId']}/${c['variant']}': c,
-  };
+  test('exercise ids are unchanged', () {
+    final ids = exerciseDatabase.keys.toList()..sort();
+    expect(ids, v1['exerciseIds']);
+    expect(exerciseDatabase, hasLength(38));
+  });
 
-  group('golden case', () {
-    for (final expected in expectedCases) {
-      final id = '${expected['exerciseId']}/${expected['variant']}';
+  group('invariant', () {
+    for (final c in cases) {
+      final id = '${c['exerciseId']}/${c['variant']}';
       test(id, () {
-        final current = actualCases[id];
-        expect(current, isNotNull, reason: 'case $id missing');
-        _expectDeepClose(current, expected, id);
+        final exercise = exerciseDatabase[c['exerciseId']]!;
+        expect(exercise.name, c['name']);
+        expect(exercise.difficulty, c['difficulty']);
+
+        final set = workoutSetFromJson(c['set'] as Map<String, dynamic>);
+        final setMli = calculateSetMli(exercise: exercise, set: set);
+        expect(
+          (setMli - (c['setMli'] as num)).abs() <= _tolerance,
+          isTrue,
+          reason: 'raw set MLI changed: ${c['setMli']} → $setMli',
+        );
+
+        final oldPrimary =
+            primaryRegions((c['regionLoad'] as Map).cast<String, num>());
+        final newRegionLoad = {
+          for (final e in aggregateToRegions(
+            calculateCompartmentLoad(exercise: exercise, set: set),
+          ).entries)
+            e.key.name: e.value,
+        };
+        final newPrimary = primaryRegions(newRegionLoad);
+        expect(newPrimary, hasLength(1), reason: 'new primary must be unique');
+        expect(
+          oldPrimary.contains(newPrimary.single),
+          isTrue,
+          reason: 'primary region changed: $oldPrimary → $newPrimary',
+        );
       });
+    }
+  });
+
+  test('every region name in v1 is a MuscleRegion', () {
+    final names = MuscleRegion.values.map((r) => r.name).toSet();
+    for (final c in cases) {
+      for (final key in (c['regionLoad'] as Map).keys) {
+        expect(names, contains(key));
+      }
     }
   });
 }

@@ -7,6 +7,8 @@ import 'package:calisthenics_app/domain/enums/muscle_group.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart';
 import 'package:calisthenics_app/data/repositories/exercise_repository.dart';
 import 'package:calisthenics_app/data/repositories/fake_exercise_repository.dart';
+import 'package:calisthenics_app/domain/services/muscle_group_derivation.dart';
+import 'package:calisthenics_app/domain/services/muscle_key_mapper.dart';
 
 /// Firestore implementation of [ExerciseRepository].
 ///
@@ -127,26 +129,24 @@ class FirestoreExerciseRepository implements ExerciseRepository {
     final DifficultyLevel difficulty = _parseDifficulty(difficultyRaw, coeff);
     final ExerciseLevel level = _parseLevel(data['level'], coeff);
 
-    // Muscles & Ratings
-    final ratings = <MuscleGroup, int>{};
-    final targetMuscles = <MuscleGroup>[];
-
-    final musclesRaw = data['muscles'];
-    if (musclesRaw is Map) {
-      musclesRaw.forEach((key, val) {
-        final group = FakeExerciseRepository.muscleFromKey(key.toString());
-        if (group != null) {
-          final double numVal = (val is num) ? val.toDouble() : 0.0;
-          final rating = (numVal > 1.0)
-              ? numVal.round().clamp(0, 5)
-              : (numVal * 5).round().clamp(0, 5);
-          ratings[group] = rating;
-          if (rating > 0 && !targetMuscles.contains(group)) {
-            targetMuscles.add(group);
-          }
-        }
-      });
+    // Kompartımanlar: `compartments` alanı varsa doğrudan okunur; yoksa eski
+    // `muscles` haritası (oran 0-1 veya puan 1-5) kompartımanlara bölünür.
+    var compartments = parseCompartmentWeights(data['compartments']);
+    if (compartments.isEmpty) {
+      final legacy = <String, double>{};
+      final musclesRaw = data['muscles'];
+      if (musclesRaw is Map) {
+        musclesRaw.forEach((key, val) {
+          if (val is num && val > 0) legacy[key.toString()] = val.toDouble();
+        });
+      }
+      compartments = compartmentWeightsFromLegacy(legacy);
     }
+
+    // Muscles & Ratings (kütüphane filtreleri için türetilir)
+    final derived = deriveMuscleGroups(compartments);
+    final ratings = derived.ratings;
+    final targetMuscles = [...derived.targets];
 
     // Explicit targetMuscleGroups if present
     final explicitTargetMuscles = data['targetMuscleGroups'];
@@ -184,6 +184,7 @@ class FirestoreExerciseRepository implements ExerciseRepository {
       difficulty: difficulty,
       targetMuscleGroups: targetMuscles,
       muscleRatings: ratings,
+      compartmentWeights: compartments,
       description: description,
       prerequisiteExercises: prerequisites,
     );

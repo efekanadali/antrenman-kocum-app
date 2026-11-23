@@ -3,6 +3,7 @@
 // Doğru import'lar:
 import 'package:calisthenics_app/domain/enums/difficulty_level.dart';
 import 'package:calisthenics_app/domain/enums/exercise_level.dart';
+import 'package:calisthenics_app/domain/enums/muscle_compartment.dart';
 import 'package:calisthenics_app/domain/enums/muscle_group.dart';
 
 /// Represents the core concept of an exercise in the domain.
@@ -16,6 +17,11 @@ class Exercise {
   final String description;
   final List<String> prerequisiteExercises;
 
+  /// 17 kas kompartımanı üzerindeki ağırlıklar (toplam 1.00; bilinmiyorsa
+  /// boş). [muscleRatings] ve [targetMuscleGroups] repository katmanında
+  /// buradan türetilir.
+  final Map<MuscleCompartment, double> compartmentWeights;
+
   const Exercise({
     required this.id,
     required this.name,
@@ -25,5 +31,6 @@ class Exercise {
     required this.muscleRatings,
     required this.description,
     this.prerequisiteExercises = const <String>[],
+    this.compartmentWeights = const <MuscleCompartment, double>{},
   });
 }

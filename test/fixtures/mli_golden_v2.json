@@ -1,0 +1,5151 @@
+{
+  "schemaVersion": 2,
+  "description": "Golden reference of the 17-compartment model: set MLI, compartment / region load, stimulus evaluation and compartment / region recovery per exercise.",
+  "completedAt": "2026-01-01T12:00:00.000Z",
+  "thresholds": {
+    "understimulated": 37.6,
+    "overload": 103.4,
+    "calibrationScale": 0.47
+  },
+  "recoverySizeFactors": {
+    "upper_chest": 1.0,
+    "mid_chest": 1.0,
+    "lower_chest": 1.0,
+    "anterior_deltoid": 1.0,
+    "lateral_deltoid": 0.85,
+    "posterior_deltoid": 1.0,
+    "lats": 1.0,
+    "upper_back_traps": 1.0,
+    "lower_back": 1.1,
+    "biceps": 0.85,
+    "triceps": 1.0,
+    "forearms": 0.85,
+    "quads": 1.1,
+    "hamstrings": 1.1,
+    "glutes": 1.0,
+    "calves": 0.85,
+    "core": 1.0
+  },
+  "exerciseCount": 38,
+  "exerciseIds": [
+    "90_degree_push_up",
+    "archer_pull_up",
+    "australian_row",
+    "box_jump",
+    "bulgarian_split_squat",
+    "calf_raise",
+    "chin_up",
+    "chin_up_hold_top",
+    "decline_push_up",
+    "diamond_push_up",
+    "dips_parallel_bar",
+    "front_lever_raise",
+    "glute_bridge",
+    "handstand_push_up",
+    "hollow_body_hold",
+    "incline_push_up",
+    "knee_push_up",
+    "l_sit_hold",
+    "lunge",
+    "muscle_up",
+    "nordic_curl",
+    "one_arm_pull_up",
+    "pike_push_up",
+    "pistol_squat",
+    "plank",
+    "pseudo_planche_push_up",
+    "pull_up_hold_top",
+    "shrimp_squat",
+    "side_plank",
+    "standard_pull_up",
+    "standard_push_up",
+    "standard_squat",
+    "support_hold_parallel_bar",
+    "tuck_front_lever",
+    "tuck_planche",
+    "wall_sit",
+    "wide_grip_pull_up",
+    "wide_push_up"
+  ],
+  "cases": [
+    {
+      "exerciseId": "90_degree_push_up",
+      "name": "90 Degree Push-up",
+      "difficulty": 3.4,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "anterior_deltoid": 0.3,
+        "core": 0.2,
+        "forearms": 0.08,
+        "lateral_deltoid": 0.05,
+        "lower_back": 0.05,
+        "triceps": 0.22,
+        "upper_back_traps": 0.05,
+        "upper_chest": 0.05
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 61.2,
+      "compartmentLoad": {
+        "anterior_deltoid": 18.36,
+        "core": 12.240000000000002,
+        "forearms": 4.896,
+        "lateral_deltoid": 3.0600000000000005,
+        "lower_back": 3.0600000000000005,
+        "triceps": 13.464,
+        "upper_back_traps": 3.0600000000000005,
+        "upper_chest": 3.0600000000000005
+      },
+      "regionLoad": {
+        "arms": 18.36,
+        "back": 6.120000000000001,
+        "chest": 3.0600000000000005,
+        "core": 12.240000000000002,
+        "shoulders": 21.42
+      },
+      "primaryRegions": [
+        "shoulders"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 18.36,
+        "back": 6.120000000000001,
+        "chest": 3.0600000000000005,
+        "core": 12.240000000000002,
+        "shoulders": 21.419999999999998
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "chest": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "anterior_deltoid": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 18.36
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 12.240000000000002
+        },
+        "forearms": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 4.896
+        },
+        "triceps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 13.464
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 18.36,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 12.240000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 18.36,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 16.524,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.366000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 12.240000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 21.419999999999998,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "archer_pull_up",
+      "name": "Archer Pull-up",
+      "difficulty": 2.2,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "biceps": 0.2,
+        "core": 0.16,
+        "forearms": 0.08,
+        "lats": 0.4,
+        "posterior_deltoid": 0.08,
+        "upper_back_traps": 0.08
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 39.6,
+      "compartmentLoad": {
+        "biceps": 7.920000000000001,
+        "core": 6.336,
+        "forearms": 3.168,
+        "lats": 15.840000000000002,
+        "posterior_deltoid": 3.168,
+        "upper_back_traps": 3.168
+      },
+      "regionLoad": {
+        "arms": 11.088000000000001,
+        "back": 19.008000000000003,
+        "core": 6.336,
+        "shoulders": 3.168
+      },
+      "primaryRegions": [
+        "back"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 11.088000000000001,
+        "back": 19.008000000000003,
+        "core": 6.336,
+        "shoulders": 3.168
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "biceps": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 7.920000000000001
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.336
+        },
+        "lats": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 15.840000000000002
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 7.920000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 15.840000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.336,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.9792,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 19.008000000000003,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.336,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "australian_row",
+      "name": "Australian Row (Horizontal Pull)",
+      "difficulty": 0.85,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "biceps": 0.15,
+        "core": 0.1,
+        "forearms": 0.05,
+        "lats": 0.25,
+        "lower_back": 0.05,
+        "posterior_deltoid": 0.15,
+        "upper_back_traps": 0.25
+      },
+      "compartmentWeightSum": 1.0000000000000002,
+      "setMli": 15.3,
+      "compartmentLoad": {
+        "biceps": 2.295,
+        "core": 1.5300000000000002,
+        "forearms": 0.7650000000000001,
+        "lats": 3.825,
+        "lower_back": 0.7650000000000001,
+        "posterior_deltoid": 2.295,
+        "upper_back_traps": 3.825
+      },
+      "regionLoad": {
+        "arms": 3.06,
+        "back": 8.415000000000001,
+        "core": 1.5300000000000002,
+        "shoulders": 2.295
+      },
+      "primaryRegions": [
+        "back"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 3.0600000000000005,
+        "back": 8.415000000000001,
+        "core": 1.5300000000000002,
+        "shoulders": 2.295
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "biceps": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 2.295
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.5300000000000002
+        },
+        "lats": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.825
+        },
+        "posterior_deltoid": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.295
+        },
+        "upper_back_traps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.825
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 2.295,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.65,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.5300000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.295,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.7540000000000004,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 8.415000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.5300000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "box_jump",
+      "name": "Box Jump",
+      "difficulty": 1.5,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "calves": 0.22,
+        "core": 0.05,
+        "glutes": 0.25,
+        "hamstrings": 0.1,
+        "quads": 0.38
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 27.0,
+      "compartmentLoad": {
+        "calves": 5.94,
+        "core": 1.35,
+        "glutes": 6.75,
+        "hamstrings": 2.7,
+        "quads": 10.26
+      },
+      "regionLoad": {
+        "core": 1.35,
+        "legs": 25.65
+      },
+      "primaryRegions": [
+        "legs"
+      ],
+      "legacyMuscleLoad": {
+        "core": 1.35,
+        "legs": 25.65
+      },
+      "evaluation": {
+        "core": "understimulated",
+        "legs": "understimulated"
+      },
+      "compartmentRecovery": {
+        "calves": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 5.94
+        },
+        "glutes": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.75
+        },
+        "hamstrings": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 2.7
+        },
+        "quads": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 10.26
+        }
+      },
+      "regionRecovery": {
+        "legs": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 25.65,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "legs": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 23.085,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "bulgarian_split_squat",
+      "name": "Bulgarian Split Squat",
+      "difficulty": 1.45,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "calves": 0.04,
+        "core": 0.12,
+        "glutes": 0.32,
+        "hamstrings": 0.1,
+        "quads": 0.42
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 26.1,
+      "compartmentLoad": {
+        "calves": 1.044,
+        "core": 3.132,
+        "glutes": 8.352,
+        "hamstrings": 2.6100000000000003,
+        "quads": 10.962
+      },
+      "regionLoad": {
+        "core": 3.132,
+        "legs": 22.968
+      },
+      "primaryRegions": [
+        "legs"
+      ],
+      "legacyMuscleLoad": {
+        "core": 3.132,
+        "legs": 22.968
+      },
+      "evaluation": {
+        "core": "understimulated",
+        "legs": "understimulated"
+      },
+      "compartmentRecovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.132
+        },
+        "glutes": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 8.352
+        },
+        "quads": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 10.962
+        }
+      },
+      "regionRecovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.132,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "legs": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 19.314,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.132,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "legs": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 20.671200000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "calf_raise",
+      "name": "Calf Raise",
+      "difficulty": 0.65,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "calves": 1.0
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 11.700000000000001,
+      "compartmentLoad": {
+        "calves": 11.700000000000001
+      },
+      "regionLoad": {
+        "legs": 11.700000000000001
+      },
+      "primaryRegions": [
+        "legs"
+      ],
+      "legacyMuscleLoad": {
+        "legs": 11.700000000000001
+      },
+      "evaluation": {
+        "legs": "understimulated"
+      },
+      "compartmentRecovery": {
+        "calves": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 11.700000000000001
+        }
+      },
+      "regionRecovery": {
+        "legs": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 11.700000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "legs": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 11.700000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "chin_up",
+      "name": "Chin-up",
+      "difficulty": 1.45,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "biceps": 0.3,
+        "core": 0.13,
+        "forearms": 0.07,
+        "lats": 0.35,
+        "lower_chest": 0.05,
+        "posterior_deltoid": 0.05,
+        "upper_back_traps": 0.05
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 26.1,
+      "compartmentLoad": {
+        "biceps": 7.83,
+        "core": 3.3930000000000002,
+        "forearms": 1.8270000000000002,
+        "lats": 9.135,
+        "lower_chest": 1.3050000000000002,
+        "posterior_deltoid": 1.3050000000000002,
+        "upper_back_traps": 1.3050000000000002
+      },
+      "regionLoad": {
+        "arms": 9.657,
+        "back": 10.44,
+        "chest": 1.3050000000000002,
+        "core": 3.3930000000000002,
+        "shoulders": 1.3050000000000002
+      },
+      "primaryRegions": [
+        "back"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 9.657,
+        "back": 10.44,
+        "chest": 1.3050000000000002,
+        "core": 3.3930000000000002,
+        "shoulders": 1.3050000000000002
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "chest": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "biceps": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 7.83
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.3930000000000002
+        },
+        "lats": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.135
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 7.83,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.135,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.3930000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 8.6913,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 10.439999999999998,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.3930000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "chin_up_hold_top",
+      "name": "Chin-up Hold Top",
+      "difficulty": 1.15,
+      "type": "calisthenics",
+      "isTimed": true,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "biceps": 0.35,
+        "core": 0.15,
+        "forearms": 0.12,
+        "lats": 0.25,
+        "posterior_deltoid": 0.05,
+        "upper_back_traps": 0.08
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 20.7,
+      "compartmentLoad": {
+        "biceps": 7.244999999999999,
+        "core": 3.105,
+        "forearms": 2.484,
+        "lats": 5.175,
+        "posterior_deltoid": 1.035,
+        "upper_back_traps": 1.656
+      },
+      "regionLoad": {
+        "arms": 9.729,
+        "back": 6.8309999999999995,
+        "core": 3.105,
+        "shoulders": 1.035
+      },
+      "primaryRegions": [
+        "arms"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 9.729,
+        "back": 6.831,
+        "core": 3.105,
+        "shoulders": 1.035
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "biceps": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 7.244999999999999
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.105
+        },
+        "forearms": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 2.484
+        },
+        "lats": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.175
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 9.729,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.175,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.105,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 8.7561,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.80635,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.105,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "chin_up_hold_top",
+      "name": "Chin-up Hold Top",
+      "difficulty": 1.15,
+      "type": "calisthenics",
+      "isTimed": true,
+      "variant": "hold30s_sir3",
+      "set": {
+        "reps": 0,
+        "rir": 3,
+        "durationInSeconds": 30
+      },
+      "compartments": {
+        "biceps": 0.35,
+        "core": 0.15,
+        "forearms": 0.12,
+        "lats": 0.25,
+        "posterior_deltoid": 0.05,
+        "upper_back_traps": 0.08
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 17.25,
+      "compartmentLoad": {
+        "biceps": 6.0375,
+        "core": 2.5875,
+        "forearms": 2.07,
+        "lats": 4.3125,
+        "posterior_deltoid": 0.8625,
+        "upper_back_traps": 1.3800000000000001
+      },
+      "regionLoad": {
+        "arms": 8.1075,
+        "back": 5.6925,
+        "core": 2.5875,
+        "shoulders": 0.8625
+      },
+      "primaryRegions": [
+        "arms"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 8.1075,
+        "back": 5.6925,
+        "core": 2.5875,
+        "shoulders": 0.8625
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "biceps": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 6.0375
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.5875
+        },
+        "forearms": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 2.07
+        },
+        "lats": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.3125
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 8.1075,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.3125,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.5875,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.29675,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.838625,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.5875,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "decline_push_up",
+      "name": "Decline Push-up",
+      "difficulty": 1.2,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "anterior_deltoid": 0.28,
+        "core": 0.1,
+        "lateral_deltoid": 0.08,
+        "mid_chest": 0.05,
+        "triceps": 0.19,
+        "upper_chest": 0.3
+      },
+      "compartmentWeightSum": 0.9999999999999999,
+      "setMli": 21.6,
+      "compartmentLoad": {
+        "anterior_deltoid": 6.048000000000001,
+        "core": 2.16,
+        "lateral_deltoid": 1.7280000000000002,
+        "mid_chest": 1.08,
+        "triceps": 4.104,
+        "upper_chest": 6.48
+      },
+      "regionLoad": {
+        "arms": 4.104,
+        "chest": 7.5600000000000005,
+        "core": 2.16,
+        "shoulders": 7.776000000000002
+      },
+      "primaryRegions": [
+        "shoulders"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 4.104,
+        "chest": 7.56,
+        "core": 2.16,
+        "shoulders": 7.776000000000002
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "chest": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "anterior_deltoid": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.048000000000001
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.16
+        },
+        "lateral_deltoid": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 1.7280000000000002
+        },
+        "triceps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.104
+        },
+        "upper_chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.48
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.104,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.48,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.16,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.776000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.6936,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.5600000000000005,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.16,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.776000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "diamond_push_up",
+      "name": "Diamond Push-up",
+      "difficulty": 1.25,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "anterior_deltoid": 0.2,
+        "core": 0.1,
+        "lower_chest": 0.05,
+        "mid_chest": 0.2,
+        "triceps": 0.4,
+        "upper_chest": 0.05
+      },
+      "compartmentWeightSum": 1.0000000000000002,
+      "setMli": 22.5,
+      "compartmentLoad": {
+        "anterior_deltoid": 4.5,
+        "core": 2.25,
+        "lower_chest": 1.125,
+        "mid_chest": 4.5,
+        "triceps": 9.0,
+        "upper_chest": 1.125
+      },
+      "regionLoad": {
+        "arms": 9.0,
+        "chest": 6.75,
+        "core": 2.25,
+        "shoulders": 4.5
+      },
+      "primaryRegions": [
+        "arms"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 9.0,
+        "chest": 6.75,
+        "core": 2.25,
+        "shoulders": 4.5
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "chest": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "anterior_deltoid": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.5
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.25
+        },
+        "mid_chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.5
+        },
+        "triceps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.0
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.0,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.5,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.25,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.5,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 8.1,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.75,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.25,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.5999999999999996,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "dips_parallel_bar",
+      "name": "Parallel Bar Dips",
+      "difficulty": 1.55,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "anterior_deltoid": 0.17,
+        "core": 0.05,
+        "forearms": 0.05,
+        "lower_chest": 0.3,
+        "mid_chest": 0.1,
+        "triceps": 0.33
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 27.900000000000002,
+      "compartmentLoad": {
+        "anterior_deltoid": 4.743,
+        "core": 1.3950000000000002,
+        "forearms": 1.3950000000000002,
+        "lower_chest": 8.370000000000001,
+        "mid_chest": 2.7900000000000005,
+        "triceps": 9.207
+      },
+      "regionLoad": {
+        "arms": 10.602,
+        "chest": 11.160000000000002,
+        "core": 1.3950000000000002,
+        "shoulders": 4.743
+      },
+      "primaryRegions": [
+        "chest"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 10.602,
+        "chest": 11.160000000000002,
+        "core": 1.3950000000000002,
+        "shoulders": 4.743
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "chest": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "anterior_deltoid": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.743
+        },
+        "lower_chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 8.370000000000001
+        },
+        "mid_chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.7900000000000005
+        },
+        "triceps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.207
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.207,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 11.160000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.743,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.5418,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 11.160000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.3950000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.7944000000000004,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "front_lever_raise",
+      "name": "Front Lever Raise",
+      "difficulty": 2.7,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "biceps": 0.05,
+        "core": 0.25,
+        "forearms": 0.05,
+        "lats": 0.38,
+        "lower_back": 0.07,
+        "posterior_deltoid": 0.08,
+        "triceps": 0.07,
+        "upper_back_traps": 0.05
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 48.6,
+      "compartmentLoad": {
+        "biceps": 2.43,
+        "core": 12.15,
+        "forearms": 2.43,
+        "lats": 18.468,
+        "lower_back": 3.4020000000000006,
+        "posterior_deltoid": 3.8880000000000003,
+        "triceps": 3.4020000000000006,
+        "upper_back_traps": 2.43
+      },
+      "regionLoad": {
+        "arms": 8.262,
+        "back": 24.3,
+        "core": 12.15,
+        "shoulders": 3.8880000000000003
+      },
+      "primaryRegions": [
+        "back"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 8.262,
+        "back": 24.3,
+        "core": 12.15,
+        "shoulders": 3.8880000000000003
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 12.15
+        },
+        "lats": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 18.468
+        }
+      },
+      "regionRecovery": {
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 18.468,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 12.15,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.4358,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 24.3,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 12.15,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "glute_bridge",
+      "name": "Glute Bridge",
+      "difficulty": 0.75,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "core": 0.07,
+        "glutes": 0.55,
+        "hamstrings": 0.25,
+        "lower_back": 0.08,
+        "quads": 0.05
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 13.5,
+      "compartmentLoad": {
+        "core": 0.9450000000000001,
+        "glutes": 7.425000000000001,
+        "hamstrings": 3.375,
+        "lower_back": 1.08,
+        "quads": 0.675
+      },
+      "regionLoad": {
+        "back": 1.08,
+        "core": 0.9450000000000001,
+        "legs": 11.475000000000001
+      },
+      "primaryRegions": [
+        "legs"
+      ],
+      "legacyMuscleLoad": {
+        "back": 1.08,
+        "core": 0.9450000000000001,
+        "legs": 11.475000000000001
+      },
+      "evaluation": {
+        "back": "understimulated",
+        "core": "understimulated",
+        "legs": "understimulated"
+      },
+      "compartmentRecovery": {
+        "glutes": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.425000000000001
+        },
+        "hamstrings": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 3.375
+        }
+      },
+      "regionRecovery": {
+        "legs": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 10.8,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "legs": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 10.3275,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "handstand_push_up",
+      "name": "Handstand Push-up",
+      "difficulty": 2.7,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "anterior_deltoid": 0.35,
+        "core": 0.1,
+        "lateral_deltoid": 0.12,
+        "triceps": 0.25,
+        "upper_back_traps": 0.13,
+        "upper_chest": 0.05
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 48.6,
+      "compartmentLoad": {
+        "anterior_deltoid": 17.009999999999998,
+        "core": 4.86,
+        "lateral_deltoid": 5.832,
+        "triceps": 12.15,
+        "upper_back_traps": 6.3180000000000005,
+        "upper_chest": 2.43
+      },
+      "regionLoad": {
+        "arms": 12.15,
+        "back": 6.3180000000000005,
+        "chest": 2.43,
+        "core": 4.86,
+        "shoulders": 22.842
+      },
+      "primaryRegions": [
+        "shoulders"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 12.15,
+        "back": 6.3180000000000005,
+        "chest": 2.43,
+        "core": 4.86,
+        "shoulders": 22.842
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "chest": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "anterior_deltoid": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 17.009999999999998
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.86
+        },
+        "lateral_deltoid": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 5.832
+        },
+        "triceps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 12.15
+        },
+        "upper_back_traps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.3180000000000005
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 12.15,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.3180000000000005,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.86,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 22.842,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 10.935,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.4749000000000008,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.86,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 22.842,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "hollow_body_hold",
+      "name": "Hollow Body Hold",
+      "difficulty": 1.1,
+      "type": "calisthenics",
+      "isTimed": true,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "anterior_deltoid": 0.05,
+        "core": 0.9,
+        "quads": 0.05
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 19.8,
+      "compartmentLoad": {
+        "anterior_deltoid": 0.9900000000000001,
+        "core": 17.82,
+        "quads": 0.9900000000000001
+      },
+      "regionLoad": {
+        "core": 17.82,
+        "legs": 0.9900000000000001,
+        "shoulders": 0.9900000000000001
+      },
+      "primaryRegions": [
+        "core"
+      ],
+      "legacyMuscleLoad": {
+        "core": 17.82,
+        "legs": 0.9900000000000001,
+        "shoulders": 0.9900000000000001
+      },
+      "evaluation": {
+        "core": "understimulated",
+        "legs": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 17.82
+        }
+      },
+      "regionRecovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 17.82,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 17.82,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "hollow_body_hold",
+      "name": "Hollow Body Hold",
+      "difficulty": 1.1,
+      "type": "calisthenics",
+      "isTimed": true,
+      "variant": "hold30s_sir3",
+      "set": {
+        "reps": 0,
+        "rir": 3,
+        "durationInSeconds": 30
+      },
+      "compartments": {
+        "anterior_deltoid": 0.05,
+        "core": 0.9,
+        "quads": 0.05
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 16.5,
+      "compartmentLoad": {
+        "anterior_deltoid": 0.8250000000000001,
+        "core": 14.85,
+        "quads": 0.8250000000000001
+      },
+      "regionLoad": {
+        "core": 14.85,
+        "legs": 0.8250000000000001,
+        "shoulders": 0.8250000000000001
+      },
+      "primaryRegions": [
+        "core"
+      ],
+      "legacyMuscleLoad": {
+        "core": 14.85,
+        "legs": 0.8250000000000001,
+        "shoulders": 0.8250000000000001
+      },
+      "evaluation": {
+        "core": "understimulated",
+        "legs": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 14.85
+        }
+      },
+      "regionRecovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 14.85,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 14.85,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "incline_push_up",
+      "name": "Incline Push-up",
+      "difficulty": 0.65,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "anterior_deltoid": 0.15,
+        "core": 0.1,
+        "lower_chest": 0.2,
+        "mid_chest": 0.3,
+        "triceps": 0.2,
+        "upper_chest": 0.05
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 11.700000000000001,
+      "compartmentLoad": {
+        "anterior_deltoid": 1.7550000000000001,
+        "core": 1.1700000000000002,
+        "lower_chest": 2.3400000000000003,
+        "mid_chest": 3.5100000000000002,
+        "triceps": 2.3400000000000003,
+        "upper_chest": 0.5850000000000001
+      },
+      "regionLoad": {
+        "arms": 2.3400000000000003,
+        "chest": 6.4350000000000005,
+        "core": 1.1700000000000002,
+        "shoulders": 1.7550000000000001
+      },
+      "primaryRegions": [
+        "chest"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 2.3400000000000003,
+        "chest": 6.435000000000001,
+        "core": 1.1700000000000002,
+        "shoulders": 1.7550000000000001
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "chest": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "anterior_deltoid": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.7550000000000001
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.1700000000000002
+        },
+        "lower_chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.3400000000000003
+        },
+        "mid_chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.5100000000000002
+        },
+        "triceps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.3400000000000003
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.3400000000000003,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.8500000000000005,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.1700000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.7550000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.1060000000000003,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.435000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.1700000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 0.8775000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "knee_push_up",
+      "name": "Knee Push-up",
+      "difficulty": 0.75,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "anterior_deltoid": 0.15,
+        "core": 0.1,
+        "lower_chest": 0.1,
+        "mid_chest": 0.35,
+        "triceps": 0.2,
+        "upper_chest": 0.1
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 13.5,
+      "compartmentLoad": {
+        "anterior_deltoid": 2.025,
+        "core": 1.35,
+        "lower_chest": 1.35,
+        "mid_chest": 4.725,
+        "triceps": 2.7,
+        "upper_chest": 1.35
+      },
+      "regionLoad": {
+        "arms": 2.7,
+        "chest": 7.424999999999999,
+        "core": 1.35,
+        "shoulders": 2.025
+      },
+      "primaryRegions": [
+        "chest"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 2.7,
+        "chest": 7.424999999999999,
+        "core": 1.35,
+        "shoulders": 2.025
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "chest": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "anterior_deltoid": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.025
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.35
+        },
+        "lower_chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.35
+        },
+        "mid_chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.725
+        },
+        "triceps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.7
+        },
+        "upper_chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.35
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.7,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.424999999999999,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.35,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.025,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.43,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.424999999999999,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.35,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.0125,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "l_sit_hold",
+      "name": "L-Sit Hold",
+      "difficulty": 1.8,
+      "type": "calisthenics",
+      "isTimed": true,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "anterior_deltoid": 0.05,
+        "core": 0.5,
+        "forearms": 0.05,
+        "lower_chest": 0.05,
+        "quads": 0.1,
+        "triceps": 0.15,
+        "upper_back_traps": 0.1
+      },
+      "compartmentWeightSum": 1.0000000000000002,
+      "setMli": 32.4,
+      "compartmentLoad": {
+        "anterior_deltoid": 1.62,
+        "core": 16.2,
+        "forearms": 1.62,
+        "lower_chest": 1.62,
+        "quads": 3.24,
+        "triceps": 4.859999999999999,
+        "upper_back_traps": 3.24
+      },
+      "regionLoad": {
+        "arms": 6.4799999999999995,
+        "back": 3.24,
+        "chest": 1.62,
+        "core": 16.2,
+        "legs": 3.24,
+        "shoulders": 1.62
+      },
+      "primaryRegions": [
+        "core"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 6.48,
+        "back": 3.24,
+        "chest": 1.62,
+        "core": 16.2,
+        "legs": 3.24,
+        "shoulders": 1.62
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "chest": "understimulated",
+        "core": "understimulated",
+        "legs": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 16.2
+        },
+        "triceps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.859999999999999
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.859999999999999,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 16.2,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 16.2,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "l_sit_hold",
+      "name": "L-Sit Hold",
+      "difficulty": 1.8,
+      "type": "calisthenics",
+      "isTimed": true,
+      "variant": "hold30s_sir3",
+      "set": {
+        "reps": 0,
+        "rir": 3,
+        "durationInSeconds": 30
+      },
+      "compartments": {
+        "anterior_deltoid": 0.05,
+        "core": 0.5,
+        "forearms": 0.05,
+        "lower_chest": 0.05,
+        "quads": 0.1,
+        "triceps": 0.15,
+        "upper_back_traps": 0.1
+      },
+      "compartmentWeightSum": 1.0000000000000002,
+      "setMli": 27.0,
+      "compartmentLoad": {
+        "anterior_deltoid": 1.35,
+        "core": 13.5,
+        "forearms": 1.35,
+        "lower_chest": 1.35,
+        "quads": 2.7,
+        "triceps": 4.05,
+        "upper_back_traps": 2.7
+      },
+      "regionLoad": {
+        "arms": 5.4,
+        "back": 2.7,
+        "chest": 1.35,
+        "core": 13.5,
+        "legs": 2.7,
+        "shoulders": 1.35
+      },
+      "primaryRegions": [
+        "core"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 5.4,
+        "back": 2.7,
+        "chest": 1.35,
+        "core": 13.5,
+        "legs": 2.7,
+        "shoulders": 1.35
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "chest": "understimulated",
+        "core": "understimulated",
+        "legs": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 13.5
+        },
+        "triceps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.05
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.05,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 13.5,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 13.5,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "lunge",
+      "name": "Lunge",
+      "difficulty": 1.15,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "calves": 0.06,
+        "core": 0.1,
+        "glutes": 0.3,
+        "hamstrings": 0.12,
+        "quads": 0.42
+      },
+      "compartmentWeightSum": 0.9999999999999999,
+      "setMli": 20.7,
+      "compartmentLoad": {
+        "calves": 1.242,
+        "core": 2.07,
+        "glutes": 6.21,
+        "hamstrings": 2.484,
+        "quads": 8.693999999999999
+      },
+      "regionLoad": {
+        "core": 2.07,
+        "legs": 18.63
+      },
+      "primaryRegions": [
+        "legs"
+      ],
+      "legacyMuscleLoad": {
+        "core": 2.07,
+        "legs": 18.63
+      },
+      "evaluation": {
+        "core": "understimulated",
+        "legs": "understimulated"
+      },
+      "compartmentRecovery": {
+        "glutes": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.21
+        },
+        "hamstrings": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 2.484
+        },
+        "quads": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 8.693999999999999
+        }
+      },
+      "regionRecovery": {
+        "legs": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 17.387999999999998,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.07,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "legs": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 16.767,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "muscle_up",
+      "name": "Muscle-up",
+      "difficulty": 2.9,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "anterior_deltoid": 0.05,
+        "biceps": 0.12,
+        "core": 0.1,
+        "forearms": 0.08,
+        "lats": 0.28,
+        "lower_chest": 0.12,
+        "triceps": 0.18,
+        "upper_back_traps": 0.07
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 52.2,
+      "compartmentLoad": {
+        "anterior_deltoid": 2.6100000000000003,
+        "biceps": 6.264,
+        "core": 5.220000000000001,
+        "forearms": 4.176,
+        "lats": 14.616000000000001,
+        "lower_chest": 6.264,
+        "triceps": 9.396,
+        "upper_back_traps": 3.6540000000000004
+      },
+      "regionLoad": {
+        "arms": 19.836,
+        "back": 18.270000000000003,
+        "chest": 6.264,
+        "core": 5.220000000000001,
+        "shoulders": 2.6100000000000003
+      },
+      "primaryRegions": [
+        "arms"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 19.836000000000002,
+        "back": 18.270000000000003,
+        "chest": 6.264,
+        "core": 5.220000000000001,
+        "shoulders": 2.6100000000000003
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "chest": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "biceps": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 6.264
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.220000000000001
+        },
+        "forearms": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 4.176
+        },
+        "lats": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 14.616000000000001
+        },
+        "lower_chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.264
+        },
+        "triceps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.396
+        },
+        "upper_back_traps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.6540000000000004
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 19.836,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 18.270000000000003,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.264,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.220000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 17.852400000000003,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 18.270000000000003,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.132,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.220000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "nordic_curl",
+      "name": "Nordic Hamstring Curl",
+      "difficulty": 2.4,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "calves": 0.08,
+        "core": 0.05,
+        "glutes": 0.12,
+        "hamstrings": 0.7,
+        "lower_back": 0.05
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 43.2,
+      "compartmentLoad": {
+        "calves": 3.4560000000000004,
+        "core": 2.16,
+        "glutes": 5.184,
+        "hamstrings": 30.24,
+        "lower_back": 2.16
+      },
+      "regionLoad": {
+        "back": 2.16,
+        "core": 2.16,
+        "legs": 38.88
+      },
+      "primaryRegions": [
+        "legs"
+      ],
+      "legacyMuscleLoad": {
+        "back": 2.16,
+        "core": 2.16,
+        "legs": 38.879999999999995
+      },
+      "evaluation": {
+        "back": "understimulated",
+        "core": "understimulated",
+        "legs": "optimal"
+      },
+      "compartmentRecovery": {
+        "hamstrings": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 30.24
+        }
+      },
+      "regionRecovery": {
+        "legs": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 30.24,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "legs": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 34.992,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "one_arm_pull_up",
+      "name": "One Arm Pull-up",
+      "difficulty": 4.2,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "biceps": 0.2,
+        "core": 0.18,
+        "forearms": 0.1,
+        "lats": 0.38,
+        "posterior_deltoid": 0.07,
+        "upper_back_traps": 0.07
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 75.60000000000001,
+      "compartmentLoad": {
+        "biceps": 15.120000000000003,
+        "core": 13.608,
+        "forearms": 7.560000000000001,
+        "lats": 28.728000000000005,
+        "posterior_deltoid": 5.292000000000001,
+        "upper_back_traps": 5.292000000000001
+      },
+      "regionLoad": {
+        "arms": 22.680000000000003,
+        "back": 34.02,
+        "core": 13.608,
+        "shoulders": 5.292000000000001
+      },
+      "primaryRegions": [
+        "back"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 22.680000000000007,
+        "back": 34.02,
+        "core": 13.608,
+        "shoulders": 5.292000000000001
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "biceps": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 15.120000000000003
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 13.608
+        },
+        "forearms": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 7.560000000000001
+        },
+        "lats": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 28.728000000000005
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 22.680000000000003,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 28.728000000000005,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 13.608,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 20.412000000000006,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 34.02,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 13.608,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "pike_push_up",
+      "name": "Pike Push-up",
+      "difficulty": 1.55,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "anterior_deltoid": 0.35,
+        "core": 0.15,
+        "lateral_deltoid": 0.1,
+        "triceps": 0.25,
+        "upper_back_traps": 0.1,
+        "upper_chest": 0.05
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 27.900000000000002,
+      "compartmentLoad": {
+        "anterior_deltoid": 9.765,
+        "core": 4.1850000000000005,
+        "lateral_deltoid": 2.7900000000000005,
+        "triceps": 6.9750000000000005,
+        "upper_back_traps": 2.7900000000000005,
+        "upper_chest": 1.3950000000000002
+      },
+      "regionLoad": {
+        "arms": 6.9750000000000005,
+        "back": 2.7900000000000005,
+        "chest": 1.3950000000000002,
+        "core": 4.1850000000000005,
+        "shoulders": 12.555000000000001
+      },
+      "primaryRegions": [
+        "shoulders"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 6.9750000000000005,
+        "back": 2.7900000000000005,
+        "chest": 1.3950000000000002,
+        "core": 4.1850000000000005,
+        "shoulders": 12.555
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "chest": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "anterior_deltoid": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.765
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.1850000000000005
+        },
+        "lateral_deltoid": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 2.7900000000000005
+        },
+        "triceps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.9750000000000005
+        },
+        "upper_back_traps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.7900000000000005
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.9750000000000005,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.7900000000000005,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.1850000000000005,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 12.555000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.277500000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.1850000000000005,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 12.555,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "pistol_squat",
+      "name": "Pistol Squat",
+      "difficulty": 2.3,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "calves": 0.08,
+        "core": 0.15,
+        "glutes": 0.25,
+        "hamstrings": 0.04,
+        "quads": 0.48
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 41.4,
+      "compartmentLoad": {
+        "calves": 3.312,
+        "core": 6.21,
+        "glutes": 10.35,
+        "hamstrings": 1.656,
+        "quads": 19.872
+      },
+      "regionLoad": {
+        "core": 6.21,
+        "legs": 35.19
+      },
+      "primaryRegions": [
+        "legs"
+      ],
+      "legacyMuscleLoad": {
+        "core": 6.21,
+        "legs": 35.19
+      },
+      "evaluation": {
+        "core": "understimulated",
+        "legs": "understimulated"
+      },
+      "compartmentRecovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.21
+        },
+        "glutes": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 10.35
+        },
+        "quads": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 19.872
+        }
+      },
+      "regionRecovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.21,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "legs": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 30.222,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.21,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "legs": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 31.671,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "plank",
+      "name": "Plank",
+      "difficulty": 0.7,
+      "type": "calisthenics",
+      "isTimed": true,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "anterior_deltoid": 0.12,
+        "core": 0.72,
+        "glutes": 0.08,
+        "quads": 0.08
+      },
+      "compartmentWeightSum": 0.9999999999999999,
+      "setMli": 12.6,
+      "compartmentLoad": {
+        "anterior_deltoid": 1.512,
+        "core": 9.072,
+        "glutes": 1.008,
+        "quads": 1.008
+      },
+      "regionLoad": {
+        "core": 9.072,
+        "legs": 2.016,
+        "shoulders": 1.512
+      },
+      "primaryRegions": [
+        "core"
+      ],
+      "legacyMuscleLoad": {
+        "core": 9.072,
+        "legs": 2.016,
+        "shoulders": 1.512
+      },
+      "evaluation": {
+        "core": "understimulated",
+        "legs": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.072
+        }
+      },
+      "regionRecovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.072,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.072,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "plank",
+      "name": "Plank",
+      "difficulty": 0.7,
+      "type": "calisthenics",
+      "isTimed": true,
+      "variant": "hold30s_sir3",
+      "set": {
+        "reps": 0,
+        "rir": 3,
+        "durationInSeconds": 30
+      },
+      "compartments": {
+        "anterior_deltoid": 0.12,
+        "core": 0.72,
+        "glutes": 0.08,
+        "quads": 0.08
+      },
+      "compartmentWeightSum": 0.9999999999999999,
+      "setMli": 10.5,
+      "compartmentLoad": {
+        "anterior_deltoid": 1.26,
+        "core": 7.56,
+        "glutes": 0.84,
+        "quads": 0.84
+      },
+      "regionLoad": {
+        "core": 7.56,
+        "legs": 1.68,
+        "shoulders": 1.26
+      },
+      "primaryRegions": [
+        "core"
+      ],
+      "legacyMuscleLoad": {
+        "core": 7.56,
+        "legs": 1.68,
+        "shoulders": 1.26
+      },
+      "evaluation": {
+        "core": "understimulated",
+        "legs": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.56
+        }
+      },
+      "regionRecovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.56,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.56,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "pseudo_planche_push_up",
+      "name": "Pseudo Planche Push-up",
+      "difficulty": 2.1,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "anterior_deltoid": 0.35,
+        "biceps": 0.05,
+        "core": 0.15,
+        "forearms": 0.05,
+        "lateral_deltoid": 0.05,
+        "mid_chest": 0.1,
+        "triceps": 0.15,
+        "upper_back_traps": 0.05,
+        "upper_chest": 0.05
+      },
+      "compartmentWeightSum": 1.0000000000000002,
+      "setMli": 37.800000000000004,
+      "compartmentLoad": {
+        "anterior_deltoid": 13.23,
+        "biceps": 1.8900000000000003,
+        "core": 5.670000000000001,
+        "forearms": 1.8900000000000003,
+        "lateral_deltoid": 1.8900000000000003,
+        "mid_chest": 3.7800000000000007,
+        "triceps": 5.670000000000001,
+        "upper_back_traps": 1.8900000000000003,
+        "upper_chest": 1.8900000000000003
+      },
+      "regionLoad": {
+        "arms": 9.450000000000001,
+        "back": 1.8900000000000003,
+        "chest": 5.670000000000001,
+        "core": 5.670000000000001,
+        "shoulders": 15.120000000000001
+      },
+      "primaryRegions": [
+        "shoulders"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 9.450000000000001,
+        "back": 1.8900000000000003,
+        "chest": 5.670000000000002,
+        "core": 5.670000000000001,
+        "shoulders": 15.120000000000001
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "chest": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "anterior_deltoid": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 13.23
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.670000000000001
+        },
+        "mid_chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.7800000000000007
+        },
+        "triceps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.670000000000001
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.670000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.7800000000000007,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.670000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 13.23,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 8.505,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.835000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.670000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 15.120000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "pull_up_hold_top",
+      "name": "Pull-up Hold Top",
+      "difficulty": 1.2,
+      "type": "calisthenics",
+      "isTimed": true,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "biceps": 0.18,
+        "core": 0.15,
+        "forearms": 0.12,
+        "lats": 0.35,
+        "posterior_deltoid": 0.08,
+        "upper_back_traps": 0.12
+      },
+      "compartmentWeightSum": 0.9999999999999999,
+      "setMli": 21.6,
+      "compartmentLoad": {
+        "biceps": 3.888,
+        "core": 3.24,
+        "forearms": 2.592,
+        "lats": 7.56,
+        "posterior_deltoid": 1.7280000000000002,
+        "upper_back_traps": 2.592
+      },
+      "regionLoad": {
+        "arms": 6.48,
+        "back": 10.152,
+        "core": 3.24,
+        "shoulders": 1.7280000000000002
+      },
+      "primaryRegions": [
+        "back"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 6.48,
+        "back": 10.152,
+        "core": 3.24,
+        "shoulders": 1.7280000000000002
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "biceps": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 3.888
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.24
+        },
+        "forearms": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 2.592
+        },
+        "lats": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.56
+        },
+        "upper_back_traps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.592
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 6.48,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 10.152,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.24,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.832000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 10.152,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.24,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "pull_up_hold_top",
+      "name": "Pull-up Hold Top",
+      "difficulty": 1.2,
+      "type": "calisthenics",
+      "isTimed": true,
+      "variant": "hold30s_sir3",
+      "set": {
+        "reps": 0,
+        "rir": 3,
+        "durationInSeconds": 30
+      },
+      "compartments": {
+        "biceps": 0.18,
+        "core": 0.15,
+        "forearms": 0.12,
+        "lats": 0.35,
+        "posterior_deltoid": 0.08,
+        "upper_back_traps": 0.12
+      },
+      "compartmentWeightSum": 0.9999999999999999,
+      "setMli": 18.0,
+      "compartmentLoad": {
+        "biceps": 3.2399999999999998,
+        "core": 2.6999999999999997,
+        "forearms": 2.16,
+        "lats": 6.3,
+        "posterior_deltoid": 1.44,
+        "upper_back_traps": 2.16
+      },
+      "regionLoad": {
+        "arms": 5.4,
+        "back": 8.46,
+        "core": 2.6999999999999997,
+        "shoulders": 1.44
+      },
+      "primaryRegions": [
+        "back"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 5.3999999999999995,
+        "back": 8.459999999999999,
+        "core": 2.6999999999999997,
+        "shoulders": 1.44
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "biceps": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 3.2399999999999998
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.6999999999999997
+        },
+        "forearms": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 2.16
+        },
+        "lats": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.3
+        },
+        "upper_back_traps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.16
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 5.4,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 8.46,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.6999999999999997,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.859999999999999,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 8.459999999999999,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.6999999999999997,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "shrimp_squat",
+      "name": "Shrimp Squat",
+      "difficulty": 2.2,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "calves": 0.03,
+        "core": 0.12,
+        "glutes": 0.28,
+        "hamstrings": 0.05,
+        "quads": 0.52
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 39.6,
+      "compartmentLoad": {
+        "calves": 1.188,
+        "core": 4.752,
+        "glutes": 11.088000000000001,
+        "hamstrings": 1.9800000000000002,
+        "quads": 20.592000000000002
+      },
+      "regionLoad": {
+        "core": 4.752,
+        "legs": 34.848000000000006
+      },
+      "primaryRegions": [
+        "legs"
+      ],
+      "legacyMuscleLoad": {
+        "core": 4.752,
+        "legs": 34.848000000000006
+      },
+      "evaluation": {
+        "core": "understimulated",
+        "legs": "understimulated"
+      },
+      "compartmentRecovery": {
+        "glutes": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 11.088000000000001
+        },
+        "quads": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 20.592000000000002
+        }
+      },
+      "regionRecovery": {
+        "legs": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 31.680000000000003,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.752,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "legs": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 31.363200000000006,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "side_plank",
+      "name": "Side Plank",
+      "difficulty": 0.8,
+      "type": "calisthenics",
+      "isTimed": true,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "core": 0.68,
+        "glutes": 0.12,
+        "lateral_deltoid": 0.1,
+        "lower_back": 0.1
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 14.4,
+      "compartmentLoad": {
+        "core": 9.792000000000002,
+        "glutes": 1.728,
+        "lateral_deltoid": 1.4400000000000002,
+        "lower_back": 1.4400000000000002
+      },
+      "regionLoad": {
+        "back": 1.4400000000000002,
+        "core": 9.792000000000002,
+        "legs": 1.728,
+        "shoulders": 1.4400000000000002
+      },
+      "primaryRegions": [
+        "core"
+      ],
+      "legacyMuscleLoad": {
+        "back": 1.4400000000000002,
+        "core": 9.792000000000002,
+        "legs": 1.728,
+        "shoulders": 1.4400000000000002
+      },
+      "evaluation": {
+        "back": "understimulated",
+        "core": "understimulated",
+        "legs": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.792000000000002
+        }
+      },
+      "regionRecovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.792000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.792000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "side_plank",
+      "name": "Side Plank",
+      "difficulty": 0.8,
+      "type": "calisthenics",
+      "isTimed": true,
+      "variant": "hold30s_sir3",
+      "set": {
+        "reps": 0,
+        "rir": 3,
+        "durationInSeconds": 30
+      },
+      "compartments": {
+        "core": 0.68,
+        "glutes": 0.12,
+        "lateral_deltoid": 0.1,
+        "lower_back": 0.1
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 12.0,
+      "compartmentLoad": {
+        "core": 8.16,
+        "glutes": 1.44,
+        "lateral_deltoid": 1.2000000000000002,
+        "lower_back": 1.2000000000000002
+      },
+      "regionLoad": {
+        "back": 1.2000000000000002,
+        "core": 8.16,
+        "legs": 1.44,
+        "shoulders": 1.2000000000000002
+      },
+      "primaryRegions": [
+        "core"
+      ],
+      "legacyMuscleLoad": {
+        "back": 1.2000000000000002,
+        "core": 8.16,
+        "legs": 1.44,
+        "shoulders": 1.2000000000000002
+      },
+      "evaluation": {
+        "back": "understimulated",
+        "core": "understimulated",
+        "legs": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 8.16
+        }
+      },
+      "regionRecovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 8.16,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 8.16,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "standard_pull_up",
+      "name": "Standard Pull-up",
+      "difficulty": 1.55,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "biceps": 0.2,
+        "core": 0.12,
+        "forearms": 0.08,
+        "lats": 0.4,
+        "posterior_deltoid": 0.1,
+        "upper_back_traps": 0.1
+      },
+      "compartmentWeightSum": 0.9999999999999999,
+      "setMli": 27.900000000000002,
+      "compartmentLoad": {
+        "biceps": 5.580000000000001,
+        "core": 3.3480000000000003,
+        "forearms": 2.232,
+        "lats": 11.160000000000002,
+        "posterior_deltoid": 2.7900000000000005,
+        "upper_back_traps": 2.7900000000000005
+      },
+      "regionLoad": {
+        "arms": 7.812000000000001,
+        "back": 13.950000000000003,
+        "core": 3.3480000000000003,
+        "shoulders": 2.7900000000000005
+      },
+      "primaryRegions": [
+        "back"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 7.812000000000001,
+        "back": 13.950000000000001,
+        "core": 3.3480000000000003,
+        "shoulders": 2.7900000000000005
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "biceps": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 5.580000000000001
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.3480000000000003
+        },
+        "lats": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 11.160000000000002
+        },
+        "posterior_deltoid": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.7900000000000005
+        },
+        "upper_back_traps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.7900000000000005
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 5.580000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 13.950000000000003,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.3480000000000003,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.7900000000000005,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.030800000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 13.950000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.3480000000000003,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "standard_push_up",
+      "name": "Standard Push-up",
+      "difficulty": 1.0,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "anterior_deltoid": 0.15,
+        "core": 0.1,
+        "lower_chest": 0.1,
+        "mid_chest": 0.35,
+        "triceps": 0.2,
+        "upper_chest": 0.1
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 18.0,
+      "compartmentLoad": {
+        "anterior_deltoid": 2.6999999999999997,
+        "core": 1.8,
+        "lower_chest": 1.8,
+        "mid_chest": 6.3,
+        "triceps": 3.6,
+        "upper_chest": 1.8
+      },
+      "regionLoad": {
+        "arms": 3.6,
+        "chest": 9.9,
+        "core": 1.8,
+        "shoulders": 2.6999999999999997
+      },
+      "primaryRegions": [
+        "chest"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 3.6,
+        "chest": 9.899999999999999,
+        "core": 1.8,
+        "shoulders": 2.6999999999999997
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "chest": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "anterior_deltoid": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.6999999999999997
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.8
+        },
+        "lower_chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.8
+        },
+        "mid_chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.3
+        },
+        "triceps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.6
+        },
+        "upper_chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.8
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.6,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.9,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.8,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.6999999999999997,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.24,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.899999999999999,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.8,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.3499999999999999,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "standard_squat",
+      "name": "Standard Squat",
+      "difficulty": 0.9,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "calves": 0.05,
+        "core": 0.07,
+        "glutes": 0.25,
+        "hamstrings": 0.08,
+        "lower_back": 0.05,
+        "quads": 0.5
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 16.2,
+      "compartmentLoad": {
+        "calves": 0.81,
+        "core": 1.1340000000000001,
+        "glutes": 4.05,
+        "hamstrings": 1.296,
+        "lower_back": 0.81,
+        "quads": 8.1
+      },
+      "regionLoad": {
+        "back": 0.81,
+        "core": 1.1340000000000001,
+        "legs": 14.255999999999998
+      },
+      "primaryRegions": [
+        "legs"
+      ],
+      "legacyMuscleLoad": {
+        "back": 0.81,
+        "core": 1.1340000000000001,
+        "legs": 14.256
+      },
+      "evaluation": {
+        "back": "understimulated",
+        "core": "understimulated",
+        "legs": "understimulated"
+      },
+      "compartmentRecovery": {
+        "glutes": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.05
+        },
+        "quads": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 8.1
+        }
+      },
+      "regionRecovery": {
+        "legs": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 12.149999999999999,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "legs": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 12.830400000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "support_hold_parallel_bar",
+      "name": "Support Hold",
+      "difficulty": 0.95,
+      "type": "calisthenics",
+      "isTimed": true,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "anterior_deltoid": 0.22,
+        "core": 0.15,
+        "forearms": 0.1,
+        "lateral_deltoid": 0.08,
+        "lower_chest": 0.1,
+        "posterior_deltoid": 0.05,
+        "triceps": 0.2,
+        "upper_back_traps": 0.1
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 17.1,
+      "compartmentLoad": {
+        "anterior_deltoid": 3.7620000000000005,
+        "core": 2.565,
+        "forearms": 1.7100000000000002,
+        "lateral_deltoid": 1.368,
+        "lower_chest": 1.7100000000000002,
+        "posterior_deltoid": 0.8550000000000001,
+        "triceps": 3.4200000000000004,
+        "upper_back_traps": 1.7100000000000002
+      },
+      "regionLoad": {
+        "arms": 5.130000000000001,
+        "back": 1.7100000000000002,
+        "chest": 1.7100000000000002,
+        "core": 2.565,
+        "shoulders": 5.985000000000001
+      },
+      "primaryRegions": [
+        "shoulders"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 5.130000000000001,
+        "back": 1.7100000000000002,
+        "chest": 1.7100000000000002,
+        "core": 2.565,
+        "shoulders": 5.985
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "chest": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "anterior_deltoid": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.7620000000000005
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.565
+        },
+        "forearms": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 1.7100000000000002
+        },
+        "lateral_deltoid": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 1.368
+        },
+        "lower_chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.7100000000000002
+        },
+        "triceps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.4200000000000004
+        },
+        "upper_back_traps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.7100000000000002
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.130000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.7100000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.7100000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.565,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.130000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.617000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 0.9405000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 0.8550000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.565,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.985,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "support_hold_parallel_bar",
+      "name": "Support Hold",
+      "difficulty": 0.95,
+      "type": "calisthenics",
+      "isTimed": true,
+      "variant": "hold30s_sir3",
+      "set": {
+        "reps": 0,
+        "rir": 3,
+        "durationInSeconds": 30
+      },
+      "compartments": {
+        "anterior_deltoid": 0.22,
+        "core": 0.15,
+        "forearms": 0.1,
+        "lateral_deltoid": 0.08,
+        "lower_chest": 0.1,
+        "posterior_deltoid": 0.05,
+        "triceps": 0.2,
+        "upper_back_traps": 0.1
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 14.25,
+      "compartmentLoad": {
+        "anterior_deltoid": 3.1350000000000002,
+        "core": 2.1374999999999997,
+        "forearms": 1.425,
+        "lateral_deltoid": 1.1400000000000001,
+        "lower_chest": 1.425,
+        "posterior_deltoid": 0.7125,
+        "triceps": 2.85,
+        "upper_back_traps": 1.425
+      },
+      "regionLoad": {
+        "arms": 4.275,
+        "back": 1.425,
+        "chest": 1.425,
+        "core": 2.1374999999999997,
+        "shoulders": 4.987500000000001
+      },
+      "primaryRegions": [
+        "shoulders"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 4.275,
+        "back": 1.425,
+        "chest": 1.425,
+        "core": 2.1374999999999997,
+        "shoulders": 4.9875
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "chest": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "anterior_deltoid": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.1350000000000002
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.1374999999999997
+        },
+        "forearms": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 1.425
+        },
+        "lateral_deltoid": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 1.1400000000000001
+        },
+        "lower_chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.425
+        },
+        "triceps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.85
+        },
+        "upper_back_traps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.425
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.275,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.425,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.425,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.1374999999999997,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.275,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.8475000000000006,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 0.7837500000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 0.7125,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.1374999999999997,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.9875,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "tuck_front_lever",
+      "name": "Tuck Front Lever",
+      "difficulty": 2.1,
+      "type": "calisthenics",
+      "isTimed": true,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "biceps": 0.08,
+        "core": 0.25,
+        "forearms": 0.07,
+        "lats": 0.35,
+        "lower_back": 0.05,
+        "posterior_deltoid": 0.08,
+        "triceps": 0.07,
+        "upper_back_traps": 0.05
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 37.800000000000004,
+      "compartmentLoad": {
+        "biceps": 3.0240000000000005,
+        "core": 9.450000000000001,
+        "forearms": 2.6460000000000004,
+        "lats": 13.23,
+        "lower_back": 1.8900000000000003,
+        "posterior_deltoid": 3.0240000000000005,
+        "triceps": 2.6460000000000004,
+        "upper_back_traps": 1.8900000000000003
+      },
+      "regionLoad": {
+        "arms": 8.316,
+        "back": 17.01,
+        "core": 9.450000000000001,
+        "shoulders": 3.0240000000000005
+      },
+      "primaryRegions": [
+        "back"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 8.316000000000003,
+        "back": 17.01,
+        "core": 9.450000000000001,
+        "shoulders": 3.0240000000000005
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.450000000000001
+        },
+        "lats": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 13.23
+        }
+      },
+      "regionRecovery": {
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 13.23,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.450000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.484400000000003,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 17.01,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.450000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "tuck_front_lever",
+      "name": "Tuck Front Lever",
+      "difficulty": 2.1,
+      "type": "calisthenics",
+      "isTimed": true,
+      "variant": "hold30s_sir3",
+      "set": {
+        "reps": 0,
+        "rir": 3,
+        "durationInSeconds": 30
+      },
+      "compartments": {
+        "biceps": 0.08,
+        "core": 0.25,
+        "forearms": 0.07,
+        "lats": 0.35,
+        "lower_back": 0.05,
+        "posterior_deltoid": 0.08,
+        "triceps": 0.07,
+        "upper_back_traps": 0.05
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 31.5,
+      "compartmentLoad": {
+        "biceps": 2.52,
+        "core": 7.875,
+        "forearms": 2.205,
+        "lats": 11.024999999999999,
+        "lower_back": 1.5750000000000002,
+        "posterior_deltoid": 2.52,
+        "triceps": 2.205,
+        "upper_back_traps": 1.5750000000000002
+      },
+      "regionLoad": {
+        "arms": 6.93,
+        "back": 14.174999999999997,
+        "core": 7.875,
+        "shoulders": 2.52
+      },
+      "primaryRegions": [
+        "back"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 6.930000000000001,
+        "back": 14.174999999999999,
+        "core": 7.875,
+        "shoulders": 2.52
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.875
+        },
+        "lats": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 11.024999999999999
+        }
+      },
+      "regionRecovery": {
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 11.024999999999999,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.875,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.237000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 14.174999999999997,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.875,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "tuck_planche",
+      "name": "Tuck Planche",
+      "difficulty": 2.8,
+      "type": "calisthenics",
+      "isTimed": true,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "anterior_deltoid": 0.35,
+        "biceps": 0.05,
+        "core": 0.18,
+        "forearms": 0.07,
+        "lateral_deltoid": 0.03,
+        "lower_back": 0.07,
+        "triceps": 0.1,
+        "upper_back_traps": 0.1,
+        "upper_chest": 0.05
+      },
+      "compartmentWeightSum": 1.0000000000000002,
+      "setMli": 50.4,
+      "compartmentLoad": {
+        "anterior_deltoid": 17.639999999999997,
+        "biceps": 2.52,
+        "core": 9.072,
+        "forearms": 3.528,
+        "lateral_deltoid": 1.512,
+        "lower_back": 3.528,
+        "triceps": 5.04,
+        "upper_back_traps": 5.04,
+        "upper_chest": 2.52
+      },
+      "regionLoad": {
+        "arms": 11.088000000000001,
+        "back": 8.568,
+        "chest": 2.52,
+        "core": 9.072,
+        "shoulders": 19.151999999999997
+      },
+      "primaryRegions": [
+        "shoulders"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 11.088000000000001,
+        "back": 8.568,
+        "chest": 2.52,
+        "core": 9.072,
+        "shoulders": 19.152
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "chest": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "anterior_deltoid": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 17.639999999999997
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.072
+        },
+        "triceps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.04
+        },
+        "upper_back_traps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.04
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.04,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.04,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.072,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 17.639999999999997,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.9792,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.2828,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.072,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 19.152,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "tuck_planche",
+      "name": "Tuck Planche",
+      "difficulty": 2.8,
+      "type": "calisthenics",
+      "isTimed": true,
+      "variant": "hold30s_sir3",
+      "set": {
+        "reps": 0,
+        "rir": 3,
+        "durationInSeconds": 30
+      },
+      "compartments": {
+        "anterior_deltoid": 0.35,
+        "biceps": 0.05,
+        "core": 0.18,
+        "forearms": 0.07,
+        "lateral_deltoid": 0.03,
+        "lower_back": 0.07,
+        "triceps": 0.1,
+        "upper_back_traps": 0.1,
+        "upper_chest": 0.05
+      },
+      "compartmentWeightSum": 1.0000000000000002,
+      "setMli": 42.0,
+      "compartmentLoad": {
+        "anterior_deltoid": 14.7,
+        "biceps": 2.1,
+        "core": 7.56,
+        "forearms": 2.9400000000000004,
+        "lateral_deltoid": 1.26,
+        "lower_back": 2.9400000000000004,
+        "triceps": 4.2,
+        "upper_back_traps": 4.2,
+        "upper_chest": 2.1
+      },
+      "regionLoad": {
+        "arms": 9.240000000000002,
+        "back": 7.140000000000001,
+        "chest": 2.1,
+        "core": 7.56,
+        "shoulders": 15.959999999999999
+      },
+      "primaryRegions": [
+        "shoulders"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 9.240000000000002,
+        "back": 7.140000000000001,
+        "chest": 2.1,
+        "core": 7.56,
+        "shoulders": 15.96
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "chest": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "anterior_deltoid": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 14.7
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.56
+        },
+        "triceps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.2
+        },
+        "upper_back_traps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.2
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.2,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.2,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.56,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 14.7,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 8.316000000000003,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.069000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.56,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 15.96,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "wall_sit",
+      "name": "Wall Sit",
+      "difficulty": 0.7,
+      "type": "calisthenics",
+      "isTimed": true,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "calves": 0.08,
+        "glutes": 0.17,
+        "hamstrings": 0.05,
+        "quads": 0.7
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 12.6,
+      "compartmentLoad": {
+        "calves": 1.008,
+        "glutes": 2.142,
+        "hamstrings": 0.63,
+        "quads": 8.819999999999999
+      },
+      "regionLoad": {
+        "legs": 12.599999999999998
+      },
+      "primaryRegions": [
+        "legs"
+      ],
+      "legacyMuscleLoad": {
+        "legs": 12.6
+      },
+      "evaluation": {
+        "legs": "understimulated"
+      },
+      "compartmentRecovery": {
+        "quads": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 8.819999999999999
+        }
+      },
+      "regionRecovery": {
+        "legs": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 8.819999999999999,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "legs": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 12.6,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "wall_sit",
+      "name": "Wall Sit",
+      "difficulty": 0.7,
+      "type": "calisthenics",
+      "isTimed": true,
+      "variant": "hold30s_sir3",
+      "set": {
+        "reps": 0,
+        "rir": 3,
+        "durationInSeconds": 30
+      },
+      "compartments": {
+        "calves": 0.08,
+        "glutes": 0.17,
+        "hamstrings": 0.05,
+        "quads": 0.7
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 10.5,
+      "compartmentLoad": {
+        "calves": 0.84,
+        "glutes": 1.7850000000000001,
+        "hamstrings": 0.525,
+        "quads": 7.35
+      },
+      "regionLoad": {
+        "legs": 10.5
+      },
+      "primaryRegions": [
+        "legs"
+      ],
+      "legacyMuscleLoad": {
+        "legs": 10.5
+      },
+      "evaluation": {
+        "legs": "understimulated"
+      },
+      "compartmentRecovery": {
+        "quads": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 7.35
+        }
+      },
+      "regionRecovery": {
+        "legs": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 7.35,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "legs": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 9.45,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "wide_grip_pull_up",
+      "name": "Wide Grip Pull-up",
+      "difficulty": 1.7,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "biceps": 0.12,
+        "core": 0.12,
+        "forearms": 0.06,
+        "lats": 0.45,
+        "posterior_deltoid": 0.13,
+        "upper_back_traps": 0.12
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 30.6,
+      "compartmentLoad": {
+        "biceps": 3.672,
+        "core": 3.672,
+        "forearms": 1.836,
+        "lats": 13.770000000000001,
+        "posterior_deltoid": 3.978,
+        "upper_back_traps": 3.672
+      },
+      "regionLoad": {
+        "arms": 5.508,
+        "back": 17.442,
+        "core": 3.672,
+        "shoulders": 3.978
+      },
+      "primaryRegions": [
+        "back"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 5.508,
+        "back": 17.442000000000004,
+        "core": 3.672,
+        "shoulders": 3.978
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "back": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "biceps": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 3.672
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.672
+        },
+        "lats": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 13.770000000000001
+        },
+        "posterior_deltoid": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.978
+        },
+        "upper_back_traps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.672
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 40.8,
+          "averageRir": 2.0,
+          "load": 3.672,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 17.442,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.672,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.978,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 4.9572,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 52.800000000000004,
+          "averageRir": 2.0,
+          "load": 17.442000000000004,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.672,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "wide_push_up",
+      "name": "Wide Push-up",
+      "difficulty": 1.1,
+      "type": "calisthenics",
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "compartments": {
+        "anterior_deltoid": 0.18,
+        "core": 0.1,
+        "lower_chest": 0.1,
+        "mid_chest": 0.4,
+        "triceps": 0.12,
+        "upper_chest": 0.1
+      },
+      "compartmentWeightSum": 1.0,
+      "setMli": 19.8,
+      "compartmentLoad": {
+        "anterior_deltoid": 3.564,
+        "core": 1.9800000000000002,
+        "lower_chest": 1.9800000000000002,
+        "mid_chest": 7.920000000000001,
+        "triceps": 2.376,
+        "upper_chest": 1.9800000000000002
+      },
+      "regionLoad": {
+        "arms": 2.376,
+        "chest": 11.88,
+        "core": 1.9800000000000002,
+        "shoulders": 3.564
+      },
+      "primaryRegions": [
+        "chest"
+      ],
+      "legacyMuscleLoad": {
+        "arms": 2.376,
+        "chest": 11.88,
+        "core": 1.9800000000000002,
+        "shoulders": 3.564
+      },
+      "evaluation": {
+        "arms": "understimulated",
+        "chest": "understimulated",
+        "core": "understimulated",
+        "shoulders": "understimulated"
+      },
+      "compartmentRecovery": {
+        "anterior_deltoid": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.564
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.9800000000000002
+        },
+        "lower_chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.9800000000000002
+        },
+        "mid_chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.920000000000001
+        },
+        "triceps": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.376
+        },
+        "upper_chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.9800000000000002
+        }
+      },
+      "regionRecovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 2.376,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 11.88,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.9800000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 3.564,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      },
+      "regionRecoveryFromLegacyKeys": {
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 11.880000000000003,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.9800000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 1.782,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    }
+  ]
+}

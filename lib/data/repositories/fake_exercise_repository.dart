@@ -8,6 +8,8 @@ import 'package:calisthenics_app/domain/models/exercise_database.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart';
 import 'package:calisthenics_app/domain/models/mli_models.dart' as mli;
 import 'package:calisthenics_app/data/repositories/exercise_repository.dart';
+import 'package:calisthenics_app/domain/services/muscle_group_derivation.dart';
+import 'package:calisthenics_app/domain/services/muscle_key_mapper.dart';
 
 /// A fake implementation of [ExerciseRepository] for development and testing.
 ///
@@ -244,22 +246,15 @@ class FakeExerciseRepository implements ExerciseRepository {
   };
 
   static Exercise _toDomainExercise(String id, mli.Exercise source) {
-    final ratings = <MuscleGroup, int>{};
-    final targetMuscles = <MuscleGroup>[];
     final level = levelFromCoefficient(source.difficulty);
-
-    source.muscles.forEach((key, value) {
-      final group = muscleFromKey(key);
-      if (group == null) {
-        return;
-      }
-
-      final rating = (value * 5).round().clamp(0, 5);
-      ratings[group] = rating;
-      if (!targetMuscles.contains(group)) {
-        targetMuscles.add(group);
-      }
-    });
+    // Kütüphane kaydı kompartımanlarla tanımlıdır; boşsa eski bölge
+    // ağırlıkları (`muscles`) kompartımanlara bölünür.
+    final compartments = source.compartments.isNotEmpty
+        ? source.compartments
+        : compartmentWeightsFromLegacy(source.muscles);
+    final derived = deriveMuscleGroups(compartments);
+    final ratings = derived.ratings;
+    final targetMuscles = derived.targets;
 
     return Exercise(
       id: id,
@@ -268,6 +263,7 @@ class FakeExerciseRepository implements ExerciseRepository {
       difficulty: difficultyFromCoefficient(source.difficulty),
       targetMuscleGroups: targetMuscles,
       muscleRatings: ratings,
+      compartmentWeights: compartments,
       description:
           exerciseDescriptions[id] ??
           '${source.name} hareketi icin kas aktivasyon dagilimi.',
