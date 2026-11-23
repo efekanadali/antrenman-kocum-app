@@ -1,0 +1,2655 @@
+{
+  "schemaVersion": 1,
+  "description": "Golden reference of MLI / muscle load / recovery output per exercise (pre 17-compartment migration). Also baseline data for re-calibrating the 80/220 MLI thresholds.",
+  "completedAt": "2026-01-01T12:00:00.000Z",
+  "exerciseCount": 38,
+  "exerciseIds": [
+    "90_degree_push_up",
+    "archer_pull_up",
+    "australian_row",
+    "box_jump",
+    "bulgarian_split_squat",
+    "calf_raise",
+    "chin_up",
+    "chin_up_hold_top",
+    "decline_push_up",
+    "diamond_push_up",
+    "dips_parallel_bar",
+    "front_lever_raise",
+    "glute_bridge",
+    "handstand_push_up",
+    "hollow_body_hold",
+    "incline_push_up",
+    "knee_push_up",
+    "l_sit_hold",
+    "lunge",
+    "muscle_up",
+    "nordic_curl",
+    "one_arm_pull_up",
+    "pike_push_up",
+    "pistol_squat",
+    "plank",
+    "pseudo_planche_push_up",
+    "pull_up_hold_top",
+    "shrimp_squat",
+    "side_plank",
+    "standard_pull_up",
+    "standard_push_up",
+    "standard_squat",
+    "support_hold_parallel_bar",
+    "tuck_front_lever",
+    "tuck_planche",
+    "wall_sit",
+    "wide_grip_pull_up",
+    "wide_push_up"
+  ],
+  "cases": [
+    {
+      "exerciseId": "90_degree_push_up",
+      "name": "90 Degree Push-up",
+      "difficulty": 3.4,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "back": 0.5,
+        "core": 0.8,
+        "shoulders": 1.0,
+        "triceps": 1.0
+      },
+      "muscleWeightSum": 3.3,
+      "setMli": 61.2,
+      "muscleLoad": {
+        "back": 30.6,
+        "core": 48.96000000000001,
+        "shoulders": 61.2,
+        "triceps": 61.2
+      },
+      "muscleLoadSum": 201.96,
+      "muscleRir": {
+        "back": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0,
+        "triceps": 2.0
+      },
+      "regionLoad": {
+        "arms": 61.2,
+        "back": 30.6,
+        "core": 48.96000000000001,
+        "shoulders": 61.2
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 61.2,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 30.6,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 48.96000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 61.2,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "archer_pull_up",
+      "name": "Archer Pull-up",
+      "difficulty": 2.2,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "back": 1.0,
+        "biceps": 0.8,
+        "core": 0.5,
+        "shoulders": 0.5
+      },
+      "muscleWeightSum": 2.8,
+      "setMli": 39.6,
+      "muscleLoad": {
+        "back": 39.6,
+        "biceps": 31.680000000000003,
+        "core": 19.8,
+        "shoulders": 19.8
+      },
+      "muscleLoadSum": 110.88,
+      "muscleRir": {
+        "back": 2.0,
+        "biceps": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0
+      },
+      "regionLoad": {
+        "arms": 31.680000000000003,
+        "back": 39.6,
+        "core": 19.8,
+        "shoulders": 19.8
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 31.680000000000003,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 39.6,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 19.8,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 19.8,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "australian_row",
+      "name": "Australian Row (Horizontal Pull)",
+      "difficulty": 0.85,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "back": 1.0,
+        "biceps": 0.5,
+        "core": 0.2,
+        "shoulders": 0.5
+      },
+      "muscleWeightSum": 2.2,
+      "setMli": 15.3,
+      "muscleLoad": {
+        "back": 15.3,
+        "biceps": 7.65,
+        "core": 3.0600000000000005,
+        "shoulders": 7.65
+      },
+      "muscleLoadSum": 33.660000000000004,
+      "muscleRir": {
+        "back": 2.0,
+        "biceps": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0
+      },
+      "regionLoad": {
+        "arms": 7.65,
+        "back": 15.3,
+        "core": 3.0600000000000005,
+        "shoulders": 7.65
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.65,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 15.3,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.65,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "box_jump",
+      "name": "Box Jump",
+      "difficulty": 1.5,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "calves": 0.8,
+        "glutes": 0.8,
+        "hamstrings": 0.5,
+        "quads": 1.0
+      },
+      "muscleWeightSum": 3.1,
+      "setMli": 27.0,
+      "muscleLoad": {
+        "calves": 21.6,
+        "glutes": 21.6,
+        "hamstrings": 13.5,
+        "quads": 27.0
+      },
+      "muscleLoadSum": 83.7,
+      "muscleRir": {
+        "calves": 2.0,
+        "glutes": 2.0,
+        "hamstrings": 2.0,
+        "quads": 2.0
+      },
+      "regionLoad": {
+        "legs": 83.7
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "legs": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 83.7,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "bulgarian_split_squat",
+      "name": "Bulgarian Split Squat",
+      "difficulty": 1.45,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "core": 0.2,
+        "glutes": 0.8,
+        "hamstrings": 0.5,
+        "quads": 1.0
+      },
+      "muscleWeightSum": 2.5,
+      "setMli": 26.1,
+      "muscleLoad": {
+        "core": 5.220000000000001,
+        "glutes": 20.880000000000003,
+        "hamstrings": 13.05,
+        "quads": 26.1
+      },
+      "muscleLoadSum": 65.25,
+      "muscleRir": {
+        "core": 2.0,
+        "glutes": 2.0,
+        "hamstrings": 2.0,
+        "quads": 2.0
+      },
+      "regionLoad": {
+        "core": 5.220000000000001,
+        "legs": 60.03
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "legs": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 60.03,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "calf_raise",
+      "name": "Calf Raise",
+      "difficulty": 0.65,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "calves": 1.0
+      },
+      "muscleWeightSum": 1.0,
+      "setMli": 11.700000000000001,
+      "muscleLoad": {
+        "calves": 11.700000000000001
+      },
+      "muscleLoadSum": 11.700000000000001,
+      "muscleRir": {
+        "calves": 2.0
+      },
+      "regionLoad": {
+        "legs": 11.700000000000001
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "legs": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 11.700000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "chin_up",
+      "name": "Chin-up",
+      "difficulty": 1.45,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "back": 1.0,
+        "biceps": 1.0,
+        "core": 0.2
+      },
+      "muscleWeightSum": 2.2,
+      "setMli": 26.1,
+      "muscleLoad": {
+        "back": 26.1,
+        "biceps": 26.1,
+        "core": 5.220000000000001
+      },
+      "muscleLoadSum": 57.42,
+      "muscleRir": {
+        "back": 2.0,
+        "biceps": 2.0,
+        "core": 2.0
+      },
+      "regionLoad": {
+        "arms": 26.1,
+        "back": 26.1,
+        "core": 5.220000000000001
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 26.1,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 26.1,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "chin_up_hold_top",
+      "name": "Chin-up Hold Top",
+      "difficulty": 1.15,
+      "isTimed": true,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "back": 0.8,
+        "biceps": 1.0,
+        "core": 0.2
+      },
+      "muscleWeightSum": 2.0,
+      "setMli": 20.7,
+      "muscleLoad": {
+        "back": 16.56,
+        "biceps": 20.7,
+        "core": 4.14
+      },
+      "muscleLoadSum": 41.4,
+      "muscleRir": {
+        "back": 2.0,
+        "biceps": 2.0,
+        "core": 2.0
+      },
+      "regionLoad": {
+        "arms": 20.7,
+        "back": 16.56,
+        "core": 4.14
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 20.7,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 16.56,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "chin_up_hold_top",
+      "name": "Chin-up Hold Top",
+      "difficulty": 1.15,
+      "isTimed": true,
+      "variant": "hold30s_sir3",
+      "set": {
+        "reps": 0,
+        "rir": 3,
+        "durationInSeconds": 30
+      },
+      "muscles": {
+        "back": 0.8,
+        "biceps": 1.0,
+        "core": 0.2
+      },
+      "muscleWeightSum": 2.0,
+      "setMli": 17.25,
+      "muscleLoad": {
+        "back": 13.8,
+        "biceps": 17.25,
+        "core": 3.45
+      },
+      "muscleLoadSum": 34.5,
+      "muscleRir": {
+        "back": 2.0,
+        "biceps": 2.0,
+        "core": 2.0
+      },
+      "regionLoad": {
+        "arms": 17.25,
+        "back": 13.8,
+        "core": 3.45
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 17.25,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 13.8,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "decline_push_up",
+      "name": "Decline Push-up",
+      "difficulty": 1.2,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "chest": 0.8,
+        "core": 0.2,
+        "shoulders": 1.0,
+        "triceps": 0.5
+      },
+      "muscleWeightSum": 2.5,
+      "setMli": 21.6,
+      "muscleLoad": {
+        "chest": 17.28,
+        "core": 4.32,
+        "shoulders": 21.6,
+        "triceps": 10.8
+      },
+      "muscleLoadSum": 54.00000000000001,
+      "muscleRir": {
+        "chest": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0,
+        "triceps": 2.0
+      },
+      "regionLoad": {
+        "arms": 10.8,
+        "chest": 17.28,
+        "core": 4.32,
+        "shoulders": 21.6
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 10.8,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 17.28,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 21.6,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "diamond_push_up",
+      "name": "Diamond Push-up",
+      "difficulty": 1.25,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "chest": 0.7,
+        "core": 0.2,
+        "shoulders": 0.5,
+        "triceps": 1.0
+      },
+      "muscleWeightSum": 2.4000000000000004,
+      "setMli": 22.5,
+      "muscleLoad": {
+        "chest": 15.749999999999998,
+        "core": 4.5,
+        "shoulders": 11.25,
+        "triceps": 22.5
+      },
+      "muscleLoadSum": 54.0,
+      "muscleRir": {
+        "chest": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0,
+        "triceps": 2.0
+      },
+      "regionLoad": {
+        "arms": 22.5,
+        "chest": 15.749999999999998,
+        "core": 4.5,
+        "shoulders": 11.25
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 22.5,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 15.749999999999998,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 11.25,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "dips_parallel_bar",
+      "name": "Parallel Bar Dips",
+      "difficulty": 1.55,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "chest": 1.0,
+        "core": 0.2,
+        "shoulders": 0.5,
+        "triceps": 1.0
+      },
+      "muscleWeightSum": 2.7,
+      "setMli": 27.900000000000002,
+      "muscleLoad": {
+        "chest": 27.900000000000002,
+        "core": 5.580000000000001,
+        "shoulders": 13.950000000000001,
+        "triceps": 27.900000000000002
+      },
+      "muscleLoadSum": 75.33,
+      "muscleRir": {
+        "chest": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0,
+        "triceps": 2.0
+      },
+      "regionLoad": {
+        "arms": 27.900000000000002,
+        "chest": 27.900000000000002,
+        "core": 5.580000000000001,
+        "shoulders": 13.950000000000001
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 27.900000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 27.900000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 13.950000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "front_lever_raise",
+      "name": "Front Lever Raise",
+      "difficulty": 2.7,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "back": 1.0,
+        "core": 1.0,
+        "shoulders": 0.5,
+        "triceps": 0.2
+      },
+      "muscleWeightSum": 2.7,
+      "setMli": 48.6,
+      "muscleLoad": {
+        "back": 48.6,
+        "core": 48.6,
+        "shoulders": 24.3,
+        "triceps": 9.72
+      },
+      "muscleLoadSum": 131.22,
+      "muscleRir": {
+        "back": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0,
+        "triceps": 2.0
+      },
+      "regionLoad": {
+        "arms": 9.72,
+        "back": 48.6,
+        "core": 48.6,
+        "shoulders": 24.3
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 48.6,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 48.6,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 24.3,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "glute_bridge",
+      "name": "Glute Bridge",
+      "difficulty": 0.75,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "core": 0.2,
+        "glutes": 1.0,
+        "hamstrings": 0.5
+      },
+      "muscleWeightSum": 1.7,
+      "setMli": 13.5,
+      "muscleLoad": {
+        "core": 2.7,
+        "glutes": 13.5,
+        "hamstrings": 6.75
+      },
+      "muscleLoadSum": 22.95,
+      "muscleRir": {
+        "core": 2.0,
+        "glutes": 2.0,
+        "hamstrings": 2.0
+      },
+      "regionLoad": {
+        "core": 2.7,
+        "legs": 20.25
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "legs": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 20.25,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "handstand_push_up",
+      "name": "Handstand Push-up",
+      "difficulty": 2.7,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "back": 0.2,
+        "core": 0.5,
+        "shoulders": 1.0,
+        "triceps": 0.8
+      },
+      "muscleWeightSum": 2.5,
+      "setMli": 48.6,
+      "muscleLoad": {
+        "back": 9.72,
+        "core": 24.3,
+        "shoulders": 48.6,
+        "triceps": 38.88
+      },
+      "muscleLoadSum": 121.5,
+      "muscleRir": {
+        "back": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0,
+        "triceps": 2.0
+      },
+      "regionLoad": {
+        "arms": 38.88,
+        "back": 9.72,
+        "core": 24.3,
+        "shoulders": 48.6
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 38.88,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 24.3,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 48.6,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "hollow_body_hold",
+      "name": "Hollow Body Hold",
+      "difficulty": 1.1,
+      "isTimed": true,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "core": 1.0
+      },
+      "muscleWeightSum": 1.0,
+      "setMli": 19.8,
+      "muscleLoad": {
+        "core": 19.8
+      },
+      "muscleLoadSum": 19.8,
+      "muscleRir": {
+        "core": 2.0
+      },
+      "regionLoad": {
+        "core": 19.8
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 19.8,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "hollow_body_hold",
+      "name": "Hollow Body Hold",
+      "difficulty": 1.1,
+      "isTimed": true,
+      "variant": "hold30s_sir3",
+      "set": {
+        "reps": 0,
+        "rir": 3,
+        "durationInSeconds": 30
+      },
+      "muscles": {
+        "core": 1.0
+      },
+      "muscleWeightSum": 1.0,
+      "setMli": 16.5,
+      "muscleLoad": {
+        "core": 16.5
+      },
+      "muscleLoadSum": 16.5,
+      "muscleRir": {
+        "core": 2.0
+      },
+      "regionLoad": {
+        "core": 16.5
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 16.5,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "incline_push_up",
+      "name": "Incline Push-up",
+      "difficulty": 0.65,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "chest": 1.0,
+        "core": 0.2,
+        "shoulders": 0.5,
+        "triceps": 0.5
+      },
+      "muscleWeightSum": 2.2,
+      "setMli": 11.700000000000001,
+      "muscleLoad": {
+        "chest": 11.700000000000001,
+        "core": 2.3400000000000003,
+        "shoulders": 5.8500000000000005,
+        "triceps": 5.8500000000000005
+      },
+      "muscleLoadSum": 25.740000000000002,
+      "muscleRir": {
+        "chest": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0,
+        "triceps": 2.0
+      },
+      "regionLoad": {
+        "arms": 5.8500000000000005,
+        "chest": 11.700000000000001,
+        "core": 2.3400000000000003,
+        "shoulders": 5.8500000000000005
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.8500000000000005,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 11.700000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.8500000000000005,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "knee_push_up",
+      "name": "Knee Push-up",
+      "difficulty": 0.75,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "chest": 1.0,
+        "core": 0.2,
+        "shoulders": 0.5,
+        "triceps": 0.5
+      },
+      "muscleWeightSum": 2.2,
+      "setMli": 13.5,
+      "muscleLoad": {
+        "chest": 13.5,
+        "core": 2.7,
+        "shoulders": 6.75,
+        "triceps": 6.75
+      },
+      "muscleLoadSum": 29.7,
+      "muscleRir": {
+        "chest": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0,
+        "triceps": 2.0
+      },
+      "regionLoad": {
+        "arms": 6.75,
+        "chest": 13.5,
+        "core": 2.7,
+        "shoulders": 6.75
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.75,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 13.5,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 6.75,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "l_sit_hold",
+      "name": "L-Sit Hold",
+      "difficulty": 1.8,
+      "isTimed": true,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "core": 1.0,
+        "shoulders": 0.5,
+        "triceps": 0.5
+      },
+      "muscleWeightSum": 2.0,
+      "setMli": 32.4,
+      "muscleLoad": {
+        "core": 32.4,
+        "shoulders": 16.2,
+        "triceps": 16.2
+      },
+      "muscleLoadSum": 64.8,
+      "muscleRir": {
+        "core": 2.0,
+        "shoulders": 2.0,
+        "triceps": 2.0
+      },
+      "regionLoad": {
+        "arms": 16.2,
+        "core": 32.4,
+        "shoulders": 16.2
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 16.2,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 32.4,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 16.2,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "l_sit_hold",
+      "name": "L-Sit Hold",
+      "difficulty": 1.8,
+      "isTimed": true,
+      "variant": "hold30s_sir3",
+      "set": {
+        "reps": 0,
+        "rir": 3,
+        "durationInSeconds": 30
+      },
+      "muscles": {
+        "core": 1.0,
+        "shoulders": 0.5,
+        "triceps": 0.5
+      },
+      "muscleWeightSum": 2.0,
+      "setMli": 27.0,
+      "muscleLoad": {
+        "core": 27.0,
+        "shoulders": 13.5,
+        "triceps": 13.5
+      },
+      "muscleLoadSum": 54.0,
+      "muscleRir": {
+        "core": 2.0,
+        "shoulders": 2.0,
+        "triceps": 2.0
+      },
+      "regionLoad": {
+        "arms": 13.5,
+        "core": 27.0,
+        "shoulders": 13.5
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 13.5,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 27.0,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 13.5,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "lunge",
+      "name": "Lunge",
+      "difficulty": 1.15,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "calves": 0.2,
+        "glutes": 0.8,
+        "hamstrings": 0.5,
+        "quads": 1.0
+      },
+      "muscleWeightSum": 2.5,
+      "setMli": 20.7,
+      "muscleLoad": {
+        "calves": 4.14,
+        "glutes": 16.56,
+        "hamstrings": 10.35,
+        "quads": 20.7
+      },
+      "muscleLoadSum": 51.75,
+      "muscleRir": {
+        "calves": 2.0,
+        "glutes": 2.0,
+        "hamstrings": 2.0,
+        "quads": 2.0
+      },
+      "regionLoad": {
+        "legs": 51.75
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "legs": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 51.75,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "muscle_up",
+      "name": "Muscle-up",
+      "difficulty": 2.9,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "back": 1.0,
+        "biceps": 0.5,
+        "chest": 0.8,
+        "core": 0.5,
+        "triceps": 0.8
+      },
+      "muscleWeightSum": 3.6,
+      "setMli": 52.2,
+      "muscleLoad": {
+        "back": 52.2,
+        "biceps": 26.1,
+        "chest": 41.760000000000005,
+        "core": 26.1,
+        "triceps": 41.760000000000005
+      },
+      "muscleLoadSum": 187.92000000000002,
+      "muscleRir": {
+        "back": 2.0,
+        "biceps": 2.0,
+        "chest": 2.0,
+        "core": 2.0,
+        "triceps": 2.0
+      },
+      "regionLoad": {
+        "arms": 67.86000000000001,
+        "back": 52.2,
+        "chest": 41.760000000000005,
+        "core": 26.1
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 67.86000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 52.2,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 41.760000000000005,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 26.1,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "nordic_curl",
+      "name": "Nordic Hamstring Curl",
+      "difficulty": 2.4,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "calves": 0.5,
+        "core": 0.2,
+        "glutes": 0.5,
+        "hamstrings": 1.0
+      },
+      "muscleWeightSum": 2.2,
+      "setMli": 43.2,
+      "muscleLoad": {
+        "calves": 21.6,
+        "core": 8.64,
+        "glutes": 21.6,
+        "hamstrings": 43.2
+      },
+      "muscleLoadSum": 95.04,
+      "muscleRir": {
+        "calves": 2.0,
+        "core": 2.0,
+        "glutes": 2.0,
+        "hamstrings": 2.0
+      },
+      "regionLoad": {
+        "core": 8.64,
+        "legs": 86.4
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "legs": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 86.4,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "one_arm_pull_up",
+      "name": "One Arm Pull-up",
+      "difficulty": 4.2,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "back": 1.0,
+        "biceps": 1.0,
+        "core": 0.8,
+        "shoulders": 0.5
+      },
+      "muscleWeightSum": 3.3,
+      "setMli": 75.60000000000001,
+      "muscleLoad": {
+        "back": 75.60000000000001,
+        "biceps": 75.60000000000001,
+        "core": 60.48000000000001,
+        "shoulders": 37.800000000000004
+      },
+      "muscleLoadSum": 249.48000000000005,
+      "muscleRir": {
+        "back": 2.0,
+        "biceps": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0
+      },
+      "regionLoad": {
+        "arms": 75.60000000000001,
+        "back": 75.60000000000001,
+        "core": 60.48000000000001,
+        "shoulders": 37.800000000000004
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 75.60000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 75.60000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 60.48000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 37.800000000000004,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "pike_push_up",
+      "name": "Pike Push-up",
+      "difficulty": 1.55,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "chest": 0.2,
+        "core": 0.5,
+        "shoulders": 1.0,
+        "triceps": 0.8
+      },
+      "muscleWeightSum": 2.5,
+      "setMli": 27.900000000000002,
+      "muscleLoad": {
+        "chest": 5.580000000000001,
+        "core": 13.950000000000001,
+        "shoulders": 27.900000000000002,
+        "triceps": 22.320000000000004
+      },
+      "muscleLoadSum": 69.75,
+      "muscleRir": {
+        "chest": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0,
+        "triceps": 2.0
+      },
+      "regionLoad": {
+        "arms": 22.320000000000004,
+        "chest": 5.580000000000001,
+        "core": 13.950000000000001,
+        "shoulders": 27.900000000000002
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 22.320000000000004,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 13.950000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 27.900000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "pistol_squat",
+      "name": "Pistol Squat",
+      "difficulty": 2.3,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "calves": 0.5,
+        "core": 0.5,
+        "glutes": 0.8,
+        "quads": 1.0
+      },
+      "muscleWeightSum": 2.8,
+      "setMli": 41.4,
+      "muscleLoad": {
+        "calves": 20.7,
+        "core": 20.7,
+        "glutes": 33.12,
+        "quads": 41.4
+      },
+      "muscleLoadSum": 115.92,
+      "muscleRir": {
+        "calves": 2.0,
+        "core": 2.0,
+        "glutes": 2.0,
+        "quads": 2.0
+      },
+      "regionLoad": {
+        "core": 20.7,
+        "legs": 95.22
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "legs": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 95.22,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "plank",
+      "name": "Plank",
+      "difficulty": 0.7,
+      "isTimed": true,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "core": 1.0,
+        "glutes": 0.2,
+        "shoulders": 0.2
+      },
+      "muscleWeightSum": 1.4,
+      "setMli": 12.6,
+      "muscleLoad": {
+        "core": 12.6,
+        "glutes": 2.52,
+        "shoulders": 2.52
+      },
+      "muscleLoadSum": 17.64,
+      "muscleRir": {
+        "core": 2.0,
+        "glutes": 2.0,
+        "shoulders": 2.0
+      },
+      "regionLoad": {
+        "core": 12.6,
+        "legs": 2.52,
+        "shoulders": 2.52
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 12.6,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "plank",
+      "name": "Plank",
+      "difficulty": 0.7,
+      "isTimed": true,
+      "variant": "hold30s_sir3",
+      "set": {
+        "reps": 0,
+        "rir": 3,
+        "durationInSeconds": 30
+      },
+      "muscles": {
+        "core": 1.0,
+        "glutes": 0.2,
+        "shoulders": 0.2
+      },
+      "muscleWeightSum": 1.4,
+      "setMli": 10.5,
+      "muscleLoad": {
+        "core": 10.5,
+        "glutes": 2.1,
+        "shoulders": 2.1
+      },
+      "muscleLoadSum": 14.7,
+      "muscleRir": {
+        "core": 2.0,
+        "glutes": 2.0,
+        "shoulders": 2.0
+      },
+      "regionLoad": {
+        "core": 10.5,
+        "legs": 2.1,
+        "shoulders": 2.1
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 10.5,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "pseudo_planche_push_up",
+      "name": "Pseudo Planche Push-up",
+      "difficulty": 2.1,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "chest": 0.5,
+        "core": 0.8,
+        "shoulders": 1.0,
+        "triceps": 0.5
+      },
+      "muscleWeightSum": 2.8,
+      "setMli": 37.800000000000004,
+      "muscleLoad": {
+        "chest": 18.900000000000002,
+        "core": 30.240000000000006,
+        "shoulders": 37.800000000000004,
+        "triceps": 18.900000000000002
+      },
+      "muscleLoadSum": 105.84000000000002,
+      "muscleRir": {
+        "chest": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0,
+        "triceps": 2.0
+      },
+      "regionLoad": {
+        "arms": 18.900000000000002,
+        "chest": 18.900000000000002,
+        "core": 30.240000000000006,
+        "shoulders": 37.800000000000004
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 18.900000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 18.900000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 30.240000000000006,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 37.800000000000004,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "pull_up_hold_top",
+      "name": "Pull-up Hold Top",
+      "difficulty": 1.2,
+      "isTimed": true,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "back": 1.0,
+        "biceps": 0.5,
+        "core": 0.2,
+        "shoulders": 0.5
+      },
+      "muscleWeightSum": 2.2,
+      "setMli": 21.6,
+      "muscleLoad": {
+        "back": 21.6,
+        "biceps": 10.8,
+        "core": 4.32,
+        "shoulders": 10.8
+      },
+      "muscleLoadSum": 47.52,
+      "muscleRir": {
+        "back": 2.0,
+        "biceps": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0
+      },
+      "regionLoad": {
+        "arms": 10.8,
+        "back": 21.6,
+        "core": 4.32,
+        "shoulders": 10.8
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 10.8,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 21.6,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 10.8,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "pull_up_hold_top",
+      "name": "Pull-up Hold Top",
+      "difficulty": 1.2,
+      "isTimed": true,
+      "variant": "hold30s_sir3",
+      "set": {
+        "reps": 0,
+        "rir": 3,
+        "durationInSeconds": 30
+      },
+      "muscles": {
+        "back": 1.0,
+        "biceps": 0.5,
+        "core": 0.2,
+        "shoulders": 0.5
+      },
+      "muscleWeightSum": 2.2,
+      "setMli": 18.0,
+      "muscleLoad": {
+        "back": 18.0,
+        "biceps": 9.0,
+        "core": 3.6,
+        "shoulders": 9.0
+      },
+      "muscleLoadSum": 39.6,
+      "muscleRir": {
+        "back": 2.0,
+        "biceps": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0
+      },
+      "regionLoad": {
+        "arms": 9.0,
+        "back": 18.0,
+        "core": 3.6,
+        "shoulders": 9.0
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.0,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 18.0,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.0,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "shrimp_squat",
+      "name": "Shrimp Squat",
+      "difficulty": 2.2,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "calves": 0.2,
+        "core": 0.5,
+        "glutes": 0.8,
+        "quads": 1.0
+      },
+      "muscleWeightSum": 2.5,
+      "setMli": 39.6,
+      "muscleLoad": {
+        "calves": 7.920000000000001,
+        "core": 19.8,
+        "glutes": 31.680000000000003,
+        "quads": 39.6
+      },
+      "muscleLoadSum": 99.0,
+      "muscleRir": {
+        "calves": 2.0,
+        "core": 2.0,
+        "glutes": 2.0,
+        "quads": 2.0
+      },
+      "regionLoad": {
+        "core": 19.8,
+        "legs": 79.2
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 19.8,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "legs": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 79.2,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "side_plank",
+      "name": "Side Plank",
+      "difficulty": 0.8,
+      "isTimed": true,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "core": 1.0,
+        "glutes": 0.2,
+        "shoulders": 0.2
+      },
+      "muscleWeightSum": 1.4,
+      "setMli": 14.4,
+      "muscleLoad": {
+        "core": 14.4,
+        "glutes": 2.8800000000000003,
+        "shoulders": 2.8800000000000003
+      },
+      "muscleLoadSum": 20.16,
+      "muscleRir": {
+        "core": 2.0,
+        "glutes": 2.0,
+        "shoulders": 2.0
+      },
+      "regionLoad": {
+        "core": 14.4,
+        "legs": 2.8800000000000003,
+        "shoulders": 2.8800000000000003
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 14.4,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "side_plank",
+      "name": "Side Plank",
+      "difficulty": 0.8,
+      "isTimed": true,
+      "variant": "hold30s_sir3",
+      "set": {
+        "reps": 0,
+        "rir": 3,
+        "durationInSeconds": 30
+      },
+      "muscles": {
+        "core": 1.0,
+        "glutes": 0.2,
+        "shoulders": 0.2
+      },
+      "muscleWeightSum": 1.4,
+      "setMli": 12.0,
+      "muscleLoad": {
+        "core": 12.0,
+        "glutes": 2.4000000000000004,
+        "shoulders": 2.4000000000000004
+      },
+      "muscleLoadSum": 16.8,
+      "muscleRir": {
+        "core": 2.0,
+        "glutes": 2.0,
+        "shoulders": 2.0
+      },
+      "regionLoad": {
+        "core": 12.0,
+        "legs": 2.4000000000000004,
+        "shoulders": 2.4000000000000004
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 12.0,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "standard_pull_up",
+      "name": "Standard Pull-up",
+      "difficulty": 1.55,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "back": 1.0,
+        "biceps": 0.5,
+        "core": 0.2,
+        "shoulders": 0.5
+      },
+      "muscleWeightSum": 2.2,
+      "setMli": 27.900000000000002,
+      "muscleLoad": {
+        "back": 27.900000000000002,
+        "biceps": 13.950000000000001,
+        "core": 5.580000000000001,
+        "shoulders": 13.950000000000001
+      },
+      "muscleLoadSum": 61.38,
+      "muscleRir": {
+        "back": 2.0,
+        "biceps": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0
+      },
+      "regionLoad": {
+        "arms": 13.950000000000001,
+        "back": 27.900000000000002,
+        "core": 5.580000000000001,
+        "shoulders": 13.950000000000001
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 13.950000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 27.900000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 13.950000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "standard_push_up",
+      "name": "Standard Push-up",
+      "difficulty": 1.0,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "chest": 1.0,
+        "core": 0.2,
+        "shoulders": 0.5,
+        "triceps": 0.5
+      },
+      "muscleWeightSum": 2.2,
+      "setMli": 18.0,
+      "muscleLoad": {
+        "chest": 18.0,
+        "core": 3.6,
+        "shoulders": 9.0,
+        "triceps": 9.0
+      },
+      "muscleLoadSum": 39.6,
+      "muscleRir": {
+        "chest": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0,
+        "triceps": 2.0
+      },
+      "regionLoad": {
+        "arms": 9.0,
+        "chest": 18.0,
+        "core": 3.6,
+        "shoulders": 9.0
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.0,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 18.0,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.0,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "standard_squat",
+      "name": "Standard Squat",
+      "difficulty": 0.9,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "calves": 0.2,
+        "glutes": 0.5,
+        "hamstrings": 0.2,
+        "quads": 1.0
+      },
+      "muscleWeightSum": 1.9,
+      "setMli": 16.2,
+      "muscleLoad": {
+        "calves": 3.24,
+        "glutes": 8.1,
+        "hamstrings": 3.24,
+        "quads": 16.2
+      },
+      "muscleLoadSum": 30.78,
+      "muscleRir": {
+        "calves": 2.0,
+        "glutes": 2.0,
+        "hamstrings": 2.0,
+        "quads": 2.0
+      },
+      "regionLoad": {
+        "legs": 30.78
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "legs": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 30.78,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "support_hold_parallel_bar",
+      "name": "Support Hold",
+      "difficulty": 0.95,
+      "isTimed": true,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "core": 0.5,
+        "shoulders": 0.8,
+        "triceps": 0.5
+      },
+      "muscleWeightSum": 1.8,
+      "setMli": 17.1,
+      "muscleLoad": {
+        "core": 8.55,
+        "shoulders": 13.680000000000001,
+        "triceps": 8.55
+      },
+      "muscleLoadSum": 30.780000000000005,
+      "muscleRir": {
+        "core": 2.0,
+        "shoulders": 2.0,
+        "triceps": 2.0
+      },
+      "regionLoad": {
+        "arms": 8.55,
+        "core": 8.55,
+        "shoulders": 13.680000000000001
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 8.55,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 8.55,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 13.680000000000001,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "support_hold_parallel_bar",
+      "name": "Support Hold",
+      "difficulty": 0.95,
+      "isTimed": true,
+      "variant": "hold30s_sir3",
+      "set": {
+        "reps": 0,
+        "rir": 3,
+        "durationInSeconds": 30
+      },
+      "muscles": {
+        "core": 0.5,
+        "shoulders": 0.8,
+        "triceps": 0.5
+      },
+      "muscleWeightSum": 1.8,
+      "setMli": 14.25,
+      "muscleLoad": {
+        "core": 7.125,
+        "shoulders": 11.4,
+        "triceps": 7.125
+      },
+      "muscleLoadSum": 25.65,
+      "muscleRir": {
+        "core": 2.0,
+        "shoulders": 2.0,
+        "triceps": 2.0
+      },
+      "regionLoad": {
+        "arms": 7.125,
+        "core": 7.125,
+        "shoulders": 11.4
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.125,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 7.125,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 11.4,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "tuck_front_lever",
+      "name": "Tuck Front Lever",
+      "difficulty": 2.1,
+      "isTimed": true,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "back": 1.0,
+        "biceps": 0.3,
+        "core": 0.8,
+        "shoulders": 0.5
+      },
+      "muscleWeightSum": 2.5999999999999996,
+      "setMli": 37.800000000000004,
+      "muscleLoad": {
+        "back": 37.800000000000004,
+        "biceps": 11.340000000000002,
+        "core": 30.240000000000006,
+        "shoulders": 18.900000000000002
+      },
+      "muscleLoadSum": 98.28000000000002,
+      "muscleRir": {
+        "back": 2.0,
+        "biceps": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0
+      },
+      "regionLoad": {
+        "arms": 11.340000000000002,
+        "back": 37.800000000000004,
+        "core": 30.240000000000006,
+        "shoulders": 18.900000000000002
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 11.340000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 37.800000000000004,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 30.240000000000006,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 18.900000000000002,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "tuck_front_lever",
+      "name": "Tuck Front Lever",
+      "difficulty": 2.1,
+      "isTimed": true,
+      "variant": "hold30s_sir3",
+      "set": {
+        "reps": 0,
+        "rir": 3,
+        "durationInSeconds": 30
+      },
+      "muscles": {
+        "back": 1.0,
+        "biceps": 0.3,
+        "core": 0.8,
+        "shoulders": 0.5
+      },
+      "muscleWeightSum": 2.5999999999999996,
+      "setMli": 31.5,
+      "muscleLoad": {
+        "back": 31.5,
+        "biceps": 9.45,
+        "core": 25.200000000000003,
+        "shoulders": 15.75
+      },
+      "muscleLoadSum": 81.9,
+      "muscleRir": {
+        "back": 2.0,
+        "biceps": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0
+      },
+      "regionLoad": {
+        "arms": 9.45,
+        "back": 31.5,
+        "core": 25.200000000000003,
+        "shoulders": 15.75
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.45,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 31.5,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 25.200000000000003,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 15.75,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "tuck_planche",
+      "name": "Tuck Planche",
+      "difficulty": 2.8,
+      "isTimed": true,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "back": 0.5,
+        "core": 0.8,
+        "shoulders": 1.0,
+        "triceps": 0.5
+      },
+      "muscleWeightSum": 2.8,
+      "setMli": 50.4,
+      "muscleLoad": {
+        "back": 25.2,
+        "core": 40.32,
+        "shoulders": 50.4,
+        "triceps": 25.2
+      },
+      "muscleLoadSum": 141.11999999999998,
+      "muscleRir": {
+        "back": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0,
+        "triceps": 2.0
+      },
+      "regionLoad": {
+        "arms": 25.2,
+        "back": 25.2,
+        "core": 40.32,
+        "shoulders": 50.4
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 25.2,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 25.2,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 40.32,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 50.4,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "tuck_planche",
+      "name": "Tuck Planche",
+      "difficulty": 2.8,
+      "isTimed": true,
+      "variant": "hold30s_sir3",
+      "set": {
+        "reps": 0,
+        "rir": 3,
+        "durationInSeconds": 30
+      },
+      "muscles": {
+        "back": 0.5,
+        "core": 0.8,
+        "shoulders": 1.0,
+        "triceps": 0.5
+      },
+      "muscleWeightSum": 2.8,
+      "setMli": 42.0,
+      "muscleLoad": {
+        "back": 21.0,
+        "core": 33.6,
+        "shoulders": 42.0,
+        "triceps": 21.0
+      },
+      "muscleLoadSum": 117.6,
+      "muscleRir": {
+        "back": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0,
+        "triceps": 2.0
+      },
+      "regionLoad": {
+        "arms": 21.0,
+        "back": 21.0,
+        "core": 33.6,
+        "shoulders": 42.0
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 21.0,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 21.0,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "core": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 33.6,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 42.0,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "wall_sit",
+      "name": "Wall Sit",
+      "difficulty": 0.7,
+      "isTimed": true,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "calves": 0.2,
+        "glutes": 0.5,
+        "quads": 1.0
+      },
+      "muscleWeightSum": 1.7,
+      "setMli": 12.6,
+      "muscleLoad": {
+        "calves": 2.52,
+        "glutes": 6.3,
+        "quads": 12.6
+      },
+      "muscleLoadSum": 21.419999999999998,
+      "muscleRir": {
+        "calves": 2.0,
+        "glutes": 2.0,
+        "quads": 2.0
+      },
+      "regionLoad": {
+        "legs": 21.419999999999998
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "legs": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 21.419999999999998,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "wall_sit",
+      "name": "Wall Sit",
+      "difficulty": 0.7,
+      "isTimed": true,
+      "variant": "hold30s_sir3",
+      "set": {
+        "reps": 0,
+        "rir": 3,
+        "durationInSeconds": 30
+      },
+      "muscles": {
+        "calves": 0.2,
+        "glutes": 0.5,
+        "quads": 1.0
+      },
+      "muscleWeightSum": 1.7,
+      "setMli": 10.5,
+      "muscleLoad": {
+        "calves": 2.1,
+        "glutes": 5.25,
+        "quads": 10.5
+      },
+      "muscleLoadSum": 17.85,
+      "muscleRir": {
+        "calves": 2.0,
+        "glutes": 2.0,
+        "quads": 2.0
+      },
+      "regionLoad": {
+        "legs": 17.85
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "legs": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 17.85,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "wide_grip_pull_up",
+      "name": "Wide Grip Pull-up",
+      "difficulty": 1.7,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "back": 1.0,
+        "biceps": 0.3,
+        "core": 0.2,
+        "shoulders": 0.5
+      },
+      "muscleWeightSum": 2.0,
+      "setMli": 30.6,
+      "muscleLoad": {
+        "back": 30.6,
+        "biceps": 9.18,
+        "core": 6.120000000000001,
+        "shoulders": 15.3
+      },
+      "muscleLoadSum": 61.2,
+      "muscleRir": {
+        "back": 2.0,
+        "biceps": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0
+      },
+      "regionLoad": {
+        "arms": 9.18,
+        "back": 30.6,
+        "core": 6.120000000000001,
+        "shoulders": 15.3
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.18,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "back": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 30.6,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 15.3,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    },
+    {
+      "exerciseId": "wide_push_up",
+      "name": "Wide Push-up",
+      "difficulty": 1.1,
+      "isTimed": false,
+      "variant": "reps10_rir2",
+      "set": {
+        "reps": 10,
+        "rir": 2,
+        "durationInSeconds": null
+      },
+      "muscles": {
+        "chest": 1.0,
+        "core": 0.2,
+        "shoulders": 0.5,
+        "triceps": 0.3
+      },
+      "muscleWeightSum": 2.0,
+      "setMli": 19.8,
+      "muscleLoad": {
+        "chest": 19.8,
+        "core": 3.9600000000000004,
+        "shoulders": 9.9,
+        "triceps": 5.94
+      },
+      "muscleLoadSum": 39.6,
+      "muscleRir": {
+        "chest": 2.0,
+        "core": 2.0,
+        "shoulders": 2.0,
+        "triceps": 2.0
+      },
+      "regionLoad": {
+        "arms": 5.94,
+        "chest": 19.8,
+        "core": 3.9600000000000004,
+        "shoulders": 9.9
+      },
+      "unmappedLoad": 0.0,
+      "recovery": {
+        "arms": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 5.94,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "chest": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 19.8,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        },
+        "shoulders": {
+          "recoveryHours": 48.0,
+          "averageRir": 2.0,
+          "load": 9.9,
+          "lastTrainedAt": "2026-01-01T12:00:00.000Z"
+        }
+      }
+    }
+  ]
+}

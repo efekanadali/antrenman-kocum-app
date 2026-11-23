@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calisthenics_app/domain/models/workout_session_summary.dart';
+import 'package:calisthenics_app/domain/services/muscle_key_mapper.dart';
 import 'package:calisthenics_app/presentation/providers/workout_history_provider.dart';
 import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 import 'package:calisthenics_app/presentation/widgets/muscle_recovery_card.dart';
@@ -47,19 +48,9 @@ const List<String> _weekdayShort = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', '
 
 enum AnalyticsRange { weekly, monthly }
 
-int? _muscleBucket(String rawKey) {
-  final key = rawKey.toLowerCase().trim();
-  const map = <String, int>{
-    'chest': 0, 'göğüs': 0, 'gogus': 0,
-    'back': 1, 'sırt': 1, 'sirt': 1,
-    'shoulders': 2, 'shoulder': 2, 'omuz': 2,
-    'biceps': 3, 'triceps': 3, 'kol': 3, 'arms': 3,
-    'core': 4, 'abs': 4, 'karın': 4, 'karin': 4,
-    'legs': 5, 'quads': 5, 'hamstrings': 5, 'glutes': 5, 'calves': 5,
-    'bacak': 5,
-  };
-  return map[key];
-}
+/// Kas anahtarını `_muscleLabels` indeksine çevirir.
+/// `_muscleLabels` sırası `MuscleRegion.values` sırasıyla aynıdır.
+int? _muscleBucket(String rawKey) => regionFromKey(rawKey)?.index;
 
 class _AnalyticsData {
   _AnalyticsData({

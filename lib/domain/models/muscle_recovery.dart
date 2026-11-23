@@ -1,71 +1,18 @@
 // lib/domain/models/muscle_recovery.dart
 
-/// Toparlanma takibinde kullanılan 6 ana kas grubu.
-enum RecoveryMuscle { chest, back, shoulders, arms, core, legs }
+import 'package:calisthenics_app/domain/enums/muscle_compartment.dart';
+import 'package:calisthenics_app/domain/services/muscle_key_mapper.dart';
 
-extension RecoveryMuscleLabel on RecoveryMuscle {
-  String get label {
-    switch (this) {
-      case RecoveryMuscle.chest:
-        return 'Göğüs';
-      case RecoveryMuscle.back:
-        return 'Sırt';
-      case RecoveryMuscle.shoulders:
-        return 'Omuz';
-      case RecoveryMuscle.arms:
-        return 'Kol';
-      case RecoveryMuscle.core:
-        return 'Karın';
-      case RecoveryMuscle.legs:
-        return 'Bacak';
-    }
-  }
-}
+/// Toparlanma takibinde kullanılan 6 ana kas grubu.
+///
+/// Geriye dönük uyumluluk için [MuscleRegion]'ın takma adıdır; `name`
+/// değerleri (Firestore doküman id'leri) ve `label` etiketleri aynıdır.
+typedef RecoveryMuscle = MuscleRegion;
 
 /// Farklı kaynaklardan gelen kas anahtarlarını (enum adı, Türkçe etiket)
 /// ana gruplardan birine eşler. Eşleşmeyen anahtarlar (ör. "Genel") için
-/// `null` döner.
-RecoveryMuscle? recoveryMuscleFromKey(String rawKey) {
-  switch (rawKey.toLowerCase().trim()) {
-    case 'chest':
-    case 'göğüs':
-    case 'gogus':
-      return RecoveryMuscle.chest;
-    case 'back':
-    case 'sırt':
-    case 'sirt':
-      return RecoveryMuscle.back;
-    case 'shoulders':
-    case 'shoulder':
-    case 'omuz':
-      return RecoveryMuscle.shoulders;
-    case 'biceps':
-    case 'biseps':
-    case 'triceps':
-    case 'triseps':
-    case 'kol':
-    case 'arms':
-      return RecoveryMuscle.arms;
-    case 'core':
-    case 'abs':
-    case 'karın':
-    case 'karin':
-      return RecoveryMuscle.core;
-    case 'legs':
-    case 'bacak':
-    case 'quads':
-    case 'quadriceps':
-    case 'hamstrings':
-    case 'glutes':
-    case 'kalça':
-    case 'kalca':
-    case 'calves':
-    case 'baldır':
-    case 'baldir':
-      return RecoveryMuscle.legs;
-  }
-  return null;
-}
+/// `null` döner. [regionFromKey]'e yönlendirir.
+RecoveryMuscle? recoveryMuscleFromKey(String rawKey) => regionFromKey(rawKey);
 
 /// Bir kas grubunun son antrenmanı ve toparlanma durumu.
 class MuscleRecoveryRecord {
