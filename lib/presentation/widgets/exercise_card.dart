@@ -87,7 +87,7 @@ class ExerciseCard extends StatelessWidget {
                               width: 1.0,
                             ),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.fitness_center_rounded,
                             color: AppColors.textHigh,
                             size: 20.0,
@@ -100,7 +100,7 @@ class ExerciseCard extends StatelessWidget {
                             children: [
                               Text(
                                 exercise.name,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: AppColors.textHigh,
                                   fontSize: 16.0,
                                   fontWeight: FontWeight.w700,
@@ -121,8 +121,8 @@ class ExerciseCard extends StatelessWidget {
                               ),
                               const SizedBox(height: 8.0),
                               Text(
-                                _formatTargets(exercise.targetMuscleGroups),
-                                style: const TextStyle(
+                                _formatTargets(exercise),
+                                style: TextStyle(
                                   color: AppColors.textMid,
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.w600,
@@ -133,7 +133,7 @@ class ExerciseCard extends StatelessWidget {
                                 '${exercise.name} hareketi için kas aktivasyon dağılımı.',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: AppColors.textMuted,
                                   fontSize: 12.0,
                                 ),
@@ -191,7 +191,16 @@ class ExerciseCard extends StatelessWidget {
     );
   }
 
-  String _formatTargets(List<MuscleGroup> muscles) {
+  /// Hedef metni: 17 kompartımandan en yüksek ağırlıklı ilk üçü. Kompartıman
+  /// verisi olmayan (eski / uzak) kayıtlarda kas grubu listesine düşer.
+  String _formatTargets(Exercise exercise) {
+    if (exercise.compartmentWeights.isNotEmpty) {
+      final top = exercise.compartmentWeights.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value));
+      final names = top.take(3).map((e) => e.key.label).join(', ');
+      return 'Hedef: $names';
+    }
+    final muscles = exercise.targetMuscleGroups;
     if (muscles.isEmpty) {
       return 'Hedef: Genel';
     }

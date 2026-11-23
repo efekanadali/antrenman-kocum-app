@@ -265,7 +265,7 @@ class _CustomProgramDaySessionScreenState
                     style: AppText.cardTitle,
                   ),
                   const SizedBox(height: 4.0),
-                  const Text(
+                  Text(
                     'Yedekte kalan tekrar (RIR)',
                     style: AppText.caption,
                   ),
@@ -562,7 +562,7 @@ class _CustomProgramDaySessionScreenState
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Dinlenme süresi', style: AppText.cardTitle),
+                  Text('Dinlenme süresi', style: AppText.cardTitle),
                   const SizedBox(height: AppSpace.sm),
                   Text.rich(
                     TextSpan(
@@ -571,7 +571,7 @@ class _CustomProgramDaySessionScreenState
                           text: '${tempValue.toInt()}',
                           style: AppText.metricL,
                         ),
-                        const TextSpan(text: ' sn', style: AppText.unit),
+                        TextSpan(text: ' sn', style: AppText.unit),
                       ],
                     ),
                   ),
@@ -774,7 +774,7 @@ class _CustomProgramDaySessionScreenState
                                 ],
                               ),
                             ),
-                            const Icon(
+                            Icon(
                               Icons.chevron_right_rounded,
                               size: 20,
                               color: AppColors.textMuted,
@@ -911,7 +911,7 @@ class _SessionTopIconButton extends StatelessWidget {
       style: IconButton.styleFrom(
         backgroundColor: AppColors.surface,
         fixedSize: const Size(40, 40),
-        side: const BorderSide(
+        side: BorderSide(
           color: AppColors.hairlineStrong,
           width: AppSpace.hairline,
         ),
@@ -932,7 +932,7 @@ class _SessionHeroCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: AppSpace.xl),
       child: Center(
         child: weights.isEmpty
-            ? const SizedBox(
+            ? SizedBox(
                 height: 200,
                 child: Icon(
                   Icons.accessibility_new_outlined,

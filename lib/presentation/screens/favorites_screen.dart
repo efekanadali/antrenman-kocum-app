@@ -12,6 +12,7 @@ import 'package:calisthenics_app/presentation/providers/filter_provider.dart';
 import 'package:calisthenics_app/presentation/widgets/exercise_card.dart';
 import 'package:calisthenics_app/presentation/widgets/empty_state.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
+import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 
 class FavoritesScreen extends ConsumerWidget {
   const FavoritesScreen({super.key});
@@ -207,9 +208,9 @@ class FavoritesScreen extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
-                    'Favorilerin 💪',
+                    'Favorilerin',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: Colors.white,
+                      color: AppColors.onAccent,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.5,
                     ),
@@ -218,7 +219,7 @@ class FavoritesScreen extends ConsumerWidget {
                   Text(
                     'Daha akıllı çalış. Güçlü kal.',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.white.withAlpha(230),
+                      color: AppColors.onAccent.withAlpha(230),
                       fontWeight: FontWeight.w400,
                     ),
                   ),
@@ -293,7 +294,7 @@ class FavoritesScreen extends ConsumerWidget {
                           region.label.toUpperCase(),
                           style: Theme.of(context).textTheme.labelMedium
                               ?.copyWith(
-                                color: filterState.regions.contains(region) ? Colors.white : null,
+                                color: filterState.regions.contains(region) ? AppColors.onAccent : null,
                                 fontWeight: FontWeight.w600,
                               ),
                         ),
@@ -334,7 +335,7 @@ class FavoritesScreen extends ConsumerWidget {
                           compartment.label,
                           style: Theme.of(context).textTheme.labelMedium
                               ?.copyWith(
-                                color: filterState.compartments.contains(compartment) ? Colors.white : null,
+                                color: filterState.compartments.contains(compartment) ? AppColors.onAccent : null,
                                 fontWeight: FontWeight.w600,
                               ),
                         ),

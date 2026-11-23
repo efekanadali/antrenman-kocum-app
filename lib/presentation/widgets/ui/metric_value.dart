@@ -11,7 +11,7 @@ class MetricValue extends StatelessWidget {
     required this.value,
     this.unit,
     this.label,
-    this.style = AppText.metricM,
+    this.style,
     this.valueColor,
     this.leading,
     this.crossAxisAlignment = CrossAxisAlignment.start,
@@ -20,7 +20,7 @@ class MetricValue extends StatelessWidget {
   final String value;
   final String? unit;
   final String? label;
-  final TextStyle style;
+  final TextStyle? style;
   final Color? valueColor;
 
   /// Değerin soluna yerleşen küçük öğe (ör. [StatusDot]).
@@ -30,7 +30,7 @@ class MetricValue extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final valueStyle =
-        valueColor == null ? style : style.copyWith(color: valueColor);
+        valueColor == null ? (style ?? AppText.metricM) : (style ?? AppText.metricM).copyWith(color: valueColor);
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: crossAxisAlignment,

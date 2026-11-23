@@ -16,7 +16,7 @@ import 'package:calisthenics_app/domain/services/muscle_key_mapper.dart';
 ///
 /// Çözümleme sırası:
 ///  1. Egzersiz kataloğundaki detay (id / ad eşleşmesi)
-///  2. `exerciseDatabase` kütüphane kaydı
+///  2. `exerciseCatalog` kütüphane kaydı (80 hareket)
 ///  3. Ada göre çıkarım (push/pull/squat/core)
 class ExerciseMliResolver {
   ExerciseMliResolver({List<domain.Exercise> catalog = const []}) {
@@ -25,7 +25,7 @@ class ExerciseMliResolver {
       _byName[item.name] = item;
       _byNormalizedName[_normalize(item.name)] = item;
     }
-    for (final entry in library_data.exerciseDatabase.entries) {
+    for (final entry in library_data.exerciseCatalog.entries) {
       _library[_normalize(entry.key)] = entry.value;
       _library[_normalize(entry.value.name)] = entry.value;
     }
@@ -51,7 +51,7 @@ class ExerciseMliResolver {
   }
 
   mli.Exercise? _resolveLibrary(CustomProgramExercise exercise) {
-    return library_data.exerciseDatabase[exercise.exerciseId] ??
+    return library_data.exerciseCatalog[exercise.exerciseId] ??
         _library[_normalize(exercise.exerciseId)] ??
         _library[_normalize(exercise.exerciseName)];
   }
@@ -202,7 +202,7 @@ class ExerciseMliResolver {
 
     final resolvedLibrary =
         libraryFallback ??
-        library_data.exerciseDatabase[detail.id] ??
+        library_data.exerciseCatalog[detail.id] ??
         _library[_normalize(detail.id)] ??
         _library[_normalize(detail.name)];
 

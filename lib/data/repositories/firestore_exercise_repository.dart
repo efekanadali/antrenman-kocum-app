@@ -33,7 +33,7 @@ class FirestoreExerciseRepository implements ExerciseRepository {
   @override
   Future<List<Exercise>> getAllExercises() async {
     try {
-      final local = await _fallbackRepository.getAllExercises();
+      final local = await _fallbackRepository.getCatalogExercises();
       final snapshot = await _firestore.collection('exercises').get();
       final remote = snapshot.docs.map((doc) {
         return _mapDocToExercise(doc.id, doc.data());
@@ -49,7 +49,7 @@ class FirestoreExerciseRepository implements ExerciseRepository {
       if (_cachedExercises != null && _cachedExercises!.isNotEmpty) {
         return _cachedExercises!;
       }
-      return await _fallbackRepository.getAllExercises();
+      return await _fallbackRepository.getCatalogExercises();
     }
   }
 

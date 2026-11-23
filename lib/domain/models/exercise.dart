@@ -3,6 +3,7 @@
 // Doğru import'lar:
 import 'package:calisthenics_app/domain/enums/difficulty_level.dart';
 import 'package:calisthenics_app/domain/enums/exercise_level.dart';
+import 'package:calisthenics_app/domain/enums/exercise_type.dart';
 import 'package:calisthenics_app/domain/enums/muscle_compartment.dart';
 import 'package:calisthenics_app/domain/enums/muscle_group.dart';
 
@@ -22,6 +23,10 @@ class Exercise {
   /// buradan türetilir.
   final Map<MuscleCompartment, double> compartmentWeights;
 
+  /// Kalistenik mi, vücut geliştirme mi (MLI formülünü ve kütüphane
+  /// sekmesini belirler).
+  final ExerciseType type;
+
   const Exercise({
     required this.id,
     required this.name,
@@ -32,5 +37,6 @@ class Exercise {
     required this.description,
     this.prerequisiteExercises = const <String>[],
     this.compartmentWeights = const <MuscleCompartment, double>{},
+    this.type = ExerciseType.calisthenics,
   });
 }

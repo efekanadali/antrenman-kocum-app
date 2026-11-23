@@ -8,6 +8,7 @@ import 'package:calisthenics_app/domain/enums/muscle_compartment.dart';
 import 'package:calisthenics_app/domain/models/workout_session_summary.dart';
 import 'package:calisthenics_app/domain/services/muscle_key_mapper.dart';
 import 'package:calisthenics_app/domain/services/push_pull_balance.dart';
+import 'package:calisthenics_app/presentation/providers/theme_mode_provider.dart';
 import 'package:calisthenics_app/presentation/providers/workout_history_provider.dart';
 import 'package:calisthenics_app/presentation/screens/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -42,14 +43,14 @@ class ProfileScreen extends ConsumerStatefulWidget {
 }
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
-  static const Color _bgBottom = AppColors.background; // #0A0C0E
-  static const Color _cardSurface = AppColors.surface; // #13171C
-  static const Color _cardSurfaceSoft = AppColors.surfaceSoft; // #181D24
-  static const Color _accentPurple = AppColors.accent; // #A3E635
-  static const Color _accentBlue = AppColors.emerald; // #10B981
-  static const Color _textHigh = AppColors.textHigh; // #F1F5F9
-  static const Color _textMid = AppColors.textMid; // #94A3B8
-  static const Color _border = AppColors.border; // #1E232A
+  static Color get _bgBottom => AppColors.background; // #0A0C0E
+  static Color get _cardSurface => AppColors.surface; // #13171C
+  static Color get _cardSurfaceSoft => AppColors.surfaceSoft; // #181D24
+  static Color get _accentPurple => AppColors.accent; // #A3E635
+  static Color get _accentBlue => AppColors.emerald; // #10B981
+  static Color get _textHigh => AppColors.textHigh; // #F1F5F9
+  static Color get _textMid => AppColors.textMid; // #94A3B8
+  static Color get _border => AppColors.border; // #1E232A
 
   static const String _heightKey = 'profile_height_cm';
   static const String _weightKey = 'profile_weight_kg';
@@ -84,6 +85,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   int _syncedStreak = 0;
   int _syncedTotalWorkouts = 0;
   bool _isLinkingGoogle = false;
+  final GlobalKey _settingsKey = GlobalKey();
 
   @override
   void initState() {
@@ -337,7 +339,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       Text(
                         errorText!,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: const Color(0xFFFF8E8E),
+                          color: AppColors.danger,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -350,7 +352,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             onPressed: () => Navigator.of(context).pop(),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: _textMid,
-                              side: const BorderSide(color: _border),
+                              side: BorderSide(color: _border),
                             ),
                             child: const Text('İptal'),
                           ),
@@ -472,18 +474,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   InputDecoration _dialogInputDecoration({required String label}) {
     return InputDecoration(
       labelText: label,
-      labelStyle: const TextStyle(color: _textMid),
+      labelStyle: TextStyle(color: _textMid),
       filled: true,
       fillColor: _cardSurfaceSoft,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.0),
-        borderSide: const BorderSide(color: _border),
+        borderSide: BorderSide(color: _border),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.0),
-        borderSide: const BorderSide(color: _border),
+        borderSide: BorderSide(color: _border),
       ),
-      focusedBorder: const OutlineInputBorder(
+      focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(12.0)),
         borderSide: BorderSide(color: _accentPurple),
       ),
@@ -625,13 +627,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       builder: (context, child) {
         final baseTheme = Theme.of(context);
         final themed = baseTheme.copyWith(
-          colorScheme: const ColorScheme.dark(
+          colorScheme: ColorScheme.dark(
             primary: _accentBlue,
             onPrimary: _textHigh,
             surface: _cardSurface,
             onSurface: _textHigh,
           ),
-          dialogTheme: const DialogThemeData(
+          dialogTheme: DialogThemeData(
             backgroundColor: _cardSurface,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(16.0)),
@@ -645,10 +647,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             backgroundColor: _cardSurface,
             headerBackgroundColor: _cardSurfaceSoft,
             headerForegroundColor: _textHigh,
-            weekdayStyle: const TextStyle(color: _textMid),
-            dayStyle: const TextStyle(color: _textHigh),
-            yearStyle: const TextStyle(color: _textHigh),
-            dividerColor: Colors.white12,
+            weekdayStyle: TextStyle(color: _textMid),
+            dayStyle: TextStyle(color: _textHigh),
+            yearStyle: TextStyle(color: _textHigh),
+            dividerColor: AppColors.hairline,
             dayForegroundColor: WidgetStateProperty.resolveWith((states) {
               if (states.contains(WidgetState.selected)) {
                 return AppColors.onAccent;
@@ -661,9 +663,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               }
               return Colors.transparent;
             }),
-            todayForegroundColor: const WidgetStatePropertyAll<Color>(
-              _accentBlue,
-            ),
+            todayForegroundColor: WidgetStatePropertyAll<Color>(_accentBlue),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(22.0),
             ),
@@ -749,15 +749,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12.0),
-                          borderSide: const BorderSide(color: _border),
+                          borderSide: BorderSide(color: _border),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12.0),
-                          borderSide: const BorderSide(color: _border),
+                          borderSide: BorderSide(color: _border),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12.0),
-                          borderSide: const BorderSide(color: _accentPurple),
+                          borderSide: BorderSide(color: _accentPurple),
                         ),
                       ),
                     ),
@@ -768,7 +768,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           child: OutlinedButton(
                             onPressed: () => Navigator.of(context).pop(),
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: _border),
+                              side: BorderSide(color: _border),
                               foregroundColor: _textMid,
                               padding: const EdgeInsets.symmetric(
                                 vertical: 12.0,
@@ -890,15 +890,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12.0),
-                          borderSide: const BorderSide(color: _border),
+                          borderSide: BorderSide(color: _border),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12.0),
-                          borderSide: const BorderSide(color: _border),
+                          borderSide: BorderSide(color: _border),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12.0),
-                          borderSide: const BorderSide(color: _accentPurple),
+                          borderSide: BorderSide(color: _accentPurple),
                         ),
                       ),
                     ),
@@ -909,7 +909,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           child: OutlinedButton(
                             onPressed: () => Navigator.of(context).pop(),
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: _border),
+                              side: BorderSide(color: _border),
                               foregroundColor: _textMid,
                               padding: const EdgeInsets.symmetric(
                                 vertical: 12.0,
@@ -1016,11 +1016,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: _cardSurface,
-        title: const Text(
+        title: Text(
           'Hesap zaten kullanımda',
           style: TextStyle(color: _textHigh),
         ),
-        content: const Text(
+        content: Text(
           'Bu Google hesabı daha önce başka bir profile bağlanmış. '
           'Bu hesapla giriş yaparsan şu anki anonim verilerin bu cihazda '
           'görünmez olur ve Google hesabındaki verilerin yüklenir.',
@@ -1057,18 +1057,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
+  /// Firebase başlatılmamışsa (ör. test/çevrimdışı ilk açılış) `null`.
+  User? _currentUserOrNull() {
+    try {
+      return FirebaseAuth.instance.currentUser;
+    } catch (_) {
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authUser =
-        ref.watch(authUserProvider).valueOrNull ??
-        FirebaseAuth.instance.currentUser;
+        ref.watch(authUserProvider).valueOrNull ?? _currentUserOrNull();
     final isGoogleLinked =
         authUser?.providerData.any((p) => p.providerId == 'google.com') ??
         false;
     final headerName =
         (isGoogleLinked && (authUser?.displayName?.trim().isNotEmpty ?? false))
         ? authUser!.displayName!.trim()
-        : 'Calisthenics Athlete';
+        : 'Sporcu';
 
     final historyAsync = ref.watch(workoutHistoryProvider);
 
@@ -1114,46 +1122,67 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         AppSpace.xxl,
                       ),
                       children: [
-                        _UserHeader(
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text('Profil', style: AppText.pageTitle),
+                            ),
+                            IconButton(
+                              key: const ValueKey('profile-settings-button'),
+                              tooltip: 'Tercihler',
+                              onPressed: () {
+                                final ctx = _settingsKey.currentContext;
+                                if (ctx != null) {
+                                  Scrollable.ensureVisible(
+                                    ctx,
+                                    duration: const Duration(milliseconds: 350),
+                                    curve: Curves.easeOutCubic,
+                                  );
+                                }
+                              },
+                              style: IconButton.styleFrom(
+                                backgroundColor: AppColors.surface,
+                                side: BorderSide(
+                                  color: AppColors.hairline,
+                                  width: 1,
+                                ),
+                              ),
+                              icon: Icon(
+                                Icons.settings_outlined,
+                                size: 20,
+                                color: AppColors.textMid,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpace.xl),
+                        _ProfileHeroCard(
                           username: headerName,
                           email: isGoogleLinked ? authUser?.email : null,
                           photoUrl: isGoogleLinked ? authUser?.photoURL : null,
-                        ),
-                        const SizedBox(height: AppSpace.xxl),
-                        StatsCard(
                           totalWorkouts: _syncedTotalWorkouts > totalWorkouts
                               ? _syncedTotalWorkouts
                               : totalWorkouts,
+                          totalSeconds: sessions.fold<int>(
+                            0,
+                            (sum, s) => sum + s.durationSeconds,
+                          ),
                           streak:
                               _syncedStreak > calculateWorkoutStreak(summaries)
                               ? _syncedStreak
                               : calculateWorkoutStreak(summaries),
-                          lastWorkoutDate: lastWorkoutDateLabel,
-                          lastWorkoutRelativeLabel: lastWorkoutRelativeLabel,
-                          onStreakTap: () {
-                            Navigator.pushNamed(
-                              context,
-                              AppRoutes.streakDetails,
-                            );
-                          },
-                          onHistoryTap: () {
-                            Navigator.pushNamed(
-                              context,
-                              AppRoutes.workoutHistory,
-                            );
-                          },
-                        ),
-                        const SizedBox(height: AppSpace.md),
-                        _WorkoutHistoryProfileCard(
-                          totalWorkouts: _syncedTotalWorkouts > totalWorkouts
-                              ? _syncedTotalWorkouts
-                              : totalWorkouts,
-                          onTap: () {
-                            Navigator.pushNamed(
-                              context,
-                              AppRoutes.workoutHistory,
-                            );
-                          },
+                          targetWorkoutsPerWeek: _targetWorkoutsPerWeek,
+                          lastWorkoutLabel: lastWorkoutRelativeLabel == '-'
+                              ? lastWorkoutDateLabel
+                              : lastWorkoutRelativeLabel,
+                          onStreakTap: () => Navigator.pushNamed(
+                            context,
+                            AppRoutes.streakDetails,
+                          ),
+                          onHistoryTap: () => Navigator.pushNamed(
+                            context,
+                            AppRoutes.workoutHistory,
+                          ),
                         ),
                         const SizedBox(height: AppSpace.section),
                         const MuscleRecoveryCard(),
@@ -1223,6 +1252,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           onPressed: _linkGoogleAccount,
                         ),
                         const SizedBox(height: AppSpace.section),
+                        _SettingsSection(
+                          key: _settingsKey,
+                          onHistoryTap: () => Navigator.pushNamed(
+                            context,
+                            AppRoutes.workoutHistory,
+                          ),
+                          onAthleteTap: () => Navigator.pushNamed(
+                            context,
+                            AppRoutes.athleteProfile,
+                          ),
+                          onWeeklyGoalTap: () => Navigator.pushNamed(
+                            context,
+                            AppRoutes.weeklyGoal,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpace.section),
                       ],
                     ),
                   );
@@ -1232,6 +1277,411 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       bottomNavigationBar: widget.showBottomNav
           ? const AppBottomNav(selectedIndex: 3)
           : null,
+    );
+  }
+}
+
+/// Profil kimlik kartı: zümrüt halkalı avatar, gerçek ad, seviye ve
+/// Antrenman / Toplam Süre / Seri metrik kutusu.
+class _ProfileHeroCard extends StatelessWidget {
+  const _ProfileHeroCard({
+    required this.username,
+    required this.email,
+    required this.photoUrl,
+    required this.totalWorkouts,
+    required this.totalSeconds,
+    required this.streak,
+    required this.targetWorkoutsPerWeek,
+    required this.lastWorkoutLabel,
+    required this.onStreakTap,
+    required this.onHistoryTap,
+  });
+
+  final String username;
+  final String? email;
+  final String? photoUrl;
+  final int totalWorkouts;
+  final int totalSeconds;
+  final int streak;
+  final int targetWorkoutsPerWeek;
+  final String lastWorkoutLabel;
+  final VoidCallback onStreakTap;
+  final VoidCallback onHistoryTap;
+
+  String get _level {
+    if (totalWorkouts >= 60) return 'İleri Seviye';
+    if (totalWorkouts >= 15) return 'Orta Seviye';
+    return 'Başlangıç Seviyesi';
+  }
+
+  String get _initials {
+    final parts = username
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((p) => p.isNotEmpty)
+        .toList();
+    if (parts.isEmpty) return '?';
+    final first = parts.first.characters.first;
+    final last = parts.length > 1 ? parts.last.characters.first : '';
+    return trUpper('$first$last');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hasPhoto = photoUrl != null && photoUrl!.isNotEmpty;
+    final hours = totalSeconds / 3600;
+    return AppSurface(
+      radius: AppRadius.card + 4,
+      padding: const EdgeInsets.fromLTRB(
+        AppSpace.xl,
+        AppSpace.xxl,
+        AppSpace.xl,
+        AppSpace.xl,
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceRaised,
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(
+                    color: AppColors.hairline,
+                    width: AppSpace.hairline,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    StatusDot(color: AppColors.emerald),
+                    const SizedBox(width: 6),
+                    Text(
+                      trUpper('Aktif üye'),
+                      style: AppText.sectionLabel.copyWith(
+                        fontSize: 10,
+                        color: AppColors.textHigh,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Spacer(),
+              Text(
+                'Son: $lastWorkoutLabel',
+                style: AppText.caption.copyWith(color: AppColors.textMuted),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpace.xl),
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.emerald, width: 2.5),
+                ),
+                child: CircleAvatar(
+                  radius: 42,
+                  backgroundColor: AppColors.surfaceRaised,
+                  backgroundImage: hasPhoto ? NetworkImage(photoUrl!) : null,
+                  child: hasPhoto
+                      ? null
+                      : Text(
+                          _initials,
+                          style: AppText.metricL.copyWith(
+                            fontSize: 28,
+                            color: AppColors.textHigh,
+                          ),
+                        ),
+                ),
+              ),
+              Positioned(
+                right: 0,
+                bottom: 2,
+                child: Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: AppColors.emerald,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.surface, width: 2),
+                  ),
+                  child: const Icon(
+                    Icons.bolt_rounded,
+                    size: 14,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpace.lg),
+          Text(
+            username,
+            key: const ValueKey('profile-name'),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: AppText.pageTitle.copyWith(fontSize: 24),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            email != null && email!.isNotEmpty
+                ? '$_level · ${email!}'
+                : '$_level · Hibrit Antrenman',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: AppText.caption.copyWith(
+              fontSize: 13,
+              color: AppColors.textMid,
+            ),
+          ),
+          const SizedBox(height: AppSpace.md),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: AppColors.hairline, width: 1),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.track_changes_outlined,
+                  size: 15,
+                  color: AppColors.activation,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'Hedef: Haftada $targetWorkoutsPerWeek antrenman',
+                  style: AppText.caption.copyWith(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textHigh,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpace.xl),
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.surfaceRaised,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: AppColors.hairline,
+                width: AppSpace.hairline,
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: AppSpace.lg),
+            child: IntrinsicHeight(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _HeroMetric(
+                      key: const ValueKey('profile-metric-workouts'),
+                      value: '$totalWorkouts',
+                      label: 'Antrenman',
+                      onTap: onHistoryTap,
+                    ),
+                  ),
+                  const Hairline.vertical(),
+                  Expanded(
+                    child: _HeroMetric(
+                      key: const ValueKey('profile-metric-duration'),
+                      value: hours >= 10
+                          ? hours.toStringAsFixed(0)
+                          : hours.toStringAsFixed(1),
+                      unit: 'sa',
+                      label: 'Toplam Süre',
+                      onTap: onHistoryTap,
+                    ),
+                  ),
+                  const Hairline.vertical(),
+                  Expanded(
+                    child: _HeroMetric(
+                      key: const ValueKey('profile-metric-streak'),
+                      value: '$streak',
+                      unit: 'Gün',
+                      label: 'Seri',
+                      color: streak > 0 ? AppColors.activation : null,
+                      onTap: onStreakTap,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeroMetric extends StatelessWidget {
+  const _HeroMetric({
+    super.key,
+    required this.value,
+    required this.label,
+    required this.onTap,
+    this.unit,
+    this.color,
+  });
+
+  final String value;
+  final String? unit;
+  final String label;
+  final Color? color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = color ?? AppColors.textHigh;
+    return InkWell(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: value,
+                    style: AppText.metricM.copyWith(color: c),
+                  ),
+                  if (unit != null)
+                    TextSpan(
+                      text: ' $unit',
+                      style: AppText.unit.copyWith(
+                        color: color ?? AppColors.textMid,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(label, style: AppText.caption),
+        ],
+      ),
+    );
+  }
+}
+
+/// Tercihler & Hesap: tema anahtarı ve kısayollar.
+class _SettingsSection extends ConsumerWidget {
+  const _SettingsSection({
+    super.key,
+    required this.onHistoryTap,
+    required this.onAthleteTap,
+    required this.onWeeklyGoalTap,
+  });
+
+  final VoidCallback onHistoryTap;
+  final VoidCallback onAthleteTap;
+  final VoidCallback onWeeklyGoalTap;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
+    return _GroupSection(
+      label: 'Tercihler & Hesap',
+      children: [
+        _SettingsRow(
+          icon: Icons.straighten_outlined,
+          label: 'Sporcu Profili & Ölçüler',
+          onTap: onAthleteTap,
+        ),
+        _SettingsRow(
+          icon: Icons.flag_outlined,
+          label: 'Haftalık Hedef',
+          onTap: onWeeklyGoalTap,
+        ),
+        _SettingsRow(
+          icon: Icons.history_outlined,
+          label: 'Antrenman Geçmişi',
+          onTap: onHistoryTap,
+        ),
+        _SettingsRow(
+          icon: Icons.dark_mode_outlined,
+          label: 'Koyu Tema (Dark Mode)',
+          trailing: Switch(
+            key: const ValueKey('profile-dark-mode-switch'),
+            value: isDark,
+            activeThumbColor: AppColors.onAccent,
+            activeTrackColor: AppColors.ring,
+            inactiveThumbColor: AppColors.surface,
+            inactiveTrackColor: AppColors.hairlineStrong,
+            trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
+            onChanged: (value) =>
+                ref.read(themeModeProvider.notifier).setDark(value),
+          ),
+          onTap: () => ref.read(themeModeProvider.notifier).setDark(!isDark),
+        ),
+      ],
+    );
+  }
+}
+
+class _SettingsRow extends StatelessWidget {
+  const _SettingsRow({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.trailing,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpace.lg,
+          vertical: 12,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceRaised,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, size: 18, color: AppColors.textMid),
+            ),
+            const SizedBox(width: AppSpace.md),
+            Expanded(
+              child: Text(
+                label,
+                style: AppText.body.copyWith(fontWeight: FontWeight.w500),
+              ),
+            ),
+            trailing ??
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: 20,
+                  color: AppColors.textMuted,
+                ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -1305,7 +1755,7 @@ class _GroupRow extends StatelessWidget {
             ),
             if (chevron) ...[
               const SizedBox(width: 6),
-              const Icon(
+              Icon(
                 Icons.chevron_right_rounded,
                 size: 18,
                 color: AppColors.textMuted,
@@ -1393,7 +1843,7 @@ class _GoogleLinkCard extends StatelessWidget {
             child: Row(
               children: [
                 if (isLoading)
-                  const SizedBox(
+                  SizedBox(
                     width: 16,
                     height: 16,
                     child: CircularProgressIndicator(
@@ -1421,74 +1871,13 @@ class _GoogleLinkCard extends StatelessWidget {
                   ),
                 ),
                 if (!disabled)
-                  const Icon(
+                  Icon(
                     Icons.chevron_right_rounded,
                     size: 18,
                     color: AppColors.textMuted,
                   ),
               ],
             ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _UserHeader extends StatelessWidget {
-  const _UserHeader({required this.username, this.email, this.photoUrl});
-
-  final String username;
-  final String? email;
-  final String? photoUrl;
-
-  @override
-  Widget build(BuildContext context) {
-    final hasPhoto = photoUrl != null && photoUrl!.isNotEmpty;
-    final hasEmail = email != null && email!.isNotEmpty;
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(2),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: AppColors.hairlineStrong,
-              width: AppSpace.hairline,
-            ),
-          ),
-          child: CircleAvatar(
-            radius: 26,
-            backgroundColor: AppColors.surfaceRaised,
-            backgroundImage: hasPhoto ? NetworkImage(photoUrl!) : null,
-            child: hasPhoto
-                ? null
-                : const Icon(
-                    Icons.person_outline_rounded,
-                    size: 26,
-                    color: AppColors.textMid,
-                  ),
-          ),
-        ),
-        const SizedBox(width: AppSpace.lg),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                username,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: AppText.pageTitle.copyWith(fontSize: 24),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                hasEmail ? email! : 'Profil',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: AppText.caption,
-              ),
-            ],
           ),
         ),
       ],
@@ -1576,28 +1965,6 @@ class _TapMetric extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(AppRadius.control),
       child: Center(child: child),
-    );
-  }
-}
-
-class _WorkoutHistoryProfileCard extends StatelessWidget {
-  const _WorkoutHistoryProfileCard({
-    required this.totalWorkouts,
-    required this.onTap,
-  });
-
-  final int totalWorkouts;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppSurface(
-      padding: EdgeInsets.zero,
-      child: _GroupRow(
-        label: 'Antrenman geçmişi',
-        value: totalWorkouts > 0 ? '$totalWorkouts seans' : 'Döküm',
-        onTap: onTap,
-      ),
     );
   }
 }
@@ -1782,7 +2149,7 @@ class PersonalRecordsCard extends StatelessWidget {
       return _GroupSection(
         label: 'Kişisel rekorlar',
         trailing: addButton,
-        children: const [
+        children: [
           Padding(
             padding: EdgeInsets.all(AppSpace.lg),
             child: Text(
@@ -1833,7 +2200,7 @@ class PersonalRecordsCard extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () => onDeleteRecord(index),
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.close_rounded,
                     size: 16,
                     color: AppColors.textMuted,
@@ -1991,7 +2358,7 @@ Map<MuscleCompartment, double> calculateCompartmentDistribution(
 
 /// İtiş / çekiş dengesi mesajı (sınıflandırma: [movementPatternOf]).
 String calculateBalanceText(Map<MuscleCompartment, double> distribution) {
-  return computePushPullBalance(distribution).message;
+  return computePushPullBalance(distribution).turkishMessage;
 }
 
 String formatDate(DateTime date) {
@@ -2018,10 +2385,10 @@ String relativeDayLabel(DateTime date) {
   final diff = today.difference(target).inDays;
 
   if (diff <= 0) {
-    return 'Bugun';
+    return 'Bugün';
   }
   if (diff == 1) {
-    return 'Dun';
+    return 'Dün';
   }
-  return '$diff gun once';
+  return '$diff gün önce';
 }

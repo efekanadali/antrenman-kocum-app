@@ -14,16 +14,16 @@ class SegmentedBar extends StatelessWidget {
     this.segments = 10,
     this.height = 4,
     this.gap = 2,
-    this.color = AppColors.textHigh,
-    this.trackColor = AppColors.hairlineStrong,
+    this.color,
+    this.trackColor,
   });
 
   final double value;
   final int segments;
   final double height;
   final double gap;
-  final Color color;
-  final Color trackColor;
+  final Color? color;
+  final Color? trackColor;
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +35,8 @@ class SegmentedBar extends StatelessWidget {
           filled: (value.clamp(0.0, 1.0) * segments).round(),
           segments: segments,
           gap: gap,
-          color: color,
-          trackColor: trackColor,
+          color: color ?? AppColors.textHigh,
+          trackColor: trackColor ?? AppColors.hairlineStrong,
         ),
       ),
     );

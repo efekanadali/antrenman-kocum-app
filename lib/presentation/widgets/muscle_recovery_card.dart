@@ -18,8 +18,8 @@ import 'package:calisthenics_app/presentation/widgets/ui/ui.dart';
 class MuscleRecoveryCard extends ConsumerStatefulWidget {
   const MuscleRecoveryCard({super.key});
 
-  static const Color _ready = AppColors.emerald;
-  static const Color _recovering = AppColors.amber;
+  static Color get _ready => AppColors.emerald;
+  static Color get _recovering => AppColors.amber;
 
   @override
   ConsumerState<MuscleRecoveryCard> createState() => _MuscleRecoveryCardState();
@@ -60,7 +60,7 @@ class _MuscleRecoveryCardState extends ConsumerState<MuscleRecoveryCard> {
             children: [
               const Expanded(child: SectionHeader('Toparlanma')),
               if (async.isLoading)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(right: AppSpace.sm),
                   child: SizedBox(
                     width: 12,
@@ -76,7 +76,7 @@ class _MuscleRecoveryCardState extends ConsumerState<MuscleRecoveryCard> {
                 style: AppText.caption.copyWith(color: AppColors.textMid),
               ),
               IconButton(
-                icon: const Icon(
+                icon: Icon(
                   Icons.info_outline,
                   color: AppColors.textMuted,
                   size: 16,
@@ -122,7 +122,7 @@ class _MuscleRecoveryCardState extends ConsumerState<MuscleRecoveryCard> {
                   trailing: AnimatedRotation(
                     turns: _expanded.contains(region) ? 0.5 : 0,
                     duration: const Duration(milliseconds: 200),
-                    child: const Icon(
+                    child: Icon(
                       Icons.expand_more_rounded,
                       size: 18,
                       color: AppColors.textMuted,
@@ -146,7 +146,7 @@ class _MuscleRecoveryCardState extends ConsumerState<MuscleRecoveryCard> {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            const Hairline.vertical(
+                            Hairline.vertical(
                               color: AppColors.hairlineStrong,
                             ),
                             const SizedBox(width: AppSpace.md),
@@ -239,7 +239,7 @@ class _FatigueMap extends StatelessWidget {
                 style: AppText.caption,
               ),
               const SizedBox(height: AppSpace.md),
-              const _Legend(
+              _Legend(
                 color: MuscleRecoveryCard._recovering,
                 label: 'Yüksek yorgunluk',
               ),

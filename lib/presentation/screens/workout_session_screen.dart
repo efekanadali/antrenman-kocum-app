@@ -208,7 +208,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
       isScrollControlled: true,
       context: context,
       backgroundColor: AppColors.surface,
-      shape: const RoundedRectangleBorder(
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
         side: BorderSide(color: AppColors.border, width: 1.0),
       ),
@@ -422,7 +422,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.surface,
-      shape: const RoundedRectangleBorder(
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
         side: BorderSide(color: AppColors.border, width: 1.0),
       ),
@@ -446,7 +446,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
                   ),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.close_rounded,
                       color: AppColors.textMid,
                       size: 20.0,
@@ -615,7 +615,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
                         Container(
                           width: 8.0,
                           height: 8.0,
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             color: AppColors.iceBlue,
                             shape: BoxShape.circle,
                           ),
@@ -795,7 +795,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
                                 shape: BoxShape.circle,
                                 border: Border.all(color: AppColors.border),
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.fitness_center_rounded,
                                 color: AppColors.iceBlue,
                                 size: 19.0,
@@ -840,7 +840,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
                                 ],
                               ),
                             ),
-                            const Icon(
+                            Icon(
                               Icons.arrow_forward_ios_rounded,
                               size: 14.0,
                               color: AppColors.textMuted,
@@ -983,7 +983,7 @@ class _ExerciseHeroCard extends StatelessWidget {
                         color: AppColors.iceBlue.withValues(alpha: 0.4),
                       ),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
@@ -1007,7 +1007,7 @@ class _ExerciseHeroCard extends StatelessWidget {
                   const SizedBox(height: 14.0),
                   Text(
                     restRemainingText,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textHigh,
                       fontSize: 54.0,
                       fontWeight: FontWeight.w900,
@@ -1022,7 +1022,7 @@ class _ExerciseHeroCard extends StatelessWidget {
                       value: restProgress.clamp(0.0, 1.0),
                       minHeight: 6.0,
                       backgroundColor: AppColors.surfaceSoft,
-                      valueColor: const AlwaysStoppedAnimation<Color>(
+                      valueColor: AlwaysStoppedAnimation<Color>(
                         AppColors.iceBlue,
                       ),
                     ),
@@ -1030,7 +1030,7 @@ class _ExerciseHeroCard extends StatelessWidget {
                   const SizedBox(height: 14.0),
                   Text(
                     nextSetText,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textMid,
                       fontSize: 13.0,
                       fontWeight: FontWeight.w600,
@@ -1039,12 +1039,12 @@ class _ExerciseHeroCard extends StatelessWidget {
                   const SizedBox(height: 10.0),
                   TextButton.icon(
                     onPressed: onStopRest,
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.skip_next_rounded,
                       size: 18.0,
                       color: AppColors.volcanic,
                     ),
-                    label: const Text(
+                    label: Text(
                       'DİNLENMEYİ BİTİR',
                       style: TextStyle(
                         color: AppColors.volcanic,
@@ -1079,7 +1079,7 @@ class _ExerciseHeroCard extends StatelessWidget {
                       ),
                       child: Text(
                         exercise.level.label.toUpperCase(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.textMid,
                           fontSize: 10.5,
                           fontWeight: FontWeight.w800,
@@ -1131,7 +1131,7 @@ class _HeroFallbackIcon extends StatelessWidget {
           shape: BoxShape.circle,
           border: Border.all(color: AppColors.border),
         ),
-        child: const Icon(
+        child: Icon(
           Icons.accessibility_new_rounded,
           size: 58.0,
           color: AppColors.textHigh,

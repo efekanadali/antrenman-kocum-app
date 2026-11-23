@@ -14,7 +14,7 @@ class AppText {
   static const List<FontFeature> tabular = [FontFeature.tabularFigures()];
 
   /// Ekran başlığı: 28 / SemiBold / -0.5.
-  static const TextStyle pageTitle = TextStyle(
+  static TextStyle get pageTitle => TextStyle(
     fontSize: 28,
     fontWeight: FontWeight.w600,
     letterSpacing: -0.5,
@@ -25,7 +25,7 @@ class AppText {
 
   /// Bölüm etiketi: 11 / büyük harf / 1.2 aralık / soluk gri.
   /// Metni çağıran taraf büyük harfe çevirir.
-  static const TextStyle sectionLabel = TextStyle(
+  static TextStyle get sectionLabel => TextStyle(
     fontSize: 11,
     fontWeight: FontWeight.w600,
     letterSpacing: 1.2,
@@ -34,7 +34,7 @@ class AppText {
     fontFeatures: tabular,
   );
 
-  static const TextStyle cardTitle = TextStyle(
+  static TextStyle get cardTitle => TextStyle(
     fontSize: 17,
     fontWeight: FontWeight.w600,
     letterSpacing: -0.3,
@@ -43,7 +43,7 @@ class AppText {
     fontFeatures: tabular,
   );
 
-  static const TextStyle body = TextStyle(
+  static TextStyle get body => TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.w400,
     height: 1.4,
@@ -51,7 +51,7 @@ class AppText {
     fontFeatures: tabular,
   );
 
-  static const TextStyle bodyMuted = TextStyle(
+  static TextStyle get bodyMuted => TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.w400,
     height: 1.4,
@@ -59,7 +59,7 @@ class AppText {
     fontFeatures: tabular,
   );
 
-  static const TextStyle caption = TextStyle(
+  static TextStyle get caption => TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.w500,
     height: 1.3,
@@ -67,7 +67,7 @@ class AppText {
     fontFeatures: tabular,
   );
 
-  static const TextStyle button = TextStyle(
+  static TextStyle get button => TextStyle(
     fontSize: 15,
     fontWeight: FontWeight.w600,
     letterSpacing: -0.1,
@@ -75,7 +75,7 @@ class AppText {
   );
 
   // ─── Metrikler (hepsi tabular) ─────────────────────────────────────────────
-  static const TextStyle metricXL = TextStyle(
+  static TextStyle get metricXL => TextStyle(
     fontSize: 44,
     fontWeight: FontWeight.w600,
     letterSpacing: -1.0,
@@ -84,7 +84,7 @@ class AppText {
     fontFeatures: tabular,
   );
 
-  static const TextStyle metricL = TextStyle(
+  static TextStyle get metricL => TextStyle(
     fontSize: 28,
     fontWeight: FontWeight.w600,
     letterSpacing: -0.6,
@@ -93,7 +93,7 @@ class AppText {
     fontFeatures: tabular,
   );
 
-  static const TextStyle metricM = TextStyle(
+  static TextStyle get metricM => TextStyle(
     fontSize: 20,
     fontWeight: FontWeight.w600,
     letterSpacing: -0.3,
@@ -102,7 +102,7 @@ class AppText {
     fontFeatures: tabular,
   );
 
-  static const TextStyle metricS = TextStyle(
+  static TextStyle get metricS => TextStyle(
     fontSize: 15,
     fontWeight: FontWeight.w600,
     height: 1.2,
@@ -111,7 +111,7 @@ class AppText {
   );
 
   /// Değerin yanındaki birim ("MLI", "sa", "%").
-  static const TextStyle unit = TextStyle(
+  static TextStyle get unit => TextStyle(
     fontSize: 13,
     fontWeight: FontWeight.w500,
     color: AppColors.textMid,

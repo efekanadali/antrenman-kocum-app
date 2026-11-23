@@ -8,17 +8,17 @@ import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 
 // ─── Design Tokens (Nordic & Cyber-Athlete) ──────────────────────────────────
-const Color _bg = AppColors.background; // #0A0C0E
-const Color _surface = AppColors.surface; // #13171C
-const Color _surfaceSoft = AppColors.surfaceSoft; // #181D24
-const Color _border = AppColors.border; // #1E232A
-const Color _volcanic = AppColors.accent; // #A3E635
-const Color _emerald = AppColors.emerald; // #10B981
-const Color _nordicIce = AppColors.nordicIce; // #38BDF8
+Color get _bg => AppColors.background; // #0A0C0E
+Color get _surface => AppColors.surface; // #13171C
+Color get _surfaceSoft => AppColors.surfaceSoft; // #181D24
+Color get _border => AppColors.border; // #1E232A
+Color get _volcanic => AppColors.accent; // #A3E635
+Color get _emerald => AppColors.emerald; // #10B981
+Color get _nordicIce => AppColors.nordicIce; // #38BDF8
 
-const Color _textPrimary = AppColors.textHigh; // #F1F5F9
-const Color _textSecondary = AppColors.textMid; // #94A3B8
-const Color _textMuted = AppColors.textMuted; // #64748B
+Color get _textPrimary => AppColors.textHigh; // #F1F5F9
+Color get _textSecondary => AppColors.textMid; // #94A3B8
+Color get _textMuted => AppColors.textMuted; // #64748B
 
 class WorkoutHistoryScreen extends ConsumerWidget {
   const WorkoutHistoryScreen({super.key});
@@ -34,10 +34,10 @@ class WorkoutHistoryScreen extends ConsumerWidget {
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: _textPrimary, size: 18),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: _textPrimary, size: 18),
           onPressed: () => Navigator.maybePop(context),
         ),
-        title: const Text(
+        title: Text(
           'Antrenman Geçmişi',
           style: TextStyle(
             color: _textPrimary,
@@ -48,12 +48,12 @@ class WorkoutHistoryScreen extends ConsumerWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.insights_rounded, color: _volcanic, size: 20),
+            icon: Icon(Icons.insights_rounded, color: _volcanic, size: 20),
             tooltip: 'Analitik',
             onPressed: () => Navigator.pushNamed(context, AppRoutes.analytics),
           ),
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: _textSecondary, size: 20),
+            icon: Icon(Icons.refresh_rounded, color: _textSecondary, size: 20),
             tooltip: 'Yenile',
             onPressed: () => ref.invalidate(workoutHistoryProvider),
           ),
@@ -82,7 +82,7 @@ class _LoadingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -126,14 +126,14 @@ class _ErrorView extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: _border, width: 1),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.wifi_off_rounded,
                 color: _volcanic,
                 size: 36,
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'Geçmiş Yüklenemedi',
               style: TextStyle(
                 color: _textPrimary,
@@ -142,7 +142,7 @@ class _ErrorView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 6),
-            const Text(
+            Text(
               'Ağ bağlantısı kurulamadı veya bir hata oluştu. Lütfen tekrar deneyin.',
               textAlign: TextAlign.center,
               style: TextStyle(color: _textSecondary, fontSize: 13, height: 1.4),
@@ -189,14 +189,14 @@ class _EmptyHistoryView extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: _border, width: 1),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.fitness_center_rounded,
                 size: 34,
                 color: _volcanic,
               ),
             ),
             const SizedBox(height: 18),
-            const Text(
+            Text(
               'Henüz tamamlanmış antrenman yok',
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -207,7 +207,7 @@ class _EmptyHistoryView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 6),
-            const Text(
+            Text(
               'Tamamladığınız antrenmanların süreleri, egzersiz detayları ve MLI iş yükü puanları burada listelenecektir.',
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -268,7 +268,7 @@ class _HistoryListView extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Tüm Seanslar',
               style: TextStyle(
                 color: _textPrimary,
@@ -279,7 +279,7 @@ class _HistoryListView extends StatelessWidget {
             ),
             Text(
               '$totalCount kayıt',
-              style: const TextStyle(
+              style: TextStyle(
                 color: _textMuted,
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
@@ -381,7 +381,7 @@ class _OverviewStat extends StatelessWidget {
         const SizedBox(height: 6),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             color: _textPrimary,
             fontSize: 15,
             fontWeight: FontWeight.w700,
@@ -391,7 +391,7 @@ class _OverviewStat extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             color: _textSecondary,
             fontSize: 11,
             fontWeight: FontWeight.w500,
@@ -480,7 +480,7 @@ class _WorkoutSessionCard extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.calendar_today_rounded,
                               size: 13,
                               color: _textMuted,
@@ -488,7 +488,7 @@ class _WorkoutSessionCard extends StatelessWidget {
                             const SizedBox(width: 5),
                             Text(
                               _formatDate(session.completedAt),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: _textSecondary,
                                 fontSize: 11.5,
                                 fontWeight: FontWeight.w500,
@@ -508,7 +508,7 @@ class _WorkoutSessionCard extends StatelessWidget {
                           ),
                           child: Text(
                             _relativeDayLabel(session.completedAt),
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: _emerald,
                               fontSize: 10.5,
                               fontWeight: FontWeight.w600,
@@ -524,7 +524,7 @@ class _WorkoutSessionCard extends StatelessWidget {
                       exerciseTitle,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: _textPrimary,
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
@@ -582,7 +582,7 @@ class _WorkoutSessionCard extends StatelessWidget {
                             ),
                             child: Text(
                               '${entry.key.label}: ${entry.value.round()}p',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: _textMuted,
                                 fontSize: 10,
                                 fontWeight: FontWeight.w500,

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
+import 'package:calisthenics_app/presentation/providers/theme_mode_provider.dart';
 
 import 'dart:async';
 
@@ -48,18 +50,52 @@ Future<void> _syncStreakAndWorkoutsOnLaunch(FirestoreService firestoreService) a
   } catch (_) {}
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
   @override
+  ConsumerState<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends ConsumerState<MyApp> {
+  static AppPalette _paletteFor(ThemeMode mode) =>
+      mode == ThemeMode.dark ? AppPalette.dark : AppPalette.light;
+
+  /// Tema değiştiğinde (const olanlar dahil) tüm elementleri yeniden kurar;
+  /// renkler [AppColors]'tan build sırasında okunduğu için durum (gezinme
+  /// yığını, kaydırma, form) kaybolmadan yeni palet uygulanır.
+  void _rebuildAll() {
+    void visit(Element element) {
+      element.markNeedsBuild();
+      element.visitChildren(visit);
+    }
+
+    (context as Element).visitChildren(visit);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    ref.listen<ThemeMode>(themeModeProvider, (previous, next) {
+      AppColors.apply(_paletteFor(next));
+      _rebuildAll();
+    });
+    final palette = _paletteFor(ref.watch(themeModeProvider));
+    AppColors.apply(palette);
+    final theme = AppTheme.themeFor(palette);
+
     return MaterialApp(
       title: 'Calisthenics App',
-      theme: AppTheme.darkTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.dark,
+      theme: theme,
+      darkTheme: theme,
+      themeMode: palette.isDark ? ThemeMode.dark : ThemeMode.light,
       initialRoute: AppRoutes.home,
       onGenerateRoute: AppRoutes.generateRoute,
+      builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
+        value: palette.isDark
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark,
+        child: child ?? const SizedBox.shrink(),
+      ),
     );
   }
 }

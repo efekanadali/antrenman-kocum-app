@@ -278,7 +278,7 @@ class TrainingProgramScreen extends StatelessWidget {
 
   Widget _buildBottomNavBar(BuildContext context, {required int selectedIndex}) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.surface,
         border: Border(
           top: BorderSide(color: AppColors.border, width: 1.0),
@@ -412,7 +412,7 @@ class TrainingProgramScreen extends StatelessWidget {
                       width: 1.0,
                     ),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.auto_awesome_rounded,
                     color: AppColors.volcanic,
                     size: 22.0,
@@ -422,7 +422,7 @@ class TrainingProgramScreen extends StatelessWidget {
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
                         'Senin Planın',
                         style: TextStyle(
@@ -486,7 +486,7 @@ class TrainingProgramScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 96.0),
         children: [
-          const Text(
+          Text(
             'Programlar',
             style: TextStyle(
               color: AppColors.textHigh,
@@ -496,7 +496,7 @@ class TrainingProgramScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4.0),
-          const Text(
+          Text(
             'Evde ve spor salonunda uygulanacak elit planlar.',
             style: TextStyle(
               color: AppColors.textMid,
@@ -549,7 +549,7 @@ class _LevelSection extends StatelessWidget {
               const SizedBox(width: 10.0),
               Text(
                 level,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.textHigh,
                   fontSize: 16.0,
                   fontWeight: FontWeight.w700,
@@ -604,7 +604,7 @@ class _DayCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   day["name"] as String,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textHigh,
                     fontSize: 15.0,
                     fontWeight: FontWeight.w700,
@@ -620,7 +620,7 @@ class _DayCard extends StatelessWidget {
                 ),
                 child: Text(
                   day["focus"] as String,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textMid,
                     fontSize: 11.0,
                     fontWeight: FontWeight.w600,
@@ -632,7 +632,7 @@ class _DayCard extends StatelessWidget {
           const SizedBox(height: 12.0),
           _SectionList(title: "Isınma", items: warmup),
           const SizedBox(height: 10.0),
-          const Text(
+          Text(
             "Ana Antrenman",
             style: TextStyle(
               color: AppColors.textHigh,
@@ -728,7 +728,7 @@ class _SectionList extends StatelessWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.textMid,
             fontSize: 12.0,
             fontWeight: FontWeight.w600,
@@ -740,7 +740,7 @@ class _SectionList extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 3.0),
             child: Text(
               '• $item',
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.textMuted,
                 fontSize: 12.0,
               ),
@@ -771,7 +771,7 @@ class _WorkoutItem extends StatelessWidget {
         children: [
           Text(
             item["exercise"] as String,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textHigh,
               fontSize: 13.0,
               fontWeight: FontWeight.w700,
@@ -780,7 +780,7 @@ class _WorkoutItem extends StatelessWidget {
           const SizedBox(height: 4.0),
           Text(
             '${item["sets"]} set | ${item["reps_or_time"]} | Dinlenme: ${item["rest"]}',
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textMid,
               fontSize: 12.0,
             ),
@@ -788,14 +788,14 @@ class _WorkoutItem extends StatelessWidget {
           const SizedBox(height: 4.0),
           Text(
             'İlerleme: ${item["progression"]}',
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textMuted,
               fontSize: 11.0,
             ),
           ),
           Text(
             'Kolaylaştırma: ${item["regression"]}',
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textMuted,
               fontSize: 11.0,
             ),

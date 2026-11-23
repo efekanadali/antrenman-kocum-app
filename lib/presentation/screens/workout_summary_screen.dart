@@ -156,7 +156,7 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
       ]);
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Row(
             children: [
               Icon(
@@ -173,7 +173,7 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
     } catch (_) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Row(
             children: [
               Icon(
@@ -241,7 +241,7 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
             AppSpace.page,
             AppSpace.md,
           ),
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppColors.background,
             border: Border(
               top: BorderSide(
@@ -297,7 +297,7 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
       children: [
         Row(
           children: [
-            const Icon(
+            Icon(
               Icons.check_circle_outline_rounded,
               size: 16,
               color: AppColors.emerald,
@@ -421,7 +421,7 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
   }
 
   Widget _buildEmptyMuscleState() {
-    return const Row(
+    return Row(
       children: [
         Icon(Icons.info_outline_rounded, color: AppColors.textMuted, size: 18),
         SizedBox(width: AppSpace.sm),

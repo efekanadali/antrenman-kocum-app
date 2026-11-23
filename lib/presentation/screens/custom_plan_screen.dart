@@ -48,9 +48,9 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Haftada kaç gün?', style: AppText.cardTitle),
+                    Text('Haftada kaç gün?', style: AppText.cardTitle),
                     const SizedBox(height: 4.0),
-                    const Text(
+                    Text(
                       'Haftalık antrenman sıklığını belirle.',
                       style: AppText.bodyMuted,
                     ),
@@ -251,7 +251,7 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Hedef set & tekrar', style: AppText.cardTitle),
+                    Text('Hedef set & tekrar', style: AppText.cardTitle),
                     const SizedBox(height: 4.0),
                     Text(
                       isTimed
@@ -292,7 +292,7 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                           decimal: true,
                         ),
                         style: AppText.metricS,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Hedef yük',
                           suffixText: 'kg',
                           suffixStyle: AppText.unit,
@@ -477,7 +477,7 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                 ),
               ),
             ),
-            const SliverPadding(
+            SliverPadding(
               padding: EdgeInsets.fromLTRB(
                 AppSpace.page,
                 AppSpace.xs,
@@ -591,7 +591,7 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                         horizontal: AppSpace.page,
                       ),
                       child: exercisesAsync.when(
-                        loading: () => const Padding(
+                        loading: () => Padding(
                           padding: EdgeInsets.all(AppSpace.section),
                           child: Center(
                             child: CircularProgressIndicator(
@@ -600,7 +600,7 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                             ),
                           ),
                         ),
-                        error: (_, _) => const Center(
+                        error: (_, _) => Center(
                           child: Text(
                             'Egzersiz kataloğu yüklenemedi.',
                             style: AppText.bodyMuted,
@@ -618,7 +618,7 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                                       _removeExercise(day.dayIndex, index),
                                 ),
                               const SizedBox(height: AppSpace.lg),
-                              const Text(
+                              Text(
                                 'Haftalık toplam, RIR 2 varsayımıyla; kaldıraç '
                                 'katsayısı ve kas ağırlıklarına göre hesaplanır.',
                                 style: AppText.caption,
@@ -649,7 +649,7 @@ class _LiveMliDock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.background,
         border: Border(
           top: BorderSide(
@@ -788,7 +788,7 @@ class _DayEditorCard extends StatelessWidget {
               ),
             ),
             if (day.exercises.isEmpty)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.fromLTRB(
                   AppSpace.card,
                   AppSpace.xs,
@@ -812,7 +812,7 @@ class _DayEditorCard extends StatelessWidget {
             const Hairline(),
             InkWell(
               onTap: onAdd,
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 14),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -962,7 +962,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                 controller: _controller,
                 onChanged: (_) => setState(() {}),
                 style: AppText.body.copyWith(fontSize: 15),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'Egzersiz ara',
                   prefixIcon: Icon(
                     Icons.search_rounded,
@@ -1011,7 +1011,7 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
                             ),
                           ),
                           const SizedBox(width: AppSpace.md),
-                          const Icon(
+                          Icon(
                             Icons.add_rounded,
                             color: AppColors.textMid,
                             size: 20,
@@ -1173,7 +1173,7 @@ class _BackButton extends StatelessWidget {
     return IconButton(
       onPressed: onPressed,
       tooltip: 'Geri',
-      icon: const Icon(
+      icon: Icon(
         Icons.arrow_back_rounded,
         color: AppColors.textHigh,
         size: 22,

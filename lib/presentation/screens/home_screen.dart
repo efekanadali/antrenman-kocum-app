@@ -238,12 +238,19 @@ class _HomeTodayScreenState extends ConsumerState<HomeTodayScreen> {
               data: data,
               statuses: statuses,
             ),
-            const SizedBox(height: AppSpace.section),
-            _WeekSection(data: data, weeklyTarget: _weeklyTarget),
-            const SizedBox(height: AppSpace.xxl),
-            const Hairline(),
             const SizedBox(height: AppSpace.xl),
-            _QuickStats(data: data),
+            AppSurface(
+              radius: AppRadius.card + 4,
+              padding: const EdgeInsets.all(AppSpace.xxl),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _WeekSection(data: data, weeklyTarget: _weeklyTarget),
+                  const SizedBox(height: AppSpace.xl),
+                  _QuickStats(data: data),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -272,7 +279,7 @@ class _DashboardHeader extends StatelessWidget {
             children: [
               Text(trUpper(dateLabel), style: AppText.sectionLabel),
               const SizedBox(height: 6),
-              const Text('Bugün', style: AppText.pageTitle),
+              Text('Bugün', style: AppText.pageTitle),
             ],
           ),
         ),
@@ -290,7 +297,7 @@ class _DashboardHeader extends StatelessWidget {
                 width: AppSpace.hairline,
               ),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.person_outline_rounded,
               size: 18,
               color: AppColors.textMid,
@@ -327,7 +334,7 @@ class _TodayCard extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: radius,
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [AppColors.heroTop, AppColors.surface],
@@ -337,7 +344,7 @@ class _TodayCard extends StatelessWidget {
           color: AppColors.hairlineStrong,
           width: AppSpace.hairline,
         ),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
             color: AppColors.shadow,
             blurRadius: 28,
@@ -415,7 +422,11 @@ class _TodayCard extends StatelessWidget {
                               ),
                               Text(
                                 'hazır',
-                                style: AppText.caption.copyWith(fontSize: 10),
+                                style: AppText.caption.copyWith(
+                                  fontSize: 10,
+                                  color: AppColors.ring,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ],
                           ),
@@ -445,6 +456,9 @@ class _TodayCard extends StatelessWidget {
                             value: '$readyCount',
                             unit: '/${statuses.length}',
                             label: 'Bölge hazır',
+                            valueColor: readyCount == statuses.length
+                                ? AppColors.emerald
+                                : null,
                           ),
                         ),
                         const Hairline.vertical(),
@@ -456,9 +470,7 @@ class _TodayCard extends StatelessWidget {
                                   label: 'Toparlandı',
                                 )
                               : MetricValue(
-                                  leading: const StatusDot(
-                                    color: AppColors.amber,
-                                  ),
+                                  leading: StatusDot(color: AppColors.amber),
                                   value:
                                       '%${(mostFatigued.progress * 100).round()}',
                                   label: mostFatigued.region.label,
@@ -496,23 +508,48 @@ class _WeekSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(
-          'Bu hafta',
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (data.streak > 0) ...[
-                const Icon(
-                  Icons.local_fire_department_outlined,
-                  size: 14,
-                  color: AppColors.textMid,
+        Row(
+          children: [
+            Expanded(
+              child: Text(trUpper('Bu hafta'), style: AppText.sectionLabel),
+            ),
+            InkWell(
+              key: const ValueKey('home-detailed-analysis'),
+              borderRadius: BorderRadius.circular(8),
+              onTap: () => Navigator.of(context).pushNamed(AppRoutes.analytics),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Detaylı Analiz',
+                      style: AppText.body.copyWith(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.arrow_forward_rounded,
+                      size: 15,
+                      color: AppColors.textHigh,
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 3),
+              ),
+            ),
+          ],
+        ),
+        if (data.streak > 0 || trend != null) ...[
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              if (data.streak > 0)
                 Text(
                   '${data.streak} gün seri',
                   style: AppText.caption.copyWith(color: AppColors.textMid),
                 ),
-              ],
               if (data.streak > 0 && trend != null)
                 Text('  ·  ', style: AppText.caption),
               if (trend != null)
@@ -525,7 +562,7 @@ class _WeekSection extends StatelessWidget {
                 ),
             ],
           ),
-        ),
+        ],
         const SizedBox(height: AppSpace.lg),
         Row(
           children: [
@@ -549,7 +586,7 @@ class _WeekSection extends StatelessWidget {
                 segments: weeklyTarget.clamp(1, 14),
                 height: 4,
                 gap: 3,
-                color: AppColors.textHigh,
+                color: AppColors.ring,
               ),
             ),
             const SizedBox(width: AppSpace.md),
@@ -600,12 +637,16 @@ class _WeekDay extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: isToday ? AppColors.accent : Colors.transparent,
+            color: isToday
+                ? AppColors.accent
+                : AppColors.isDark
+                ? Colors.transparent
+                : AppColors.surfaceRaised,
             border: isToday
                 ? null
                 : Border.all(
-                    color: done ? AppColors.textMid : AppColors.hairlineStrong,
-                    width: 1,
+                    color: done ? AppColors.emerald : AppColors.hairlineStrong,
+                    width: done ? 1.2 : 1,
                   ),
           ),
           child: Text(
@@ -705,7 +746,7 @@ class AppBottomNav extends StatelessWidget {
       (Icons.person_outline_rounded, 'Profil', AppRoutes.userProfile),
     ];
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.background,
         border: Border(
           top: BorderSide(color: AppColors.hairline, width: AppSpace.hairline),

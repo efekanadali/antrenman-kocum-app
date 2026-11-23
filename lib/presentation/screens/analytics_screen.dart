@@ -113,13 +113,13 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
             IconButton(
               onPressed: () => Navigator.of(context).maybePop(),
               tooltip: 'Geri',
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_back_rounded,
                 color: AppColors.textHigh,
                 size: 22,
               ),
             ),
-          const Expanded(child: Text('Analiz', style: AppText.pageTitle)),
+          Expanded(child: Text('Analiz', style: AppText.pageTitle)),
           SizedBox(
             width: 168,
             child: AppSegmentedControl<AnalyticsRange>(
@@ -137,7 +137,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: historyAsync.when(
-          loading: () => const Center(
+          loading: () => Center(
             child: CircularProgressIndicator(
               strokeWidth: 1.5,
               color: AppColors.textMuted,
@@ -286,7 +286,7 @@ class _LoadChartCard extends StatefulWidget {
 class _LoadChartCardState extends State<_LoadChartCard> {
   int? _touched;
 
-  static const TextStyle _axisStyle = TextStyle(
+  static TextStyle get _axisStyle => TextStyle(
     color: AppColors.textMuted,
     fontSize: 10,
     fontFeatures: AppText.tabular,
@@ -335,7 +335,7 @@ class _LoadChartCardState extends State<_LoadChartCard> {
                   show: true,
                   drawVerticalLine: false,
                   horizontalInterval: top / 2,
-                  getDrawingHorizontalLine: (_) => const FlLine(
+                  getDrawingHorizontalLine: (_) => FlLine(
                     color: AppColors.hairline,
                     strokeWidth: AppSpace.hairline,
                     dashArray: [2, 4],
@@ -425,7 +425,7 @@ class _LoadChartCardState extends State<_LoadChartCard> {
                     fitInsideVertically: true,
                     getTooltipItem: (group, gi, rod, ri) => BarTooltipItem(
                       '${_formatThousands(rod.toY)} MLI\n',
-                      const TextStyle(
+                      TextStyle(
                         color: AppColors.textHigh,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -434,7 +434,7 @@ class _LoadChartCardState extends State<_LoadChartCard> {
                       children: [
                         TextSpan(
                           text: data.dayLabels[group.x],
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.textMuted,
                             fontSize: 11,
                             fontWeight: FontWeight.w500,
@@ -489,7 +489,7 @@ class _MuscleDistributionCard extends StatelessWidget {
     );
 
     if (sum <= 0) {
-      return const Column(
+      return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           header,

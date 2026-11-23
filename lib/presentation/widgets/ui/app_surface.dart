@@ -11,7 +11,7 @@ class AppSurface extends StatelessWidget {
     required this.child,
     this.padding = const EdgeInsets.all(AppSpace.card),
     this.onTap,
-    this.color = AppColors.surface,
+    this.color,
     this.radius = AppRadius.card,
     this.showBorder = true,
   });
@@ -19,7 +19,7 @@ class AppSurface extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
   final VoidCallback? onTap;
-  final Color color;
+  final Color? color;
   final double radius;
   final bool showBorder;
 
@@ -28,14 +28,14 @@ class AppSurface extends StatelessWidget {
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(radius),
       side: showBorder
-          ? const BorderSide(
+          ? BorderSide(
               color: AppColors.hairline,
               width: AppSpace.hairline,
             )
           : BorderSide.none,
     );
     return Material(
-      color: color,
+      color: color ?? AppColors.surface,
       shape: shape,
       clipBehavior: Clip.antiAlias,
       child: onTap == null

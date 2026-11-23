@@ -44,7 +44,7 @@ class ProgramPreviewBadge extends StatelessWidget {
               width: 28,
               height: 20,
               child: IconButton(
-                icon: const Icon(
+                icon: Icon(
                   Icons.info_outline,
                   color: AppColors.textMuted,
                   size: 16,
@@ -80,7 +80,7 @@ class ProgramPreviewBadge extends StatelessWidget {
                                 : AppColors.textHigh,
                           ),
                     ),
-                    const TextSpan(text: ' MLI', style: AppText.unit),
+                    TextSpan(text: ' MLI', style: AppText.unit),
                   ],
                 ),
               ),

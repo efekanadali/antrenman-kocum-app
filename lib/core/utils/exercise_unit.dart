@@ -11,6 +11,8 @@ bool isTimedExercise({required String exerciseName, String? exerciseId}) {
     'tuck_planche',
     'wall_sit',
     'hollow_body_hold',
+    'towel_dead_hang',
+    'arch_body_hold',
   };
 
   if (timedExerciseIds.contains(normalizedId)) {

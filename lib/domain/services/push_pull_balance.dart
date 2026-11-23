@@ -71,6 +71,19 @@ class PushPullBalance {
         return 'Balanced training';
     }
   }
+
+  /// Arayüzde gösterilen Türkçe karşılık ([message] İngilizce sözleşme olarak
+  /// korunur).
+  String get turkishMessage {
+    switch (verdict) {
+      case PushPullVerdict.pushDominant:
+        return 'İtiş kasları baskın. Çekiş kasları geride kalıyor.';
+      case PushPullVerdict.pullDominant:
+        return 'Çekiş kasları baskın. İtiş kasları geride kalıyor.';
+      case PushPullVerdict.balanced:
+        return 'Dengeli antrenman';
+    }
+  }
 }
 
 /// Kompartıman yüklerinden itiş / çekiş toplamlarını hesaplar.

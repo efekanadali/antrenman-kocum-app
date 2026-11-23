@@ -64,7 +64,7 @@ class GhostButton extends StatelessWidget {
     this.icon,
     this.expand = false,
     this.height = 44,
-    this.foregroundColor = AppColors.textHigh,
+    this.foregroundColor,
   });
 
   final String label;
@@ -72,7 +72,7 @@ class GhostButton extends StatelessWidget {
   final IconData? icon;
   final bool expand;
   final double height;
-  final Color foregroundColor;
+  final Color? foregroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -82,9 +82,9 @@ class GhostButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
-          foregroundColor: foregroundColor,
+          foregroundColor: foregroundColor ?? AppColors.textHigh,
           padding: const EdgeInsets.symmetric(horizontal: AppSpace.lg),
-          side: const BorderSide(
+          side: BorderSide(
             color: AppColors.hairlineStrong,
             width: AppSpace.hairline,
           ),

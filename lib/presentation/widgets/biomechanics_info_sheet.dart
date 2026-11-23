@@ -59,7 +59,7 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
 
     return Container(
       constraints: BoxConstraints(maxHeight: maxHeight),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(AppRadius.sheet),
@@ -90,7 +90,7 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -114,7 +114,7 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
                     tooltip: 'Kapat',
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.close_rounded,
                       color: AppColors.textMid,
                       size: 20,
@@ -175,7 +175,7 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('MLI (Muscular Workload Index)', style: AppText.cardTitle),
+        Text('MLI (Muscular Workload Index)', style: AppText.cardTitle),
         const SizedBox(height: AppSpace.lg),
         const SectionHeader(
           'İş yükü hesaplama formülü',
@@ -188,7 +188,7 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
             color: AppColors.surfaceRaised,
             borderRadius: BorderRadius.circular(10),
           ),
-          child: const Text(
+          child: Text(
             'MLI = Set × Tekrar × Kaldıraç Zorluk Katsayısı',
             style: TextStyle(
               color: AppColors.textHigh,
@@ -199,7 +199,7 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
           ),
         ),
         const SizedBox(height: AppSpace.md),
-        const Text(
+        Text(
           '• Statik tutuşlarda süre: Süre (sn) ÷ 2 olarak hesaba katılır.\n'
           '• Ek ağırlık eklendiğinde: (1 + Ek Ağırlık ÷ Vücut Ağırlığı) çarpanı uygulanır.',
           style: TextStyle(
@@ -213,7 +213,7 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
           'Kalistenikte kaldıraç neden önemli?',
           padding: EdgeInsets.only(bottom: AppSpace.sm),
         ),
-        const Text(
+        Text(
           'Geleneksel ağırlık antrenmanında direnç plaka ağırlığı ile sabitlenir. '
           'Kalistenikte ise kaslara binen yük vücut açısı ve eklem moment kolu (kaldıraç) ile değişir.',
           style: TextStyle(
@@ -280,12 +280,12 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'RIR Tabanlı Kas Toparlanması (Recovery)',
           style: AppText.cardTitle,
         ),
         const SizedBox(height: AppSpace.md),
-        const Text(
+        Text(
           'RIR (Reps in Reserve), set sonrasında tükenişe kalan tahmini tekrar mesafenizdir. '
           'Tükenişe yaklaştıkça kas mikroyırtıkları ve sinir sistemi (CNS) yorgunluğu katlanarak artar.',
           style: TextStyle(
@@ -326,7 +326,7 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
             color: AppColors.surfaceRaised,
             borderRadius: BorderRadius.circular(AppRadius.control),
           ),
-          child: const Column(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(

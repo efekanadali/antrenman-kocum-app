@@ -17,8 +17,8 @@ class SegmentedRing extends StatelessWidget {
     this.strokeWidth = 5,
     this.segments = 30,
     this.gapDegrees = 3,
-    this.color = AppColors.accent,
-    this.trackColor = AppColors.hairlineStrong,
+    this.color,
+    this.trackColor,
     this.child,
   });
 
@@ -27,8 +27,8 @@ class SegmentedRing extends StatelessWidget {
   final double strokeWidth;
   final int segments;
   final double gapDegrees;
-  final Color color;
-  final Color trackColor;
+  final Color? color;
+  final Color? trackColor;
   final Widget? child;
 
   @override
@@ -46,8 +46,8 @@ class SegmentedRing extends StatelessWidget {
             strokeWidth: strokeWidth,
             segments: segments,
             gapDegrees: gapDegrees,
-            color: color,
-            trackColor: trackColor,
+            color: color ?? AppColors.ring,
+            trackColor: trackColor ?? AppColors.hairlineStrong,
           ),
           child: child,
         ),

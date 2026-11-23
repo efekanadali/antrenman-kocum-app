@@ -36,9 +36,7 @@ class ProgramPreview {
   /// En ağır yüklenen kas grubu.
   RecoveryMuscle? get topMuscle {
     if (muscleLoad.isEmpty) return null;
-    return muscleLoad.entries
-        .reduce((a, b) => a.value >= b.value ? a : b)
-        .key;
+    return muscleLoad.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
   }
 
   /// Hedef kas grubunun toplam içindeki payı (0-1).
@@ -51,12 +49,17 @@ class ProgramPreview {
 
 /// Planlanan egzersizler için, [assumedRir] varsayımıyla tahmini MLI hesaplar.
 ///
-/// `MLI = hacim x kaldıraç katsayısı x (1 + (10-RIR)/10)`, kas bazlı dağılım
-/// `omega` ağırlıklarıyla yapılır.
+/// Set MLI'ı [calculateSetMli] ile hesaplanır; böylece hareketin türüne göre
+/// hibrit formül kullanılır:
+/// * Kalistenik: `hacim × Lf × RIR_faktörü`
+/// * Vücut geliştirme: `hacim × (loadKg / vücut_ağırlığı) × Lf_bb × RIR_faktörü`
+///   (hedef yük `CustomProgramExercise.loadKg`'den okunur).
+/// Kas bazlı dağılım `omega` ağırlıklarıyla yapılır.
 ProgramPreview estimateProgramPreview(
   Iterable<CustomProgramExercise> exercises,
   ExerciseMliResolver resolver, {
   int assumedRir = 2,
+  double? bodyWeightKg,
 }) {
   var total = 0.0;
   var leverageWeighted = 0.0;
@@ -71,8 +74,15 @@ ProgramPreview estimateProgramPreview(
             reps: 0,
             rir: assumedRir,
             durationInSeconds: item.value,
+            bodyWeightKg: bodyWeightKg,
+            loadKg: item.loadKg,
           )
-        : WorkoutSet(reps: item.value, rir: assumedRir);
+        : WorkoutSet(
+            reps: item.value,
+            rir: assumedRir,
+            bodyWeightKg: bodyWeightKg,
+            loadKg: item.loadKg,
+          );
 
     final perSet = calculateMuscleLoad(exercise: exercise, set: set);
     perSet.forEach((key, load) {
@@ -83,17 +93,7 @@ ProgramPreview estimateProgramPreview(
       }
     });
 
-    final setMli = set.durationInSeconds != null
-        ? calculateStaticMLI(
-            durationInSeconds: item.value,
-            difficulty: exercise.difficulty,
-            secondsInReserve: assumedRir,
-          )
-        : calculateMLI(
-            volume: set.volume,
-            difficulty: exercise.difficulty,
-            rir: assumedRir,
-          );
+    final setMli = calculateSetMli(exercise: exercise, set: set);
     total += setMli * item.sets;
     leverageWeighted += exercise.difficulty * item.sets;
     totalSets += item.sets;

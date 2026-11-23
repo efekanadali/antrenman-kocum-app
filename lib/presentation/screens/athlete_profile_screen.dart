@@ -2,14 +2,17 @@
 
 import 'package:flutter/material.dart';
 
+import 'package:calisthenics_app/presentation/theme/app_theme.dart';
+
 class AthleteProfileScreen extends StatelessWidget {
   const AthleteProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Atlet Profil'),
+        title: const Text('Atlet Profili'),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 24.0),
@@ -17,7 +20,7 @@ class AthleteProfileScreen extends StatelessWidget {
           _ProfileHeaderCard(
             name: 'Deniz Kaya',
             level: 'Orta Seviye',
-            tagline: 'Skill odakli calisthenics',
+            tagline: 'Skill odaklı kalistenik',
             weight: '72.4 kg',
             height: '178 cm',
             age: '26',
@@ -35,35 +38,35 @@ class AthleteProfileScreen extends StatelessWidget {
           SizedBox(height: 12.0),
           _ProfileSummaryCard(
             level: 'Orta Seviye',
-            goal: 'Guc + Skill',
-            frequency: 'Haftada 4 gun',
+            goal: 'Güç + Skill',
+            frequency: 'Haftada 4 gün',
           ),
           SizedBox(height: 16.0),
           _SectionCard(
-            title: 'Guclu Hareketler',
+            title: 'Güçlü Hareketler',
             child: _SimpleListCard(
               items: [
                 _ListItemData(
                   title: 'Pull-up',
                   subtitle: '4 set x 10 tekrar',
-                  trailing: 'Son: 2 gun once',
+                  trailing: 'Son: 2 gün önce',
                 ),
                 _ListItemData(
                   title: 'Dip',
                   subtitle: '4 set x 12 tekrar',
-                  trailing: 'Son: 4 gun once',
+                  trailing: 'Son: 4 gün önce',
                 ),
                 _ListItemData(
                   title: 'Pike Push-up',
                   subtitle: '3 set x 10 tekrar',
-                  trailing: 'Son: 6 gun once',
+                  trailing: 'Son: 6 gün önce',
                 ),
               ],
             ),
           ),
           SizedBox(height: 16.0),
           _SectionCard(
-            title: 'Skill Ilerleme',
+            title: 'Skill İlerleme',
             child: _ProgressListCard(
               items: [
                 _ProgressItemData(
@@ -98,11 +101,11 @@ class AthleteProfileScreen extends StatelessWidget {
           ),
           SizedBox(height: 16.0),
           _SectionCard(
-            title: 'Rutin Planlayici',
+            title: 'Rutin Planlayıcı',
             child: _ScheduleCard(
               items: [
                 _ScheduleItemData(day: 'Pzt', focus: 'Push + Skill'),
-                _ScheduleItemData(day: 'Car', focus: 'Pull + Core'),
+                _ScheduleItemData(day: 'Çar', focus: 'Pull + Core'),
                 _ScheduleItemData(day: 'Cum', focus: 'Legs + Mobilite'),
                 _ScheduleItemData(day: 'Cmt', focus: 'Full Body'),
               ],
@@ -115,37 +118,37 @@ class AthleteProfileScreen extends StatelessWidget {
               items: [
                 _ListItemData(
                   title: 'Omuz',
-                  subtitle: 'Gunde 10 dk mobilite',
-                  trailing: '70%',
+                  subtitle: 'Günde 10 dk mobilite',
+                  trailing: '%70',
                 ),
                 _ListItemData(
-                  title: 'Kalca',
+                  title: 'Kalça',
                   subtitle: 'Dinamik esneme',
-                  trailing: '55%',
+                  trailing: '%55',
                 ),
                 _ListItemData(
                   title: 'Hamstring',
                   subtitle: 'Statik esneme',
-                  trailing: '60%',
+                  trailing: '%60',
                 ),
               ],
             ),
           ),
           SizedBox(height: 16.0),
           _SectionCard(
-            title: 'Olcumler',
+            title: 'Ölçümler',
             child: _MetricGridCard(
               items: [
                 _MetricItemData(label: 'Kilo', value: '72.4 kg'),
                 _MetricItemData(label: 'Bel', value: '78 cm'),
-                _MetricItemData(label: 'Kalca', value: '94 cm'),
+                _MetricItemData(label: 'Kalça', value: '94 cm'),
                 _MetricItemData(label: 'Trend', value: '+0.4 kg'),
               ],
             ),
           ),
           SizedBox(height: 16.0),
           _SectionCard(
-            title: 'Antrenman Gunlugu',
+            title: 'Antrenman Günlüğü',
             child: _SimpleListCard(
               items: [
                 _ListItemData(
@@ -168,9 +171,9 @@ class AthleteProfileScreen extends StatelessWidget {
           ),
           SizedBox(height: 16.0),
           _SectionCard(
-            title: 'Haftalik Hacim',
+            title: 'Haftalık Hacim',
             child: _MiniBarChart(
-              title: 'Haftalik Hacim',
+              title: 'Haftalık Hacim',
               bars: [
                 _BarData(label: 'H1', value: 0.55),
                 _BarData(label: 'H2', value: 0.75),
@@ -184,29 +187,29 @@ class AthleteProfileScreen extends StatelessWidget {
             title: 'Rozetler',
             child: _BadgeRowCard(
               items: [
-                _BadgeItemData(label: '7 gun streak', icon: Icons.whatshot),
-                _BadgeItemData(label: '30 gun devam', icon: Icons.emoji_events),
+                _BadgeItemData(label: '7 gün seri', icon: Icons.whatshot),
+                _BadgeItemData(label: '30 gün devam', icon: Icons.emoji_events),
                 _BadgeItemData(label: 'Yeni skill', icon: Icons.star),
               ],
             ),
           ),
           SizedBox(height: 16.0),
           _SectionCard(
-            title: 'Progress Fotograflari',
+            title: 'Progress Fotoğrafları',
             child: _PhotoRowCard(
               items: [
                 _PhotoItemData(label: 'Ocak'),
-                _PhotoItemData(label: 'Subat'),
+                _PhotoItemData(label: 'Şubat'),
                 _PhotoItemData(label: 'Mart'),
               ],
             ),
           ),
           SizedBox(height: 16.0),
           _SectionCard(
-            title: 'Profil Notlari',
+            title: 'Profil Notları',
             child: _NotesCard(
               notes:
-                  'Omuz mobilitesi gelisiyor. Hedef: 30 sn handstand. Haftaya baslangic tekrarini 1 arttir.',
+                  'Omuz mobilitesi gelişiyor. Hedef: 30 sn handstand. Haftaya başlangıç tekrarını 1 artır.',
             ),
           ),
         ],
@@ -234,21 +237,20 @@ class _ProfileHeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(20.0),
-        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+        border: Border.all(color: AppColors.hairline),
       ),
       child: Row(
         children: [
           CircleAvatar(
             radius: 30.0,
-            backgroundColor: colorScheme.primary.withValues(alpha: 0.12),
-            child: Icon(Icons.person, color: colorScheme.primary, size: 30.0),
+            backgroundColor: AppColors.surfaceRaised,
+            child: Icon(Icons.person, color: AppColors.textHigh, size: 30.0),
           ),
           const SizedBox(width: 12.0),
           Expanded(
@@ -265,17 +267,17 @@ class _ProfileHeaderCard extends StatelessWidget {
                 Text(
                   '$level • $tagline',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
+                        color: AppColors.textMid,
                       ),
                 ),
                 const SizedBox(height: 10.0),
-                Row(
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
                   children: [
                     _StatPill(label: 'Kilo', value: weight),
-                    const SizedBox(width: 8.0),
                     _StatPill(label: 'Boy', value: height),
-                    const SizedBox(width: 8.0),
-                    _StatPill(label: 'Yas', value: age),
+                    _StatPill(label: 'Yaş', value: age),
                   ],
                 ),
               ],
@@ -295,14 +297,13 @@ class _StatPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
+        color: AppColors.surfaceRaised,
         borderRadius: BorderRadius.circular(999.0),
-        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+        border: Border.all(color: AppColors.hairline),
       ),
       child: Text(
         '$label: $value',
@@ -328,7 +329,6 @@ class _TagRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Wrap(
       spacing: 10.0,
@@ -341,18 +341,18 @@ class _TagRow extends StatelessWidget {
                 vertical: 8.0,
               ),
               decoration: BoxDecoration(
-                color: colorScheme.primary.withValues(alpha: 0.12),
+                color: AppColors.surfaceRaised,
                 borderRadius: BorderRadius.circular(999.0),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(tag.icon, size: 16.0, color: colorScheme.primary),
+                  Icon(tag.icon, size: 16.0, color: AppColors.textHigh),
                   const SizedBox(width: 6.0),
                   Text(
                     tag.label,
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: colorScheme.primary,
+                          color: AppColors.textHigh,
                           fontWeight: FontWeight.w700,
                         ),
                   ),
@@ -394,11 +394,14 @@ class _SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Theme(
       data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
       child: ExpansionTile(
+        iconColor: AppColors.textMid,
+        collapsedIconColor: AppColors.textMid,
+        textColor: AppColors.textHigh,
+        collapsedTextColor: AppColors.textHigh,
 
         tilePadding: const EdgeInsets.symmetric(horizontal: 16.0),
         childrenPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
@@ -410,14 +413,14 @@ class _SectionCard extends StatelessWidget {
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18.0),
-          side: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+          side: BorderSide(color: AppColors.hairline),
         ),
         collapsedShape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18.0),
-          side: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+          side: BorderSide(color: AppColors.hairline),
         ),
-        backgroundColor: colorScheme.surfaceContainerLow,
-        collapsedBackgroundColor: colorScheme.surfaceContainerLow,
+        backgroundColor: AppColors.surface,
+        collapsedBackgroundColor: AppColors.surface,
         children: [child],
       ),
     );
@@ -437,24 +440,23 @@ class _ProfileSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(18.0),
-        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+        border: Border.all(color: AppColors.hairline),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10.0),
             decoration: BoxDecoration(
-              color: colorScheme.primary.withValues(alpha: 0.12),
+              color: AppColors.surfaceRaised,
               borderRadius: BorderRadius.circular(14.0),
             ),
-            child: Icon(Icons.badge, color: colorScheme.primary),
+            child: Icon(Icons.badge, color: AppColors.textHigh),
           ),
           const SizedBox(width: 12.0),
           Expanded(
@@ -471,14 +473,14 @@ class _ProfileSummaryCard extends StatelessWidget {
                 Text(
                   'Hedef: $goal',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
+                        color: AppColors.textMid,
                       ),
                 ),
                 const SizedBox(height: 2.0),
                 Text(
-                  'Siklik: $frequency',
+                  'Sıklık: $frequency',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
+                        color: AppColors.textMid,
                       ),
                 ),
               ],
@@ -509,14 +511,13 @@ class _SimpleListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(18.0),
-        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+        border: Border.all(color: AppColors.hairline),
       ),
       child: Column(
         children: [
@@ -537,7 +538,6 @@ class _SimpleListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Row(
       children: [
@@ -555,7 +555,7 @@ class _SimpleListTile extends StatelessWidget {
               Text(
                 data.subtitle,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
+                      color: AppColors.textMid,
                     ),
               ),
             ],
@@ -566,7 +566,7 @@ class _SimpleListTile extends StatelessWidget {
           data.trailing,
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: colorScheme.primary,
+                color: AppColors.textHigh,
               ),
         ),
       ],
@@ -593,14 +593,13 @@ class _ProgressListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(18.0),
-        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+        border: Border.all(color: AppColors.hairline),
       ),
       child: Column(
         children: [
@@ -621,7 +620,6 @@ class _ProgressRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -639,7 +637,7 @@ class _ProgressRow extends StatelessWidget {
             Text(
               data.level,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
+                    color: AppColors.textMid,
                   ),
             ),
           ],
@@ -650,8 +648,8 @@ class _ProgressRow extends StatelessWidget {
           child: LinearProgressIndicator(
             value: data.progress,
             minHeight: 8.0,
-            backgroundColor: colorScheme.surfaceContainerHighest,
-            color: colorScheme.primary,
+            backgroundColor: AppColors.hairlineStrong,
+            color: AppColors.ring,
           ),
         ),
       ],
@@ -673,14 +671,13 @@ class _MetricGridCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(18.0),
-        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+        border: Border.all(color: AppColors.hairline),
       ),
       child: Wrap(
         spacing: 12.0,
@@ -702,7 +699,6 @@ class _MetricTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final width = (MediaQuery.of(context).size.width - 16.0 * 2 - 12.0) / 2;
 
     return SizedBox(
@@ -710,9 +706,9 @@ class _MetricTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12.0),
         decoration: BoxDecoration(
-          color: colorScheme.surface,
+          color: AppColors.surfaceRaised,
           borderRadius: BorderRadius.circular(14.0),
-          border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+          border: Border.all(color: AppColors.hairline),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -720,7 +716,7 @@ class _MetricTile extends StatelessWidget {
             Text(
               data.label,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
+                    color: AppColors.textMid,
                   ),
             ),
             const SizedBox(height: 6.0),
@@ -751,14 +747,13 @@ class _ScheduleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(18.0),
-        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+        border: Border.all(color: AppColors.hairline),
       ),
       child: Column(
         children: items
@@ -773,13 +768,13 @@ class _ScheduleCard extends StatelessWidget {
                         vertical: 6.0,
                       ),
                       decoration: BoxDecoration(
-                        color: colorScheme.primary.withValues(alpha: 0.12),
+                        color: AppColors.surfaceRaised,
                         borderRadius: BorderRadius.circular(999.0),
                       ),
                       child: Text(
                         item.day,
                         style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                              color: colorScheme.primary,
+                              color: AppColors.textHigh,
                               fontWeight: FontWeight.w700,
                             ),
                       ),
@@ -817,14 +812,13 @@ class _BadgeRowCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(18.0),
-        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+        border: Border.all(color: AppColors.hairline),
       ),
       child: Wrap(
         spacing: 12.0,
@@ -837,16 +831,16 @@ class _BadgeRowCard extends StatelessWidget {
                   vertical: 10.0,
                 ),
                 decoration: BoxDecoration(
-                  color: colorScheme.surface,
+                  color: AppColors.surfaceRaised,
                   borderRadius: BorderRadius.circular(999.0),
                   border: Border.all(
-                    color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+                    color: AppColors.hairline,
                   ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(item.icon, size: 18.0, color: colorScheme.primary),
+                    Icon(item.icon, size: 18.0, color: AppColors.textHigh),
                     const SizedBox(width: 8.0),
                     Text(
                       item.label,
@@ -877,14 +871,13 @@ class _PhotoRowCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(18.0),
-        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+        border: Border.all(color: AppColors.hairline),
       ),
       child: Row(
         children: items
@@ -895,10 +888,10 @@ class _PhotoRowCard extends StatelessWidget {
                   child: Container(
                     height: 90.0,
                     decoration: BoxDecoration(
-                      color: colorScheme.surface,
+                      color: AppColors.surfaceRaised,
                       borderRadius: BorderRadius.circular(14.0),
                       border: Border.all(
-                        color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+                        color: AppColors.hairline,
                       ),
                     ),
                     child: Column(
@@ -906,13 +899,13 @@ class _PhotoRowCard extends StatelessWidget {
                       children: [
                         Icon(
                           Icons.photo_camera,
-                          color: colorScheme.primary,
+                          color: AppColors.textHigh,
                         ),
                         const SizedBox(height: 6.0),
                         Text(
                           item.label,
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
+                                color: AppColors.textMid,
                               ),
                         ),
                       ],
@@ -934,19 +927,18 @@ class _NotesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(18.0),
-        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+        border: Border.all(color: AppColors.hairline),
       ),
       child: Text(
         notes,
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant,
+              color: AppColors.textMid,
             ),
       ),
     );
@@ -968,7 +960,6 @@ class _MiniBarChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
 
     return InkWell(
       borderRadius: BorderRadius.circular(18.0),
@@ -1003,9 +994,9 @@ class _MiniBarChart extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerLow,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(18.0),
-          border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+          border: Border.all(color: AppColors.hairline),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -1021,7 +1012,7 @@ class _MiniBarChart extends StatelessWidget {
                           height: 90.0,
                           margin: const EdgeInsets.symmetric(horizontal: 6.0),
                           decoration: BoxDecoration(
-                            color: colorScheme.primary,
+                            color: AppColors.ring,
                             borderRadius: BorderRadius.circular(12.0),
                           ),
                         ),
@@ -1030,7 +1021,7 @@ class _MiniBarChart extends StatelessWidget {
                       Text(
                         bar.label,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
+                              color: AppColors.textMid,
                             ),
                       ),
                     ],
@@ -1052,7 +1043,6 @@ class _DetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final percent = (value * 100).round();
 
     return Row(
@@ -1063,9 +1053,9 @@ class _DetailRow extends StatelessWidget {
         ),
         const Spacer(),
         Text(
-          '$percent%',
+          '%$percent',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: colorScheme.primary,
+                color: AppColors.ring,
                 fontWeight: FontWeight.w700,
               ),
         ),

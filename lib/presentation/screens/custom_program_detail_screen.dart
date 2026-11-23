@@ -2,10 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:calisthenics_app/domain/enums/muscle_group.dart';
+import 'package:calisthenics_app/domain/enums/muscle_compartment.dart';
 import 'package:calisthenics_app/domain/models/custom_program.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart';
-import 'package:calisthenics_app/core/utils/enum_label.dart';
 import 'package:calisthenics_app/presentation/providers/exercise_list_provider.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/presentation/screens/custom_program_day_session_screen.dart';
@@ -45,11 +44,16 @@ class CustomProgramDetailScreen extends ConsumerWidget {
     );
   }
 
-  Map<MuscleGroup, _MuscleSummary> _buildMuscleSummaries(
+  /// Programın 6 ana bölgeye göre set ve etki dağılımı.
+  ///
+  /// 17 kompartıman ağırlıkları bölgelere toplanır; bir hareket, bölge payı
+  /// en az %15 ise o bölgeye set katkısı yapar. Etki puanı (1–5), bölge
+  /// payının set ağırlıklı ortalamasıdır.
+  Map<MuscleRegion, _MuscleSummary> _buildMuscleSummaries(
     List<Exercise> exercises,
   ) {
-    final totals = <MuscleGroup, int>{};
-    final weighted = <MuscleGroup, int>{};
+    final totals = <MuscleRegion, int>{};
+    final weightedShare = <MuscleRegion, double>{};
     final exerciseMap = {
       for (final exercise in exercises) exercise.id: exercise,
     };
@@ -60,27 +64,29 @@ class CustomProgramDetailScreen extends ConsumerWidget {
         if (exercise == null) {
           continue;
         }
-        for (final muscle in exercise.targetMuscleGroups) {
-          totals[muscle] = (totals[muscle] ?? 0) + entry.sets;
-          final rating = exercise.muscleRatings[muscle] ?? 1;
-          weighted[muscle] =
-              (weighted[muscle] ?? 0) + (rating * entry.sets);
-        }
+        final shares = <MuscleRegion, double>{};
+        exercise.compartmentWeights.forEach((compartment, weight) {
+          shares[compartment.region] =
+              (shares[compartment.region] ?? 0) + weight;
+        });
+        shares.forEach((region, share) {
+          if (share < 0.15) return;
+          totals[region] = (totals[region] ?? 0) + entry.sets;
+          weightedShare[region] =
+              (weightedShare[region] ?? 0) + share * entry.sets;
+        });
       }
     }
 
-    final summaries = <MuscleGroup, _MuscleSummary>{};
-    for (final entry in totals.entries) {
-      final totalSets = entry.value;
-      final weightedSum = weighted[entry.key] ?? totalSets;
-      final avg = (weightedSum / totalSets).round();
-      summaries[entry.key] = _MuscleSummary(
-        sets: totalSets,
-        rating: _clampRating(avg),
-      );
-    }
-
-    return summaries;
+    return {
+      for (final entry in totals.entries)
+        entry.key: _MuscleSummary(
+          sets: entry.value,
+          rating: _clampRating(
+            ((weightedShare[entry.key] ?? 0) / entry.value * 5).round(),
+          ),
+        ),
+    };
   }
 
   @override
@@ -113,7 +119,7 @@ class CustomProgramDetailScreen extends ConsumerWidget {
               const SizedBox(height: 14.0),
               Text(
                 program.name,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.textHigh,
                   fontSize: 22.0,
                   fontWeight: FontWeight.w700,
@@ -121,7 +127,7 @@ class CustomProgramDetailScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 3.0),
-              const Text(
+              Text(
                 'Özel Program Mimarisi & Gün Dağılımı',
                 style: TextStyle(
                   color: AppColors.textMid,
@@ -196,7 +202,7 @@ class CustomProgramDetailScreen extends ConsumerWidget {
                               ),
                               child: Text(
                                 '${day.dayIndex}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: AppColors.volcanic,
                                   fontSize: 13.0,
                                   fontWeight: FontWeight.w700,
@@ -207,7 +213,7 @@ class CustomProgramDetailScreen extends ConsumerWidget {
                             Expanded(
                               child: Text(
                                 day.name,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: AppColors.textHigh,
                                   fontSize: 15.5,
                                   fontWeight: FontWeight.w700,
@@ -218,7 +224,7 @@ class CustomProgramDetailScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 12.0),
                         if (day.exercises.isEmpty)
-                          const Padding(
+                          Padding(
                             padding: EdgeInsets.symmetric(vertical: 6.0),
                             child: Text(
                               'Bu gün için egzersiz eklenmedi.',
@@ -256,7 +262,7 @@ class CustomProgramDetailScreen extends ConsumerWidget {
                                             children: [
                                               Text(
                                                 exercise.exerciseName,
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   color: AppColors.textHigh,
                                                   fontSize: 13.5,
                                                   fontWeight: FontWeight.w600,
@@ -268,7 +274,7 @@ class CustomProgramDetailScreen extends ConsumerWidget {
                                                     ? '${exercise.sets} set × ${exercise.value} sn'
                                                     : '${exercise.sets} set × ${exercise.value} tekrar'
                                                         '${formatLoadKgSuffix(exercise.loadKg)}',
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   color: AppColors.textMid,
                                                   fontSize: 11.5,
                                                 ),
@@ -276,7 +282,7 @@ class CustomProgramDetailScreen extends ConsumerWidget {
                                             ],
                                           ),
                                         ),
-                                        const Icon(
+                                        Icon(
                                           Icons.check_circle_rounded,
                                           color: AppColors.emerald,
                                           size: 18.0,
@@ -346,12 +352,12 @@ class CustomProgramDetailScreen extends ConsumerWidget {
                   border: Border.all(color: AppColors.border, width: 1.0),
                 ),
                 child: exercisesAsync.when(
-                  loading: () => const Center(
+                  loading: () => Center(
                     child: CircularProgressIndicator(
                       color: AppColors.volcanic,
                     ),
                   ),
-                  error: (_, _) => const Text(
+                  error: (_, _) => Text(
                     'Bölge dağılımı yüklenemedi.',
                     style: TextStyle(
                       color: AppColors.textMid,
@@ -361,7 +367,7 @@ class CustomProgramDetailScreen extends ConsumerWidget {
                   data: (exercises) {
                     final summaries = _buildMuscleSummaries(exercises);
                     if (summaries.isEmpty) {
-                      return const Text(
+                      return Text(
                         'Bölge dağılımı için veri yok.',
                         style: TextStyle(
                           color: AppColors.textMid,
@@ -379,7 +385,7 @@ class CustomProgramDetailScreen extends ConsumerWidget {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Bölge Dağılımı',
                           style: TextStyle(
                             color: AppColors.textHigh,
@@ -389,8 +395,8 @@ class CustomProgramDetailScreen extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(height: 4.0),
-                        const Text(
-                          'Her kas grubu için toplam set ve etki puanı.',
+                        Text(
+                          'Her bölge için toplam set ve etki puanı (17 kompartımandan).',
                           style: TextStyle(
                             color: AppColors.textMid,
                             fontSize: 12.0,
@@ -445,7 +451,7 @@ class _BackButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(12.0),
             border: Border.all(color: AppColors.border, width: 1.0),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.arrow_back_rounded,
             color: AppColors.textHigh,
             size: 20.0,
@@ -483,7 +489,7 @@ class _InfoPill extends StatelessWidget {
           children: [
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.textMuted,
                 fontSize: 11.0,
                 fontWeight: FontWeight.w600,
@@ -535,7 +541,7 @@ class _RegionSetChip extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textHigh,
               fontSize: 13.0,
               fontWeight: FontWeight.w600,
@@ -547,7 +553,7 @@ class _RegionSetChip extends StatelessWidget {
               Expanded(
                 child: Text(
                   '$sets set',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textMid,
                     fontSize: 11.5,
                     fontWeight: FontWeight.w600,

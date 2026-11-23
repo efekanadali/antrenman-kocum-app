@@ -239,7 +239,7 @@ class ExerciseDetailScreen extends ConsumerWidget {
             const SizedBox(height: AppSpace.section),
             const Hairline(),
             const SizedBox(height: AppSpace.xxl),
-            const Text(
+            Text(
               'Detaylı Açıklama & Form İpuçları',
               style: AppText.cardTitle,
             ),
@@ -287,7 +287,7 @@ class _Header extends StatelessWidget {
                 style: AppText.pageTitle.copyWith(fontSize: 24),
               ),
               const SizedBox(height: 2),
-              const Text(
+              Text(
                 'Biyomekanik hareket detayı',
                 style: AppText.bodyMuted,
               ),
@@ -365,7 +365,7 @@ class _PrerequisiteChip extends StatelessWidget {
               ),
               if (enabled) ...[
                 const SizedBox(width: 4),
-                const Icon(
+                Icon(
                   Icons.chevron_right_rounded,
                   size: 16,
                   color: AppColors.textMuted,
@@ -399,7 +399,7 @@ class _ActivationSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Hedef Kaslar & Aktivasyon', style: AppText.cardTitle),
+        Text('Hedef Kaslar & Aktivasyon', style: AppText.cardTitle),
         const SizedBox(height: AppSpace.lg),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,

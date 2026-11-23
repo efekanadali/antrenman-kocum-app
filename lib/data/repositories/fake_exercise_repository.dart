@@ -8,6 +8,7 @@ import 'package:calisthenics_app/domain/models/exercise_database.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart';
 import 'package:calisthenics_app/domain/models/mli_models.dart' as mli;
 import 'package:calisthenics_app/data/repositories/exercise_repository.dart';
+import 'package:calisthenics_app/data/repositories/phase7_exercise_descriptions.dart';
 import 'package:calisthenics_app/domain/services/muscle_group_derivation.dart';
 import 'package:calisthenics_app/domain/services/muscle_key_mapper.dart';
 
@@ -18,6 +19,11 @@ import 'package:calisthenics_app/domain/services/muscle_key_mapper.dart';
 /// without needing a real backend.
 class FakeExerciseRepository implements ExerciseRepository {
   static final List<Exercise> _fakeExercises = exerciseDatabase.entries
+      .map((entry) => _toDomainExercise(entry.key, entry.value))
+      .toList();
+
+  /// 80 hareketlik hibrit katalog (40 kalistenik + 40 vücut geliştirme).
+  static final List<Exercise> _catalogExercises = exerciseCatalog.entries
       .map((entry) => _toDomainExercise(entry.key, entry.value))
       .toList();
 
@@ -264,8 +270,10 @@ class FakeExerciseRepository implements ExerciseRepository {
       targetMuscleGroups: targetMuscles,
       muscleRatings: ratings,
       compartmentWeights: compartments,
+      type: source.type,
       description:
           exerciseDescriptions[id] ??
+          phase7ExerciseDescriptions[id] ??
           '${source.name} hareketi için kas aktivasyon dağılımı.',
       prerequisiteExercises: buildPrerequisites(id: id, level: level),
     );
@@ -275,12 +283,13 @@ class FakeExerciseRepository implements ExerciseRepository {
     required String id,
     required ExerciseLevel level,
   }) {
-    if (level == ExerciseLevel.beginner) {
+    if (level == ExerciseLevel.beginner ||
+        bodybuildingExercises.containsKey(id)) {
       return const <String>[];
     }
 
     final prerequisiteNames = (prerequisiteExerciseIds[id] ?? const <String>[])
-        .map((exerciseId) => exerciseDatabase[exerciseId]?.name)
+        .map((exerciseId) => exerciseCatalog[exerciseId]?.name)
         .whereType<String>()
         .toList();
 
@@ -350,11 +359,23 @@ class FakeExerciseRepository implements ExerciseRepository {
     return Future.delayed(const Duration(milliseconds: 500));
   }
 
+  /// Dondurulmuş 38 hareketlik kalistenik çekirdek (golden ve senkronizasyon
+  /// testlerinin sözleşmesi). Uygulama genelinde [getCatalogExercises]
+  /// kullanılır.
   @override
   Future<List<Exercise>> getAllExercises() async {
     await _simulateNetworkDelay();
     return _fakeExercises;
   }
+
+  /// 80 hareketlik hibrit katalog (kalistenik + vücut geliştirme).
+  Future<List<Exercise>> getCatalogExercises() async {
+    await _simulateNetworkDelay();
+    return _catalogExercises;
+  }
+
+  /// Ağ gecikmesi olmadan hibrit katalog (ör. çevrimdışı geri dönüş).
+  static List<Exercise> get catalogExercises => _catalogExercises;
 
   @override
   Future<List<Exercise>> getExercisesByLevel(ExerciseLevel level) async {
