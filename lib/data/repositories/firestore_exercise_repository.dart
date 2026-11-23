@@ -160,7 +160,7 @@ class FirestoreExerciseRepository implements ExerciseRepository {
     final description = (data['description'] as String?)?.isNotEmpty == true
         ? data['description'] as String
         : (FakeExerciseRepository.exerciseDescriptions[id] ??
-            '$name hareketi icin kas aktivasyon dagilimi.');
+            '$name hareketi için kas aktivasyon dağılımı.');
 
     // Prerequisites fallback
     List<String> prerequisites = const [];

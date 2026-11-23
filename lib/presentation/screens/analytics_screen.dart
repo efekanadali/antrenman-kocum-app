@@ -8,36 +8,11 @@ import 'package:calisthenics_app/domain/enums/muscle_compartment.dart';
 import 'package:calisthenics_app/presentation/providers/workout_history_provider.dart';
 import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 import 'package:calisthenics_app/presentation/widgets/muscle_recovery_card.dart';
-
-// ─── Design Tokens (Nordic & Cyber-Athlete) ──────────────────────────────────
-const Color _bg = AppColors.background; // #0A0C0E
-const Color _surface = AppColors.surface; // #13171C
-const Color _surfaceSoft = AppColors.surfaceSoft; // #181D24
-const Color _border = AppColors.border; // #1E232A
-
-const Color _volcanic = AppColors.volcanic; // #FF5533
-const Color _volcanicSoft = AppColors.volcanicSoft; // #FF7733
-const Color _emerald = AppColors.emerald; // #10B981
-const Color _nordicIce = AppColors.nordicIce; // #38BDF8
-const Color _amber = AppColors.amber; // #F59E0B
-
-const Color _textHigh = AppColors.textHigh; // #F1F5F9
-const Color _textMid = AppColors.textMid; // #94A3B8
-const Color _textMuted = AppColors.textMuted; // #64748B
+import 'package:calisthenics_app/presentation/widgets/ui/ui.dart';
 
 /// `MuscleRegion.values` sırasıyla bölge etiketleri.
 final List<String> _muscleLabels = [
   for (final region in MuscleRegion.values) region.label,
-];
-
-// Mat Nordic kas paleti
-const List<Color> _muscleColors = [
-  _volcanic, // Göğüs (Volkanik Turuncu)
-  _emerald, // Sırt (Toparlanma Yeşili)
-  _nordicIce, // Omuz (Buz Mavisi)
-  _amber, // Kol (Kehribar)
-  Color(0xFFFF6B6B), // Karın (Mat Mercan)
-  Color(0xFF34D399), // Bacak (Mat Nane Yeşili)
 ];
 
 const List<String> _weekdayShort = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
@@ -123,134 +98,125 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
   @override
   Widget build(BuildContext context) {
     final historyAsync = ref.watch(workoutHistoryProvider);
+    final canPop = Navigator.of(context).canPop();
 
-    return Scaffold(
-      backgroundColor: _bg,
-      appBar: AppBar(
-        backgroundColor: _bg,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        title: const Text(
-          'Analitik & Kas Yükü',
-          style: TextStyle(
-            color: _textHigh,
-            fontWeight: FontWeight.w600,
-            fontSize: 17,
-            letterSpacing: -0.2,
-          ),
-        ),
-        iconTheme: const IconThemeData(color: _textHigh),
-      ),
-      body: historyAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(
-            strokeWidth: 2.5,
-            color: _volcanic,
-          ),
-        ),
-        error: (e, _) => _MessageView(
-          icon: Icons.wifi_off_rounded,
-          title: 'Veriler yüklenemedi',
-          message: 'Bağlantını kontrol edip tekrar dene.',
-          actionLabel: 'Tekrar Dene',
-          onAction: () => ref.invalidate(workoutHistoryProvider),
-        ),
-        data: (sessions) {
-          if (sessions.length < 2) {
-            return ListView(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
-              children: const [
-                _MessageView(
-                  icon: Icons.insights_rounded,
-                  title: 'Henüz yeterli antrenman verisi bulunmuyor',
-                  message: 'Seans tamamladıkça grafikler ve analizler otomatik güncellenecektir.',
-                ),
-                SizedBox(height: 16),
-                MuscleRecoveryCard(),
-              ],
-            );
-          }
-          final days = _range == AnalyticsRange.weekly ? 7 : 30;
-          final data = _compute(sessions, days);
-          return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
-            children: [
-              _RangeToggle(
-                value: _range,
-                onChanged: (r) => setState(() => _range = r),
-              ),
-              const SizedBox(height: 12),
-              _SummaryRow(data: data),
-              const SizedBox(height: 12),
-              _LoadChartCard(data: data, weekly: _range == AnalyticsRange.weekly),
-              const SizedBox(height: 12),
-              _MuscleDistributionCard(data: data),
-              const SizedBox(height: 12),
-              const MuscleRecoveryCard(),
-            ],
-          );
-        },
-      ),
-    );
-  }
-}
-
-// ─── Range Toggle (Nordic Mat Seçici) ─────────────────────────────────────────
-class _RangeToggle extends StatelessWidget {
-  const _RangeToggle({required this.value, required this.onChanged});
-
-  final AnalyticsRange value;
-  final ValueChanged<AnalyticsRange> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    Widget item(AnalyticsRange r, String label) {
-      final selected = value == r;
-      return Expanded(
-        child: GestureDetector(
-          onTap: () => onChanged(r),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(vertical: 9),
-            decoration: BoxDecoration(
-              color: selected ? _surfaceSoft : Colors.transparent,
-              borderRadius: BorderRadius.circular(10),
-              border: selected
-                  ? Border.all(color: _volcanic.withValues(alpha: 0.35), width: 1)
-                  : null,
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              label,
-              style: TextStyle(
-                color: selected ? _textHigh : _textMid,
-                fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                fontSize: 13,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: _surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: _border, width: 1),
+    final header = Padding(
+      padding: EdgeInsets.fromLTRB(
+        canPop ? AppSpace.sm : AppSpace.page,
+        AppSpace.sm,
+        AppSpace.page,
+        AppSpace.xxl,
       ),
       child: Row(
         children: [
-          item(AnalyticsRange.weekly, 'Son 7 Gün'),
-          item(AnalyticsRange.monthly, 'Son 30 Gün'),
+          if (canPop)
+            IconButton(
+              onPressed: () => Navigator.of(context).maybePop(),
+              tooltip: 'Geri',
+              icon: const Icon(
+                Icons.arrow_back_rounded,
+                color: AppColors.textHigh,
+                size: 22,
+              ),
+            ),
+          const Expanded(child: Text('Analiz', style: AppText.pageTitle)),
+          SizedBox(
+            width: 168,
+            child: AppSegmentedControl<AnalyticsRange>(
+              values: AnalyticsRange.values,
+              labelOf: (r) => r == AnalyticsRange.weekly ? '7 Gün' : '30 Gün',
+              selected: _range,
+              onChanged: (r) => setState(() => _range = r),
+            ),
+          ),
         ],
+      ),
+    );
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: historyAsync.when(
+          loading: () => const Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 1.5,
+              color: AppColors.textMuted,
+            ),
+          ),
+          error: (e, _) => _MessageView(
+            icon: Icons.wifi_off_rounded,
+            title: 'Veriler yüklenemedi',
+            message: 'Bağlantını kontrol edip tekrar dene.',
+            actionLabel: 'Tekrar Dene',
+            onAction: () => ref.invalidate(workoutHistoryProvider),
+          ),
+          data: (sessions) {
+            if (sessions.length < 2) {
+              return ListView(
+                padding: const EdgeInsets.only(bottom: AppSpace.section),
+                children: [
+                  header,
+                  const _MessageView(
+                    icon: Icons.insights_outlined,
+                    title: 'Henüz yeterli antrenman verisi yok',
+                    message:
+                        'Seans tamamladıkça grafikler ve analizler otomatik güncellenecek.',
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: AppSpace.page),
+                    child: MuscleRecoveryCard(),
+                  ),
+                ],
+              );
+            }
+            final days = _range == AnalyticsRange.weekly ? 7 : 30;
+            final data = _compute(sessions, days);
+            return ListView(
+              padding: const EdgeInsets.only(bottom: AppSpace.section),
+              children: [
+                header,
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpace.page,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _SummaryRow(data: data),
+                      const SizedBox(height: AppSpace.section),
+                      _LoadChartCard(
+                        key: ValueKey(_range),
+                        data: data,
+                        weekly: _range == AnalyticsRange.weekly,
+                      ),
+                      const SizedBox(height: AppSpace.section),
+                      _MuscleDistributionCard(data: data),
+                      const SizedBox(height: AppSpace.section),
+                      const MuscleRecoveryCard(),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
 }
 
-// ─── Summary Cards (Özet Kartları - Minimalist Mat İkonlar) ────────────────────
+String _formatThousands(num value) {
+  final v = value.round();
+  final s = v.abs().toString();
+  final buf = StringBuffer();
+  for (var i = 0; i < s.length; i++) {
+    if (i > 0 && (s.length - i) % 3 == 0) buf.write('.');
+    buf.write(s[i]);
+  }
+  return v < 0 ? '-$buf' : buf.toString();
+}
+
+// ─── Özet Metrikler ───────────────────────────────────────────────────────────
 class _SummaryRow extends StatelessWidget {
   const _SummaryRow({required this.data});
 
@@ -259,99 +225,45 @@ class _SummaryRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final top = data.topMuscleIndex;
-    return Row(
-      children: [
-        Expanded(
-          child: _SummaryCard(
-            icon: Icons.check_circle_outline_rounded,
-            iconColor: _emerald,
-            value: '${data.sessionCount}',
-            label: 'Toplam Seans',
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _SummaryCard(
-            icon: Icons.bolt_rounded,
-            iconColor: _volcanic,
-            value: data.totalLoad.round().toString(),
-            label: 'Toplam MLI',
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _SummaryCard(
-            icon: Icons.fitness_center_rounded,
-            iconColor: _nordicIce,
-            value: top == null ? '-' : _muscleLabels[top],
-            label: 'Ağırlıklı Kas',
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _SummaryCard extends StatelessWidget {
-  const _SummaryCard({
-    required this.icon,
-    required this.iconColor,
-    required this.value,
-    required this.label,
-  });
-
-  final IconData icon;
-  final Color iconColor;
-  final String value;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
-      decoration: BoxDecoration(
-        color: _surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: _border, width: 1),
-      ),
+    return AppSurface(
+      padding: EdgeInsets.zero,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Minimalist, mat renkli ikon rozeti
-          Container(
-            padding: const EdgeInsets.all(7),
-            decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: iconColor.withValues(alpha: 0.24),
-                width: 1,
-              ),
-            ),
-            child: Icon(icon, color: iconColor, size: 17),
-          ),
-          const SizedBox(height: 8),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              value,
-              style: const TextStyle(
-                color: _textHigh,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.3,
-              ),
+          Padding(
+            padding: const EdgeInsets.all(AppSpace.xxl),
+            child: MetricValue(
+              value: _formatThousands(data.totalLoad),
+              unit: 'MLI',
+              label: 'Toplam iş yükü',
+              style: AppText.metricXL,
             ),
           ),
-          const SizedBox(height: 3),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: _textMid,
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
+          const Hairline(),
+          IntrinsicHeight(
+            child: Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpace.xl),
+                    child: MetricValue(
+                      value: '${data.sessionCount}',
+                      unit: 'seans',
+                      label: 'Toplam seans',
+                    ),
+                  ),
+                ),
+                const Hairline.vertical(),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpace.xl),
+                    child: MetricValue(
+                      value: top == null ? '—' : _muscleLabels[top],
+                      label: 'Ağırlıklı kas',
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -360,124 +272,209 @@ class _SummaryCard extends StatelessWidget {
   }
 }
 
-// ─── Bar Chart (Günlük MLI İş Yükü - Mat Volkanik Turuncu Gradyan) ────────────
-class _LoadChartCard extends StatelessWidget {
-  const _LoadChartCard({required this.data, required this.weekly});
+// ─── Günlük İş Yükü Grafiği ──────────────────────────────────────────────────
+class _LoadChartCard extends StatefulWidget {
+  const _LoadChartCard({super.key, required this.data, required this.weekly});
 
   final _AnalyticsData data;
   final bool weekly;
 
   @override
-  Widget build(BuildContext context) {
-    final maxY = data.dailyLoad.fold<double>(0, (a, b) => b > a ? b : a);
-    final top = maxY <= 0 ? 10.0 : maxY * 1.2;
-    final labelStep = weekly ? 1 : 5;
+  State<_LoadChartCard> createState() => _LoadChartCardState();
+}
 
-    return _Panel(
-      title: 'MLI İş Yükü Dağılımı',
-      subtitle: weekly ? 'Son 7 günün seans yükleri' : 'Son 30 günün seans yükleri',
-      child: SizedBox(
-        height: 200,
-        child: BarChart(
-          BarChartData(
-            maxY: top,
-            alignment: BarChartAlignment.spaceBetween,
-            gridData: FlGridData(
-              show: true,
-              drawVerticalLine: false,
-              horizontalInterval: top / 4,
-              getDrawingHorizontalLine: (_) => const FlLine(
-                color: _border,
-                strokeWidth: 1,
-              ),
-            ),
-            borderData: FlBorderData(show: false),
-            titlesData: FlTitlesData(
-              topTitles: const AxisTitles(),
-              rightTitles: const AxisTitles(),
-              leftTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 34,
-                  interval: top / 4,
-                  getTitlesWidget: (v, meta) {
-                    if (v == meta.max) return const SizedBox.shrink();
-                    return Text(
-                      v.round().toString(),
-                      style: const TextStyle(color: _textMuted, fontSize: 10),
-                    );
-                  },
-                ),
-              ),
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 24,
-                  getTitlesWidget: (v, meta) {
-                    final i = v.toInt();
-                    if (i < 0 ||
-                        i >= data.dayLabels.length ||
-                        (i % labelStep != 0 && i != data.dayLabels.length - 1)) {
-                      return const SizedBox.shrink();
-                    }
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 6),
-                      child: Text(
-                        data.dayLabels[i],
-                        style: const TextStyle(color: _textMid, fontSize: 10),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            barTouchData: BarTouchData(
-              touchTooltipData: BarTouchTooltipData(
-                getTooltipColor: (_) => _surfaceSoft,
-                tooltipBorder: const BorderSide(color: _border, width: 1),
-                tooltipBorderRadius: BorderRadius.circular(8),
-                getTooltipItem: (group, gi, rod, ri) => BarTooltipItem(
-                  '${data.dayLabels[group.x]}\n${rod.toY.round()} MLI',
-                  const TextStyle(
-                    color: _textHigh,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 11,
+class _LoadChartCardState extends State<_LoadChartCard> {
+  int? _touched;
+
+  static const TextStyle _axisStyle = TextStyle(
+    color: AppColors.textMuted,
+    fontSize: 10,
+    fontFeatures: AppText.tabular,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final data = widget.data;
+    final weekly = widget.weekly;
+    final maxY = data.dailyLoad.fold<double>(0, (a, b) => b > a ? b : a);
+    final top = maxY <= 0 ? 10.0 : maxY * 1.15;
+    final activeDays = data.dailyLoad.where((v) => v > 0).toList();
+    final average = activeDays.isEmpty
+        ? 0.0
+        : activeDays.fold<double>(0, (a, b) => a + b) / activeDays.length;
+    final labelStep = weekly ? 1 : 5;
+    final todayIndex = data.dailyLoad.length - 1;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(
+          'Günlük iş yükü',
+          trailing: Text(
+            average <= 0
+                ? (weekly ? 'Son 7 gün' : 'Son 30 gün')
+                : 'ort. ${_formatThousands(average)} MLI',
+            style: AppText.caption,
+          ),
+          padding: const EdgeInsets.only(bottom: AppSpace.md),
+        ),
+        AppSurface(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpace.lg,
+            AppSpace.xxl,
+            AppSpace.sm,
+            AppSpace.md,
+          ),
+          child: SizedBox(
+            height: 200,
+            child: BarChart(
+              BarChartData(
+                maxY: top,
+                alignment: BarChartAlignment.spaceBetween,
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: false,
+                  horizontalInterval: top / 2,
+                  getDrawingHorizontalLine: (_) => const FlLine(
+                    color: AppColors.hairline,
+                    strokeWidth: AppSpace.hairline,
+                    dashArray: [2, 4],
                   ),
                 ),
-              ),
-            ),
-            barGroups: [
-              for (var i = 0; i < data.dailyLoad.length; i++)
-                BarChartGroupData(
-                  x: i,
-                  barRods: [
-                    BarChartRodData(
-                      toY: data.dailyLoad[i],
-                      width: weekly ? 18 : 5,
-                      borderRadius: BorderRadius.circular(weekly ? 5 : 2.5),
-                      // Mat Volkanik Turuncu Gradyan (#FF5533 -> #FF7733)
-                      gradient: const LinearGradient(
-                        colors: [_volcanic, _volcanicSoft],
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
+                borderData: FlBorderData(show: false),
+                extraLinesData: ExtraLinesData(
+                  horizontalLines: [
+                    if (average > 0)
+                      HorizontalLine(
+                        y: average,
+                        color: AppColors.textMuted,
+                        strokeWidth: 0.75,
+                        dashArray: [4, 4],
+                        label: HorizontalLineLabel(
+                          show: true,
+                          alignment: Alignment.topLeft,
+                          padding: const EdgeInsets.only(left: 2, bottom: 2),
+                          style: _axisStyle,
+                          labelResolver: (_) => 'ort.',
+                        ),
                       ),
-                      backDrawRodData: BackgroundBarChartRodData(
-                        show: true,
-                        toY: top,
-                        color: _surfaceSoft,
-                      ),
-                    ),
                   ],
                 ),
-            ],
+                titlesData: FlTitlesData(
+                  topTitles: const AxisTitles(),
+                  leftTitles: const AxisTitles(),
+                  rightTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 40,
+                      interval: top / 2,
+                      getTitlesWidget: (v, meta) {
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: Text(
+                            _formatThousands(v),
+                            style: _axisStyle,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 24,
+                      getTitlesWidget: (v, meta) {
+                        final i = v.toInt();
+                        if (i < 0 ||
+                            i >= data.dayLabels.length ||
+                            (i % labelStep != 0 &&
+                                i != data.dayLabels.length - 1)) {
+                          return const SizedBox.shrink();
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text(
+                            data.dayLabels[i],
+                            style: _axisStyle.copyWith(
+                              color: i == todayIndex
+                                  ? AppColors.textHigh
+                                  : AppColors.textMuted,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                barTouchData: BarTouchData(
+                  touchCallback: (event, response) {
+                    final index = event.isInterestedForInteractions
+                        ? response?.spot?.touchedBarGroupIndex
+                        : null;
+                    if (index != _touched) setState(() => _touched = index);
+                  },
+                  touchTooltipData: BarTouchTooltipData(
+                    getTooltipColor: (_) => AppColors.surfaceRaised,
+                    tooltipBorderRadius: BorderRadius.circular(10),
+                    tooltipPadding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 8,
+                    ),
+                    tooltipMargin: 8,
+                    fitInsideHorizontally: true,
+                    fitInsideVertically: true,
+                    getTooltipItem: (group, gi, rod, ri) => BarTooltipItem(
+                      '${_formatThousands(rod.toY)} MLI\n',
+                      const TextStyle(
+                        color: AppColors.textHigh,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        fontFeatures: AppText.tabular,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: data.dayLabels[group.x],
+                          style: const TextStyle(
+                            color: AppColors.textMuted,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            fontFeatures: AppText.tabular,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                barGroups: [
+                  for (var i = 0; i < data.dailyLoad.length; i++)
+                    BarChartGroupData(
+                      x: i,
+                      barRods: [
+                        BarChartRodData(
+                          toY: data.dailyLoad[i],
+                          width: weekly ? 14 : 5,
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(weekly ? 3 : 1.5),
+                          ),
+                          color: i == _touched
+                              ? AppColors.accent
+                              : i == todayIndex
+                              ? AppColors.textHigh
+                              : AppColors.chartNeutral,
+                        ),
+                      ],
+                    ),
+                ],
+              ),
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 }
 
-// ─── Muscle Distribution (Kas Grubu Dağılımı) ────────────────────────────────
+// ─── Kas Grubu Dağılımı ──────────────────────────────────────────────────────
 class _MuscleDistributionCard extends StatelessWidget {
   const _MuscleDistributionCard({required this.data});
 
@@ -486,123 +483,48 @@ class _MuscleDistributionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final sum = data.muscleSum;
+    const header = SectionHeader(
+      'Kas grubu dağılımı',
+      padding: EdgeInsets.only(bottom: AppSpace.md),
+    );
 
     if (sum <= 0) {
-      return const _Panel(
-        title: 'Kas Grubu Dağılımı',
-        subtitle: 'Seçili dönem iş yükü',
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 20),
-          child: Center(
+      return const Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          header,
+          AppSurface(
             child: Text(
               'Bu dönemde kas grubu verisi yok.',
-              style: TextStyle(color: _textMid, fontSize: 13),
+              style: AppText.bodyMuted,
             ),
           ),
-        ),
+        ],
       );
     }
 
     final order = List<int>.generate(_muscleLabels.length, (i) => i)
       ..sort((a, b) => data.muscleTotals[b].compareTo(data.muscleTotals[a]));
+    final max = data.muscleTotals[order.first];
 
-    return _Panel(
-      title: 'Kas Grubu Dağılımı',
-      subtitle: 'Seçili dönemin toplam iş yükü payı',
-      child: Column(
-        children: [
-          SizedBox(
-            height: 175,
-            child: PieChart(
-              PieChartData(
-                sectionsSpace: 2,
-                centerSpaceRadius: 44,
-                sections: [
-                  for (final i in order)
-                    if (data.muscleTotals[i] > 0)
-                      PieChartSectionData(
-                        value: data.muscleTotals[i],
-                        color: _muscleColors[i],
-                        radius: 28,
-                        title: '${(data.muscleTotals[i] / sum * 100).round()}%',
-                        titleStyle: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 14),
-          for (final i in order) ...[
-            _MuscleBar(
-              label: _muscleLabels[i],
-              color: _muscleColors[i],
-              fraction: data.muscleTotals[i] / sum,
-              value: data.muscleTotals[i],
-            ),
-            const SizedBox(height: 9),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _MuscleBar extends StatelessWidget {
-  const _MuscleBar({
-    required this.label,
-    required this.color,
-    required this.fraction,
-    required this.value,
-  });
-
-  final String label;
-  final Color color;
-  final double fraction;
-  final double value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Container(
-          width: 8,
-          height: 8,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: 8),
-        SizedBox(
-          width: 52,
-          child: Text(
-            label,
-            style: const TextStyle(color: _textHigh, fontSize: 13, fontWeight: FontWeight.w500),
-          ),
-        ),
-        Expanded(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: fraction.clamp(0.0, 1.0),
-              minHeight: 6,
-              backgroundColor: _border,
-              valueColor: AlwaysStoppedAnimation<Color>(color),
-            ),
-          ),
-        ),
-        const SizedBox(width: 10),
-        SizedBox(
-          width: 44,
-          child: Text(
-            value.round().toString(),
-            textAlign: TextAlign.right,
-            style: const TextStyle(
-              color: _textMid,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
+        header,
+        AppSurface(
+          child: Column(
+            children: [
+              for (final (rank, i) in order.indexed) ...[
+                if (rank > 0) const SizedBox(height: AppSpace.lg),
+                _MuscleBar(
+                  label: _muscleLabels[i],
+                  highlight: rank == 0,
+                  fraction: max <= 0 ? 0 : data.muscleTotals[i] / max,
+                  share: data.muscleTotals[i] / sum,
+                  value: data.muscleTotals[i],
+                ),
+              ],
+            ],
           ),
         ),
       ],
@@ -610,48 +532,62 @@ class _MuscleBar extends StatelessWidget {
   }
 }
 
-// ─── Shared Nordic Panel ─────────────────────────────────────────────────────
-class _Panel extends StatelessWidget {
-  const _Panel({
-    required this.title,
-    required this.subtitle,
-    required this.child,
+class _MuscleBar extends StatelessWidget {
+  const _MuscleBar({
+    required this.label,
+    required this.highlight,
+    required this.fraction,
+    required this.share,
+    required this.value,
   });
 
-  final String title;
-  final String subtitle;
-  final Widget child;
+  final String label;
+  final bool highlight;
+  final double fraction;
+  final double share;
+  final double value;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: _surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: _border, width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              color: _textHigh,
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              letterSpacing: -0.2,
+    return Row(
+      children: [
+        SizedBox(
+          width: 64,
+          child: Text(
+            label,
+            style: AppText.body.copyWith(fontWeight: FontWeight.w500),
+          ),
+        ),
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(2),
+            child: LinearProgressIndicator(
+              value: fraction.clamp(0.0, 1.0),
+              minHeight: 3,
+              backgroundColor: AppColors.hairline,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                highlight ? AppColors.textHigh : AppColors.chartNeutral,
+              ),
             ),
           ),
-          const SizedBox(height: 2),
-          Text(
-            subtitle,
-            style: const TextStyle(color: _textMuted, fontSize: 11.5),
+        ),
+        SizedBox(
+          width: 48,
+          child: Text(
+            '%${(share * 100).round()}',
+            textAlign: TextAlign.right,
+            style: AppText.metricS.copyWith(fontSize: 14),
           ),
-          const SizedBox(height: 14),
-          child,
-        ],
-      ),
+        ),
+        SizedBox(
+          width: 56,
+          child: Text(
+            _formatThousands(value),
+            textAlign: TextAlign.right,
+            style: AppText.caption,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -675,55 +611,22 @@ class _MessageView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppSpace.section),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _surface,
-                border: Border.all(color: _border, width: 1),
-              ),
-              child: Icon(icon, size: 36, color: _textMid),
-            ),
-            const SizedBox(height: 18),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: _textHigh,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.2,
-              ),
-            ),
+            Icon(icon, size: 28, color: AppColors.textMuted),
+            const SizedBox(height: AppSpace.lg),
+            Text(title, textAlign: TextAlign.center, style: AppText.cardTitle),
             const SizedBox(height: 6),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: _textMid, fontSize: 13, height: 1.4),
+              style: AppText.bodyMuted,
             ),
             if (actionLabel != null) ...[
-              const SizedBox(height: 18),
-              ElevatedButton(
-                onPressed: onAction,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _volcanic,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                ),
-                child: Text(
-                  actionLabel!,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-              ),
+              const SizedBox(height: AppSpace.xl),
+              GhostButton(label: actionLabel!, onPressed: onAction),
             ],
           ],
         ),

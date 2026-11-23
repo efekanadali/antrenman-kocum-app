@@ -447,7 +447,7 @@ class _CustomPlanHeroCard extends StatelessWidget {
                         Navigator.pushNamed(context, AppRoutes.customPlan),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.volcanic,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppColors.onAccent,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),

@@ -13,6 +13,7 @@ import 'package:calisthenics_app/domain/services/exercise_mli_resolver.dart';
 import 'package:calisthenics_app/domain/services/program_preview.dart';
 import 'package:calisthenics_app/presentation/widgets/program_preview_badge.dart';
 import 'package:calisthenics_app/presentation/theme/app_theme.dart';
+import 'package:calisthenics_app/presentation/widgets/ui/ui.dart';
 
 class CustomPlanScreen extends ConsumerStatefulWidget {
   const CustomPlanScreen({super.key});
@@ -39,11 +40,6 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
       builder: (context) {
         int temp = _daysCount ?? 3;
         return Dialog(
-          backgroundColor: AppColors.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.0),
-            side: const BorderSide(color: AppColors.border, width: 1.0),
-          ),
           child: StatefulBuilder(
             builder: (context, setDialogState) {
               return Padding(
@@ -52,22 +48,11 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Haftada Kaç Gün?',
-                      style: TextStyle(
-                        color: AppColors.textHigh,
-                        fontSize: 17.0,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.2,
-                      ),
-                    ),
+                    const Text('Haftada kaç gün?', style: AppText.cardTitle),
                     const SizedBox(height: 4.0),
                     const Text(
                       'Haftalık antrenman sıklığını belirle.',
-                      style: TextStyle(
-                        color: AppColors.textMid,
-                        fontSize: 13.0,
-                      ),
+                      style: AppText.bodyMuted,
                     ),
                     const SizedBox(height: 16.0),
                     Wrap(
@@ -90,13 +75,9 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                             decoration: BoxDecoration(
                               color: selected
                                   ? AppColors.volcanic
-                                  : AppColors.surfaceSoft,
-                              borderRadius: BorderRadius.circular(10.0),
-                              border: Border.all(
-                                color: selected
-                                    ? AppColors.volcanic
-                                    : AppColors.border,
-                                width: 1.0,
+                                  : AppColors.surfaceRaised,
+                              borderRadius: BorderRadius.circular(
+                                AppRadius.control,
                               ),
                             ),
                             child: Column(
@@ -104,12 +85,11 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                               children: [
                                 Text(
                                   '$day',
-                                  style: TextStyle(
+                                  style: AppText.metricM.copyWith(
+                                    fontSize: 17,
                                     color: selected
-                                        ? Colors.white
+                                        ? AppColors.onAccent
                                         : AppColors.textHigh,
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.w700,
                                   ),
                                 ),
                                 const SizedBox(height: 2.0),
@@ -117,7 +97,7 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                                   'Gün',
                                   style: TextStyle(
                                     color: selected
-                                        ? Colors.white.withValues(alpha: 0.85)
+                                        ? AppColors.onAccent.withValues(alpha: 0.7)
                                         : AppColors.textMid,
                                     fontSize: 11.0,
                                     fontWeight: FontWeight.w500,
@@ -144,7 +124,7 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                           onPressed: () => Navigator.of(context).pop(temp),
                           style: FilledButton.styleFrom(
                             backgroundColor: AppColors.volcanic,
-                            foregroundColor: Colors.white,
+                            foregroundColor: AppColors.onAccent,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
@@ -185,9 +165,6 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
       backgroundColor: AppColors.surface,
       showDragHandle: true,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
-      ),
       builder: (context) {
         return _ExercisePickerSheet(exercises: exercises);
       },
@@ -259,11 +236,6 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
         int sets = 3;
         int targetValue = isTimed ? 30 : 10;
         return Dialog(
-          backgroundColor: AppColors.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.0),
-            side: const BorderSide(color: AppColors.border, width: 1.0),
-          ),
           child: StatefulBuilder(
             builder: (context, setDialogState) {
               int minTarget() => isTimed ? 10 : 3;
@@ -279,26 +251,15 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Hedef Set & Tekrar',
-                      style: TextStyle(
-                        color: AppColors.textHigh,
-                        fontSize: 17.0,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.2,
-                      ),
-                    ),
+                    const Text('Hedef set & tekrar', style: AppText.cardTitle),
                     const SizedBox(height: 4.0),
                     Text(
                       isTimed
                           ? 'Set sayısı ve hedef saniyeyi belirle.'
                           : 'Set ve hedef tekrar sayısını belirle.',
-                      style: const TextStyle(
-                        color: AppColors.textMid,
-                        fontSize: 13.0,
-                      ),
+                      style: AppText.bodyMuted,
                     ),
-                    const SizedBox(height: 16.0),
+                    const SizedBox(height: 12.0),
                     _StepperField(
                       label: 'Set Sayısı',
                       value: sets,
@@ -330,26 +291,11 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
                         ),
-                        style: const TextStyle(color: AppColors.textHigh),
-                        decoration: InputDecoration(
-                          labelText: 'Hedef Yük',
+                        style: AppText.metricS,
+                        decoration: const InputDecoration(
+                          labelText: 'Hedef yük',
                           suffixText: 'kg',
-                          labelStyle: const TextStyle(color: AppColors.textMid),
-                          suffixStyle: const TextStyle(color: AppColors.textMid),
-                          filled: true,
-                          fillColor: AppColors.surfaceSoft,
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14.0),
-                            borderSide: const BorderSide(
-                              color: AppColors.border,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14.0),
-                            borderSide: const BorderSide(
-                              color: AppColors.volcanic,
-                            ),
-                          ),
+                          suffixStyle: AppText.unit,
                         ),
                       ),
                     ],
@@ -377,7 +323,7 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                           ),
                           style: FilledButton.styleFrom(
                             backgroundColor: AppColors.volcanic,
-                            foregroundColor: Colors.white,
+                            foregroundColor: AppColors.onAccent,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
@@ -500,45 +446,81 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
   @override
   Widget build(BuildContext context) {
     final exercisesAsync = ref.watch(exerciseListProvider);
+    final building = _daysCount != null;
+    final catalog = exercisesAsync.valueOrNull;
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      bottomNavigationBar: building && catalog != null
+          ? _LiveMliDock(
+              preview: _buildPreview(catalog),
+              onSave: _saveProgram,
+            )
+          : null,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
             // Üst Başlık & Geri Butonu
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20.0, 16.0, 20.0, 12.0),
-                child: Row(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpace.sm,
+                  AppSpace.sm,
+                  AppSpace.page,
+                  0,
+                ),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: _BackButton(
+                    onPressed: () => Navigator.of(context).maybePop(),
+                  ),
+                ),
+              ),
+            ),
+            const SliverPadding(
+              padding: EdgeInsets.fromLTRB(
+                AppSpace.page,
+                AppSpace.xs,
+                AppSpace.page,
+                AppSpace.section,
+              ),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _BackButton(
-                      onPressed: () => Navigator.of(context).maybePop(),
+                    Text('Senin Planın', style: AppText.pageTitle),
+                    SizedBox(height: 6),
+                    Text(
+                      'Özel kalistenik antrenman mimarı',
+                      style: AppText.bodyMuted,
                     ),
-                    const SizedBox(width: 14.0),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            'Senin Planın',
-                            style: TextStyle(
-                              color: AppColors.textHigh,
-                              fontSize: 22.0,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.3,
-                            ),
-                          ),
-                          SizedBox(height: 3.0),
-                          Text(
-                            'Özel kalistenik antrenman mimarı',
-                            style: TextStyle(
-                              color: AppColors.textMid,
-                              fontSize: 13.0,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
+                  ],
+                ),
+              ),
+            ),
+
+            // Program Adı
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpace.page),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SectionHeader(
+                      'Program adı',
+                      trailing: Text(
+                        _daysCount == null
+                            ? 'Gün seçilmedi'
+                            : '$_daysCount günlük plan',
+                        style: AppText.caption,
+                      ),
+                      padding: const EdgeInsets.only(bottom: AppSpace.sm),
+                    ),
+                    TextField(
+                      controller: _nameController,
+                      style: AppText.body.copyWith(fontSize: 15),
+                      decoration: const InputDecoration(
+                        hintText: 'Örn: Tüm Vücut 3 Günlük Rutin',
                       ),
                     ),
                   ],
@@ -546,170 +528,57 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
               ),
             ),
 
-            // Program Adı Kartı
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              sliver: SliverToBoxAdapter(
-                child: Container(
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(16.0),
-                    border: Border.all(color: AppColors.border, width: 1.0),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Program Adı',
-                        style: TextStyle(
-                          color: AppColors.textHigh,
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 8.0),
-                      TextField(
-                        controller: _nameController,
-                        style: const TextStyle(
-                          color: AppColors.textHigh,
-                          fontSize: 14.5,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'Örn: Tüm Vücut 3 Günlük Rutin',
-                          hintStyle: const TextStyle(
-                            color: AppColors.textMuted,
-                            fontSize: 13.5,
-                          ),
-                          filled: true,
-                          fillColor: AppColors.surfaceSoft,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 14.0,
-                            vertical: 12.0,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                            borderSide: const BorderSide(
-                              color: AppColors.border,
-                              width: 1.0,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                            borderSide: const BorderSide(
-                              color: AppColors.border,
-                              width: 1.0,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                            borderSide: const BorderSide(
-                              color: AppColors.volcanic,
-                              width: 1.0,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10.0),
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                              vertical: 3.5,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.surfaceSoft,
-                              borderRadius: BorderRadius.circular(6.0),
-                              border: Border.all(
-                                color: AppColors.border,
-                                width: 1.0,
-                              ),
-                            ),
-                            child: Text(
-                              _daysCount == null
-                                  ? 'Henüz gün seçilmedi'
-                                  : '$_daysCount Günlük Plan',
-                              style: const TextStyle(
-                                color: AppColors.textMid,
-                                fontSize: 11.5,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
             const SliverToBoxAdapter(
-              child: SizedBox(height: 14.0),
+              child: SizedBox(height: AppSpace.section),
             ),
 
             // Eğer gün sayısı henüz seçilmemişse Başlangıç Rehberi göster
-            if (_daysCount == null)
+            if (!building)
               SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpace.page,
+                ),
                 sliver: SliverToBoxAdapter(
-                  child: Container(
-                    padding: const EdgeInsets.all(18.0),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(16.0),
-                      border: Border.all(color: AppColors.border, width: 1.0),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Nasıl Çalışır?',
-                          style: TextStyle(
-                            color: AppColors.textHigh,
-                            fontSize: 15.0,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.2,
-                          ),
-                        ),
-                        const SizedBox(height: 14.0),
-                        const _StepItem(
-                          index: '01',
-                          title: 'Gün Sayısını Seç',
-                          subtitle: 'Haftalık 1 ile 7 gün arasında plan kur.',
-                        ),
-                        const SizedBox(height: 12.0),
-                        const _StepItem(
-                          index: '02',
-                          title: 'Egzersizleri Ekle',
-                          subtitle: 'Her gün için kataloğumuzdan hareket seç.',
-                        ),
-                        const SizedBox(height: 12.0),
-                        const _StepItem(
-                          index: '03',
-                          title: 'Set ve Tekrarları Ayarla',
-                          subtitle: 'Biyomekanik iş yükünü canlı önizle ve kaydet.',
-                        ),
-                        const SizedBox(height: 18.0),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 44.0,
-                          child: FilledButton.icon(
-                            onPressed: _startProgramFlow,
-                            icon: const Icon(Icons.edit_calendar_rounded, size: 18.0),
-                            label: const Text('Yeni Program Başlat'),
-                            style: FilledButton.styleFrom(
-                              backgroundColor: AppColors.volcanic,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SectionHeader(
+                        'Nasıl çalışır',
+                        padding: EdgeInsets.only(bottom: AppSpace.sm),
+                      ),
+                      const AppSurface(
+                        padding: EdgeInsets.zero,
+                        child: Column(
+                          children: [
+                            _StepItem(
+                              index: '01',
+                              title: 'Gün sayısını seç',
+                              subtitle:
+                                  'Haftalık 1 ile 7 gün arasında plan kur.',
                             ),
-                          ),
+                            Hairline(indent: 56),
+                            _StepItem(
+                              index: '02',
+                              title: 'Egzersizleri ekle',
+                              subtitle:
+                                  'Her gün için kataloğumuzdan hareket seç.',
+                            ),
+                            Hairline(indent: 56),
+                            _StepItem(
+                              index: '03',
+                              title: 'Set ve tekrarları ayarla',
+                              subtitle:
+                                  'Biyomekanik iş yükünü canlı önizle ve kaydet.',
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: AppSpace.xxl),
+                      PrimaryButton(
+                        label: 'Yeni Program Başlat',
+                        onPressed: _startProgramFlow,
+                      ),
+                    ],
                   ),
                 ),
               )
@@ -718,20 +587,23 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                 delegate: SliverChildListDelegate(
                   [
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpace.page,
+                      ),
                       child: exercisesAsync.when(
-                        loading: () => const Center(
-                          child: CircularProgressIndicator(
-                            color: AppColors.volcanic,
+                        loading: () => const Padding(
+                          padding: EdgeInsets.all(AppSpace.section),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 1.5,
+                              color: AppColors.textMuted,
+                            ),
                           ),
                         ),
                         error: (_, _) => const Center(
                           child: Text(
                             'Egzersiz kataloğu yüklenemedi.',
-                            style: TextStyle(
-                              color: AppColors.textMid,
-                              fontSize: 12.0,
-                            ),
+                            style: AppText.bodyMuted,
                           ),
                         ),
                         data: (exercises) {
@@ -745,37 +617,13 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                                   onRemove: (index) =>
                                       _removeExercise(day.dayIndex, index),
                                 ),
-                              const SizedBox(height: 12.0),
-                              ProgramPreviewBadge(
-                                title: 'Canlı Biyomekanik Önizleme',
-                                preview: _buildPreview(exercises),
-                                footnote:
-                                    'Haftalık toplam, RIR 2 varsayımıyla; kaldıraç katsayısı ve kas ağırlıklarına göre hesaplanır.',
+                              const SizedBox(height: AppSpace.lg),
+                              const Text(
+                                'Haftalık toplam, RIR 2 varsayımıyla; kaldıraç '
+                                'katsayısı ve kas ağırlıklarına göre hesaplanır.',
+                                style: AppText.caption,
                               ),
-                              const SizedBox(height: 16.0),
-                              SizedBox(
-                                width: double.infinity,
-                                height: 46.0,
-                                child: FilledButton.icon(
-                                  onPressed: _saveProgram,
-                                  icon: const Icon(Icons.check_circle_rounded, size: 18.0),
-                                  label: const Text(
-                                    'Programı Kaydet ve Başla',
-                                    style: TextStyle(
-                                      fontSize: 14.0,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  style: FilledButton.styleFrom(
-                                    backgroundColor: AppColors.volcanic,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 36.0),
+                              const SizedBox(height: AppSpace.section),
                             ],
                           );
                         },
@@ -785,6 +633,55 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                 ),
               ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Oluşturucunun altına sabitlenen canlı MLI şeridi + kaydet butonu.
+class _LiveMliDock extends StatelessWidget {
+  const _LiveMliDock({required this.preview, required this.onSave});
+
+  final ProgramPreview preview;
+  final VoidCallback onSave;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.background,
+        border: Border(
+          top: BorderSide(
+            color: AppColors.hairline,
+            width: AppSpace.hairline,
+          ),
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpace.page,
+            AppSpace.lg,
+            AppSpace.page,
+            AppSpace.md,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ProgramPreviewBadge(
+                title: 'Tahmini haftalık MLI',
+                preview: preview,
+                docked: true,
+              ),
+              const SizedBox(height: AppSpace.lg),
+              PrimaryButton(
+                label: 'Programı Kaydet ve Başla',
+                onPressed: onSave,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -804,55 +701,36 @@ class _StepItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 32.0,
-          height: 32.0,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: AppColors.volcanic.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(8.0),
-            border: Border.all(
-              color: AppColors.volcanic.withValues(alpha: 0.35),
-              width: 1.0,
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpace.lg,
+        vertical: AppSpace.lg,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 40,
+            child: Text(
+              index,
+              style: AppText.metricS.copyWith(color: AppColors.textMuted),
             ),
           ),
-          child: Text(
-            index,
-            style: const TextStyle(
-              color: AppColors.volcanic,
-              fontSize: 12.0,
-              fontWeight: FontWeight.w700,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: AppText.body.copyWith(fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 2),
+                Text(subtitle, style: AppText.caption),
+              ],
             ),
           ),
-        ),
-        const SizedBox(width: 12.0),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: AppColors.textHigh,
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 2.0),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  color: AppColors.textMid,
-                  fontSize: 12.0,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -870,97 +748,91 @@ class _DayEditorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 14.0),
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: AppColors.border, width: 1.0),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12.0,
-                    vertical: 8.0,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceSoft,
-                    borderRadius: BorderRadius.circular(10.0),
-                    border: Border.all(
-                      color: AppColors.border,
-                      width: 1.0,
-                    ),
-                  ),
-                  child: TextField(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpace.lg),
+      child: AppSurface(
+        padding: EdgeInsets.zero,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpace.card,
+                AppSpace.lg,
+                AppSpace.card,
+                AppSpace.sm,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(trUpper('Gün ${day.dayIndex}'),
+                      style: AppText.sectionLabel),
+                  const SizedBox(height: 2),
+                  TextField(
                     controller: day.nameController,
-                    style: const TextStyle(
-                      color: AppColors.textHigh,
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: AppText.cardTitle,
                     decoration: InputDecoration(
                       hintText: 'Gün ${day.dayIndex}',
-                      hintStyle: const TextStyle(
+                      hintStyle: AppText.cardTitle.copyWith(
                         color: AppColors.textMuted,
-                        fontSize: 13.0,
                       ),
+                      filled: false,
                       border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
                       isCollapsed: true,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 4),
                     ),
                   ),
-                ),
+                ],
               ),
-              const SizedBox(width: 10.0),
-              OutlinedButton.icon(
-                onPressed: onAdd,
-                icon: const Icon(Icons.add_rounded, size: 16.0),
-                label: const Text('Egzersiz Ekle'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.volcanic,
-                  side: BorderSide(
-                    color: AppColors.volcanic.withValues(alpha: 0.4),
-                    width: 1.0,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12.0,
-                    vertical: 8.0,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12.0),
-          if (day.exercises.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: const Text(
-                'Bu güne henüz egzersiz eklenmedi.',
-                style: TextStyle(
-                  color: AppColors.textMuted,
-                  fontSize: 12.5,
-                ),
-              ),
-            )
-          else
-            Column(
-              children: [
-                for (int i = 0; i < day.exercises.length; i++)
-                  _ExerciseRow(
-                    exercise: day.exercises[i],
-                    onRemove: () => onRemove(i),
-                  ),
-              ],
             ),
-        ],
+            if (day.exercises.isEmpty)
+              const Padding(
+                padding: EdgeInsets.fromLTRB(
+                  AppSpace.card,
+                  AppSpace.xs,
+                  AppSpace.card,
+                  AppSpace.md,
+                ),
+                child: Text(
+                  'Bu güne henüz egzersiz eklenmedi.',
+                  style: AppText.caption,
+                ),
+              )
+            else
+              for (int i = 0; i < day.exercises.length; i++) ...[
+                const Hairline(indent: AppSpace.card),
+                _ExerciseRow(
+                  index: i + 1,
+                  exercise: day.exercises[i],
+                  onRemove: () => onRemove(i),
+                ),
+              ],
+            const Hairline(),
+            InkWell(
+              onTap: onAdd,
+              child: const Padding(
+                padding: EdgeInsets.symmetric(vertical: 14),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.add_rounded, size: 16, color: AppColors.textMid),
+                    SizedBox(width: 6),
+                    Text(
+                      'Egzersiz Ekle',
+                      style: TextStyle(
+                        color: AppColors.textMid,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -968,63 +840,53 @@ class _DayEditorCard extends StatelessWidget {
 
 class _ExerciseRow extends StatelessWidget {
   const _ExerciseRow({
+    required this.index,
     required this.exercise,
     required this.onRemove,
   });
 
+  final int index;
   final _DraftExercise exercise;
   final VoidCallback onRemove;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8.0),
-      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceSoft,
-        borderRadius: BorderRadius.circular(10.0),
-        border: Border.all(
-          color: AppColors.border,
-          width: 1.0,
-        ),
-      ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(AppSpace.card, 12, 8, 12),
       child: Row(
         children: [
-          Container(
-            width: 32.0,
-            height: 32.0,
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: const Icon(
-              Icons.fitness_center_rounded,
-              color: AppColors.textMid,
-              size: 16.0,
+          SizedBox(
+            width: 28,
+            child: Text(
+              '$index',
+              style: AppText.metricS.copyWith(
+                fontSize: 13,
+                color: AppColors.textMuted,
+              ),
             ),
           ),
-          const SizedBox(width: 10.0),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   exercise.exerciseName,
-                  style: const TextStyle(
-                    color: AppColors.textHigh,
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w600,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppText.body.copyWith(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 2.0),
+                const SizedBox(height: 2),
                 Text(
                   exercise.isTimed
-                      ? '${exercise.sets} set × ${exercise.value} sn'
-                      : '${exercise.sets} set × ${exercise.value} tekrar'
+                      ? '${exercise.sets} × ${exercise.value} sn'
+                      : '${exercise.sets} × ${exercise.value} tekrar'
                           '${formatLoadKgSuffix(exercise.loadKg)}',
-                  style: const TextStyle(
+                  style: AppText.caption.copyWith(
+                    fontSize: 13,
                     color: AppColors.textMid,
-                    fontSize: 11.5,
                   ),
                 ),
               ],
@@ -1034,9 +896,7 @@ class _ExerciseRow extends StatelessWidget {
             onPressed: onRemove,
             icon: const Icon(Icons.close_rounded),
             color: AppColors.textMuted,
-            iconSize: 18.0,
-            padding: const EdgeInsets.all(4.0),
-            constraints: const BoxConstraints(),
+            iconSize: 16,
             tooltip: 'Egzersizi kaldır',
           ),
         ],
@@ -1092,103 +952,73 @@ class _ExercisePickerSheetState extends State<_ExercisePickerSheet> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(20.0, 8.0, 20.0, 12.0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpace.page,
+                AppSpace.xs,
+                AppSpace.page,
+                AppSpace.md,
+              ),
               child: TextField(
                 controller: _controller,
                 onChanged: (_) => setState(() {}),
-                style: const TextStyle(color: AppColors.textHigh, fontSize: 14.5),
-                decoration: InputDecoration(
-                  hintText: 'Egzersiz ara...',
-                  hintStyle: const TextStyle(
-                    color: AppColors.textMuted,
-                    fontSize: 13.5,
-                  ),
-                  prefixIcon: const Icon(
+                style: AppText.body.copyWith(fontSize: 15),
+                decoration: const InputDecoration(
+                  hintText: 'Egzersiz ara',
+                  prefixIcon: Icon(
                     Icons.search_rounded,
                     color: AppColors.textMuted,
-                    size: 20.0,
-                  ),
-                  filled: true,
-                  fillColor: AppColors.surfaceSoft,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 14.0,
-                    vertical: 10.0,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                    borderSide: const BorderSide(
-                      color: AppColors.border,
-                      width: 1.0,
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                    borderSide: const BorderSide(
-                      color: AppColors.border,
-                      width: 1.0,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                    borderSide: const BorderSide(
-                      color: AppColors.volcanic,
-                      width: 1.0,
-                    ),
+                    size: 20,
                   ),
                 ),
               ),
             ),
             Flexible(
               child: ListView.separated(
-                padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 20.0),
+                padding: const EdgeInsets.only(bottom: AppSpace.xl),
                 itemCount: filtered.length,
-                separatorBuilder: (context, index) => const Divider(
-                  height: 1.0,
-                  color: AppColors.border,
-                ),
+                separatorBuilder: (context, index) =>
+                    const Hairline(indent: AppSpace.page),
                 itemBuilder: (context, index) {
                   final exercise = filtered[index];
-                  return ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 8.0,
-                      vertical: 4.0,
-                    ),
-                    leading: Container(
-                      width: 36.0,
-                      height: 36.0,
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceSoft,
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: const Icon(
-                        Icons.fitness_center_rounded,
-                        color: AppColors.textHigh,
-                        size: 18.0,
-                      ),
-                    ),
-                    title: Text(
-                      exercise.name,
-                      style: const TextStyle(
-                        color: AppColors.textHigh,
-                        fontSize: 14.5,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    subtitle: Text(
-                      exercise.description,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: AppColors.textMid,
-                        fontSize: 12.0,
-                      ),
-                    ),
-                    trailing: const Icon(
-                      Icons.add_rounded,
-                      color: AppColors.volcanic,
-                      size: 20.0,
-                    ),
+                  return InkWell(
                     onTap: () => Navigator.of(context).pop(exercise),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpace.page,
+                        vertical: 12,
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  exercise.name,
+                                  style: AppText.body.copyWith(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  exercise.description,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppText.caption,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: AppSpace.md),
+                          const Icon(
+                            Icons.add_rounded,
+                            color: AppColors.textMid,
+                            size: 20,
+                          ),
+                        ],
+                      ),
+                    ),
                   );
                 },
               ),
@@ -1261,60 +1091,42 @@ class _StepperFieldState extends State<_StepperField> {
   @override
   Widget build(BuildContext context) {
     final value = widget.value;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceSoft,
-        borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: AppColors.border, width: 1.0),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpace.sm),
+      child: Row(
         children: [
-          Text(
-            widget.label,
-            style: const TextStyle(
-              color: AppColors.textMid,
-              fontSize: 12.0,
-              fontWeight: FontWeight.w500,
+          Expanded(
+            child: Text(widget.label, style: AppText.bodyMuted),
+          ),
+          _StepButton(
+            icon: Icons.remove_rounded,
+            onTap: value > widget.minValue
+                ? () => widget.onChanged(value - 1)
+                : null,
+          ),
+          SizedBox(
+            width: 64,
+            child: TextField(
+              controller: _controller,
+              keyboardType: TextInputType.number,
+              textAlign: TextAlign.center,
+              style: AppText.metricM,
+              decoration: const InputDecoration(
+                isCollapsed: true,
+                filled: false,
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+              ),
+              onSubmitted: _applyTypedValue,
+              onChanged: _applyTypedValue,
             ),
           ),
-          const SizedBox(height: 6.0),
-          Row(
-            children: [
-              _StepButton(
-                icon: Icons.remove_rounded,
-                onTap: value > widget.minValue
-                    ? () => widget.onChanged(value - 1)
-                    : null,
-              ),
-              const SizedBox(width: 10.0),
-              Expanded(
-                child: TextField(
-                  controller: _controller,
-                  keyboardType: TextInputType.number,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: AppColors.textHigh,
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  decoration: const InputDecoration(
-                    isCollapsed: true,
-                    border: InputBorder.none,
-                  ),
-                  onSubmitted: _applyTypedValue,
-                  onChanged: _applyTypedValue,
-                ),
-              ),
-              const SizedBox(width: 10.0),
-              _StepButton(
-                icon: Icons.add_rounded,
-                onTap: value < widget.maxValue
-                    ? () => widget.onChanged(value + 1)
-                    : null,
-              ),
-            ],
+          _StepButton(
+            icon: Icons.add_rounded,
+            onTap: value < widget.maxValue
+                ? () => widget.onChanged(value + 1)
+                : null,
           ),
         ],
       ),
@@ -1332,29 +1144,18 @@ class _StepButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final enabled = onTap != null;
     return Material(
-      color: Colors.transparent,
+      color: AppColors.surfaceRaised,
+      shape: const CircleBorder(),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(8.0),
-        child: Container(
-          width: 32.0,
-          height: 32.0,
-          decoration: BoxDecoration(
-            color: enabled
-                ? AppColors.volcanic.withValues(alpha: 0.15)
-                : AppColors.surface,
-            borderRadius: BorderRadius.circular(8.0),
-            border: Border.all(
-              color: enabled
-                  ? AppColors.volcanic.withValues(alpha: 0.35)
-                  : AppColors.border,
-              width: 1.0,
-            ),
-          ),
+        child: SizedBox(
+          width: 36,
+          height: 36,
           child: Icon(
             icon,
-            size: 18.0,
-            color: enabled ? AppColors.volcanic : AppColors.textMuted,
+            size: 18,
+            color: enabled ? AppColors.textHigh : AppColors.textMuted,
           ),
         ),
       ),
@@ -1369,25 +1170,13 @@ class _BackButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(12.0),
-        child: Container(
-          width: 40.0,
-          height: 40.0,
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(12.0),
-            border: Border.all(color: AppColors.border, width: 1.0),
-          ),
-          child: const Icon(
-            Icons.arrow_back_rounded,
-            color: AppColors.textHigh,
-            size: 20.0,
-          ),
-        ),
+    return IconButton(
+      onPressed: onPressed,
+      tooltip: 'Geri',
+      icon: const Icon(
+        Icons.arrow_back_rounded,
+        color: AppColors.textHigh,
+        size: 22,
       ),
     );
   }

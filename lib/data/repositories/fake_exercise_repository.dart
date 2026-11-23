@@ -54,195 +54,195 @@ class FakeExerciseRepository implements ExerciseRepository {
 
   static const Map<String, String> exerciseDescriptions = {
     'incline_push_up':
-        'Kurulum: Eller yukselti uzerinde omuz genisliginde, govde duz cizgi.\n'
-        'Uygulama: Dirsekleri 30-45 derece geriye kirip gogsu yukseltiye yaklastir, iterek basa don.\n'
-        'Ipucu: Kalcayi dusurme, boynu notr tut.\n'
-        'Sik hata: Dirsekleri yana acmak, beli cokertmek.',
+        'Kurulum: Eller yükselti üzerinde omuz genişliğinde, gövde düz çizgi.\n'
+        'Uygulama: Dirsekleri 30-45 derece geriye kırıp göğsü yükseltiye yaklaştır, iterek başa dön.\n'
+        'İpucu: Kalçayı düşürme, boynu nötr tut.\n'
+        'Sık hata: Dirsekleri yana açmak, beli çökertmek.',
     'knee_push_up':
-        'Kurulum: Dizler yerde, eller omuz altinda, diz-omuz hatti duz.\n'
-        'Uygulama: Kontrollu in, kollari acarak yukari it.\n'
-        'Ipucu: Govde tek parca hareket etsin.\n'
-        'Sik hata: Kalcayi fazla kaldirip hareketi kisaltmak.',
+        'Kurulum: Dizler yerde, eller omuz altında, diz-omuz hattı düz.\n'
+        'Uygulama: Kontrollü in, kolları açarak yukarı it.\n'
+        'İpucu: Gövde tek parça hareket etsin.\n'
+        'Sık hata: Kalçayı fazla kaldırıp hareketi kısaltmak.',
     'standard_push_up':
-        'Kurulum: Eller omuz altinda/az genis, ayaklar geride, plank durusu.\n'
-        'Uygulama: Gogsu kontrollu yaklastir, zemini iterek yukari cik.\n'
-        'Ipucu: Karin ve kalcayi sik.\n'
-        'Sik hata: Belin sarkmasi, yarim tekrar.',
+        'Kurulum: Eller omuz altında/az geniş, ayaklar geride, plank duruşu.\n'
+        'Uygulama: Göğsü kontrollü yaklaştır, zemini iterek yukarı çık.\n'
+        'İpucu: Karın ve kalçayı sık.\n'
+        'Sık hata: Belin sarkması, yarım tekrar.',
     'wide_push_up':
-        'Kurulum: Eller omuzdan genis, govde duz cizgi.\n'
-        'Uygulama: Kontrollu asagi in, guclu sekilde yukari it.\n'
-        'Ipucu: Dirsekleri hafif geriye yonlendir.\n'
-        'Sik hata: Omuzlari one dusurmek, kontrolsuz inis.',
+        'Kurulum: Eller omuzdan geniş, gövde düz çizgi.\n'
+        'Uygulama: Kontrollü aşağı in, güçlü şekilde yukarı it.\n'
+        'İpucu: Dirsekleri hafif geriye yönlendir.\n'
+        'Sık hata: Omuzları öne düşürmek, kontrolsüz iniş.',
     'diamond_push_up':
-        'Kurulum: Eller gogus altinda elmas/ucgen sekli, govde duz.\n'
-        'Uygulama: Dirsekleri govdeye yakin tutup in, triceps ile iterek cik.\n'
-        'Ipucu: Omuzlari one yigma.\n'
-        'Sik hata: Dirsekleri yana acmak, bilegi zorlamak.',
+        'Kurulum: Eller göğüs altında elmas/üçgen şekli, gövde düz.\n'
+        'Uygulama: Dirsekleri gövdeye yakın tutup in, triceps ile iterek çık.\n'
+        'İpucu: Omuzları öne yığma.\n'
+        'Sık hata: Dirsekleri yana açmak, bileği zorlamak.',
     'decline_push_up':
-      'Kurulum: Ayaklar yuksekte, eller yerde omuz genisliginde.\n'
-        'Uygulama: Gogsu eller arasina indir, zemini iterek yukari cik.\n'
-        'Ipucu: Beli sarkitma, kalcayi kirma.\n'
-        'Sik hata: Boynu germek, beli cokertmek.',
+      'Kurulum: Ayaklar yüksekte, eller yerde omuz genişliğinde.\n'
+        'Uygulama: Göğsü eller arasına indir, zemini iterek yukarı çık.\n'
+        'İpucu: Beli sarkıtma, kalçayı kırma.\n'
+        'Sık hata: Boynu germek, beli çökertmek.',
     'pike_push_up':
-        'Kurulum: Kalca yukarida ters V, eller omuz genisliginde.\n'
-        'Uygulama: Basi kontrollu yaklastir, omuzlarla iterek yukari cik.\n'
-        'Ipucu: Agirligi ellere tasi.\n'
-        'Sik hata: Hareketi normal sinava cevirmek.',
+        'Kurulum: Kalça yukarıda ters V, eller omuz genişliğinde.\n'
+        'Uygulama: Başı kontrollü yaklaştır, omuzlarla iterek yukarı çık.\n'
+        'İpucu: Ağırlığı ellere taşı.\n'
+        'Sık hata: Hareketi normal şınava çevirmek.',
     'dips_parallel_bar':
-        'Kurulum: Paralelde support pozisyonu, omuzlar asagida.\n'
-        'Uygulama: Dirsekleri kirip kontrollu in, barlari iterek kilitle.\n'
-        'Ipucu: Omuzlari one dusurme.\n'
-        'Sik hata: Cok derine inmek, omuz silkerek cikmak.',
+        'Kurulum: Paralelde support pozisyonu, omuzlar aşağıda.\n'
+        'Uygulama: Dirsekleri kırıp kontrollü in, barları iterek kilitle.\n'
+        'İpucu: Omuzları öne düşürme.\n'
+        'Sık hata: Çok derine inmek, omuz silkerek çıkmak.',
     'pseudo_planche_push_up':
-        'Kurulum: Eller biraz geride, omuzlar one lean pozisyonunda.\n'
-        'Uygulama: Lean koruyarak sinav gibi kontrollu in-cik.\n'
-        'Ipucu: Bilekleri iyi isit.\n'
-        'Sik hata: Lean kaybedip normal sinava donmek.',
+        'Kurulum: Eller biraz geride, omuzlar öne lean pozisyonunda.\n'
+        'Uygulama: Lean koruyarak şınav gibi kontrollü in-çık.\n'
+        'İpucu: Bilekleri iyi ısıt.\n'
+        'Sık hata: Lean kaybedip normal şınava dönmek.',
     'handstand_push_up':
-        'Kurulum: Duvar destekli el durusu, karin siki, bel duz.\n'
-        'Uygulama: Basi kontrollu indir, omuzlarla iterek yukari kalk.\n'
-        'Ipucu: Banana pozisyonundan kac in.\n'
-        'Sik hata: Bel asiri kavisi, kollarin one kacmasi.',
+        'Kurulum: Duvar destekli el duruşu, karın sıkı, bel düz.\n'
+        'Uygulama: Başı kontrollü indir, omuzlarla iterek yukarı kalk.\n'
+        'İpucu: Banana pozisyonundan kaçın in.\n'
+        'Sık hata: Bel aşırı kavisi, kolların öne kaçması.',
     '90_degree_push_up':
-        'Kurulum: Omuzlari one al, agirligi ellere tasi, govde siki.\n'
-        'Uygulama: Kontrollu in, 90 derece civarinda dengeyi koruyup presle.\n'
-        'Ipucu: Dusuk tekrar, temiz form.\n'
-        'Sik hata: Kontrolsuz dusmek, omuzu cokertmek.',
+        'Kurulum: Omuzları öne al, ağırlığı ellere taşı, gövde sıkı.\n'
+        'Uygulama: Kontrollü in, 90 derece civarında dengeyi koruyup presle.\n'
+        'İpucu: Düşük tekrar, temiz form.\n'
+        'Sık hata: Kontrolsüz düşmek, omuzu çökertmek.',
     'australian_row':
-        'Kurulum: Bar altinda govde plank, topuklar yerde.\n'
-        'Uygulama: Gogsu bara cek, kurekleri geriye-asagi topla, kontrollu in.\n'
-        'Ipucu: Kalcayi dusurme.\n'
-        'Sik hata: Sadece kolla cekmek, beli sarkitmak.',
+        'Kurulum: Bar altında gövde plank, topuklar yerde.\n'
+        'Uygulama: Göğsü bara çek, kürekleri geriye-aşağı topla, kontrollü in.\n'
+        'İpucu: Kalçayı düşürme.\n'
+        'Sık hata: Sadece kolla çekmek, beli sarkıtmak.',
     'chin_up_hold_top':
-        'Kurulum: Supine tutus, cene bar ustunde tepe pozisyon.\n'
-        'Uygulama: Omuzlari asagida tutup sureyi koru.\n'
-        'Ipucu: Kisa ve kontrollu nefes al.\n'
-        'Sik hata: Omuzlari kulaga cekmek.',
+        'Kurulum: Supine tutuş, çene bar üstünde tepe pozisyon.\n'
+        'Uygulama: Omuzları aşağıda tutup süreyi koru.\n'
+        'İpucu: Kısa ve kontrollü nefes al.\n'
+        'Sık hata: Omuzları kulağa çekmek.',
     'pull_up_hold_top':
-        'Kurulum: Pronated tutus, cene bar ustunde tepe pozisyon.\n'
-        'Uygulama: Kurekleri asagi/geri sabitleyip bekle.\n'
-        'Ipucu: Boynu notr tut, gogsu yukarida kal.\n'
-        'Sik hata: Omuzlarin yukselmesi, govdenin donmesi.',
+        'Kurulum: Pronated tutuş, çene bar üstünde tepe pozisyon.\n'
+        'Uygulama: Kürekleri aşağı/geri sabitleyip bekle.\n'
+        'İpucu: Boynu nötr tut, göğsü yukarıda kal.\n'
+        'Sık hata: Omuzların yükselmesi, gövdenin dönmesi.',
     'standard_pull_up':
-        'Kurulum: Omuz genisligi tutus, aktif asilis ile basla.\n'
-        'Uygulama: Dirsekleri asagi/geri surerek yukari cek, kontrollu tam in.\n'
-        'Ipucu: Sallanma yapma.\n'
-        'Sik hata: Yarim tekrar, boynu one uzatmak.',
+        'Kurulum: Omuz genişliği tutuş, aktif asılış ile başla.\n'
+        'Uygulama: Dirsekleri aşağı/geri sürerek yukarı çek, kontrollü tam in.\n'
+        'İpucu: Sallanma yapma.\n'
+        'Sık hata: Yarım tekrar, boynu öne uzatmak.',
     'chin_up':
-        'Kurulum: Avuc icleri sana bakar, govde siki.\n'
-        'Uygulama: Dirsekleri asagi cekip ceneyi bara getir, kontrollu in.\n'
-        'Ipucu: Inisi yavas yap.\n'
-        'Sik hata: Belden sallanmak, omuzlari yukari cekmek.',
+        'Kurulum: Avuç içleri sana bakar, gövde sıkı.\n'
+        'Uygulama: Dirsekleri aşağı çekip çeneyi bara getir, kontrollü in.\n'
+        'İpucu: İnişi yavaş yap.\n'
+        'Sık hata: Belden sallanmak, omuzları yukarı çekmek.',
     'wide_grip_pull_up':
-        'Kurulum: Omuzdan genis tutus, omuzlar kulaktan uzak.\n'
-        'Uygulama: Kurekleri asagi cekip yukari cik, kontrollu in.\n'
-        'Ipucu: Agrisiz aralikta calis.\n'
-        'Sik hata: Omuzu sikistirmak, kontrolsuz inis.',
+        'Kurulum: Omuzdan geniş tutuş, omuzlar kulaktan uzak.\n'
+        'Uygulama: Kürekleri aşağı çekip yukarı çık, kontrollü in.\n'
+        'İpucu: Ağrısız aralıkta çalış.\n'
+        'Sık hata: Omuzu sıkıştırmak, kontrolsüz iniş.',
     'archer_pull_up':
-        'Kurulum: Genis tutus, govde siki.\n'
-        'Uygulama: Bir tarafa kayarak bir kolu daha cok buk, diger tarafa tekrarla.\n'
-        'Ipucu: Hareketi savurmadan yap.\n'
-        'Sik hata: Momentumla yana firlamak.',
+        'Kurulum: Geniş tutuş, gövde sıkı.\n'
+        'Uygulama: Bir tarafa kayarak bir kolu daha çok bük, diğer tarafa tekrarla.\n'
+        'İpucu: Hareketi savurmadan yap.\n'
+        'Sık hata: Momentumla yana fırlamak.',
     'muscle_up':
-        'Kurulum: Patlayici cekis + dip gucu, govde siki.\n'
-        'Uygulama: Yuksek cekis, gecis, dip ile ustte kilitle.\n'
-        'Ipucu: Geciste acele etme.\n'
-        'Sik hata: Sadece sallanmayla gecmeye calismak.',
+        'Kurulum: Patlayıcı çekiş + dip gücü, gövde sıkı.\n'
+        'Uygulama: Yüksek çekiş, geçiş, dip ile üstte kilitle.\n'
+        'İpucu: Geçişte acele etme.\n'
+        'Sık hata: Sadece sallanmayla geçmeye çalışmak.',
     'tuck_front_lever':
-        'Kurulum: Asilista dizleri gogse cek, hollow pozisyon.\n'
-        'Uygulama: Kurekleri asagi/geri sabitleyip paralel hatti koru.\n'
-        'Ipucu: Kalcayi dusurme.\n'
-        'Sik hata: Swing ile tutmak, beli boslamak.',
+        'Kurulum: Asılışta dizleri göğse çek, hollow pozisyon.\n'
+        'Uygulama: Kürekleri aşağı/geri sabitleyip paralel hattı koru.\n'
+        'İpucu: Kalçayı düşürme.\n'
+        'Sık hata: Swing ile tutmak, beli boşlamak.',
     'front_lever_raise':
-        'Kurulum: Asilis ve kurek kontrolu hazir olsun.\n'
-        'Uygulama: Tuck front levera kontrollu yuksel, kontrollu geri in.\n'
-        'Ipucu: Hiz degil cizgi kontrolu.\n'
-        'Sik hata: Momentumla yukselmek.',
+        'Kurulum: Asılış ve kürek kontrolü hazır olsun.\n'
+        'Uygulama: Tuck front lever\'a kontrollü yüksel, kontrollü geri in.\n'
+        'İpucu: Hız değil çizgi kontrolü.\n'
+        'Sık hata: Momentumla yükselmek.',
     'one_arm_pull_up':
-        'Kurulum: Cok ileri seviye, genelde yardimli calisilir.\n'
-        'Uygulama: Kuregi asagi bastir, dirsegi cekip govdeyi bara yaklastir.\n'
-        'Ipucu: Az tekrar, uzun dinlenme.\n'
-        'Sik hata: Omuzun yukari kacmasi, dirsegi zorlamak.',
+        'Kurulum: Çok ileri seviye, genelde yardımlı çalışılır.\n'
+        'Uygulama: Küreği aşağı bastır, dirseği çekip gövdeyi bara yaklaştır.\n'
+        'İpucu: Az tekrar, uzun dinlenme.\n'
+        'Sık hata: Omuzun yukarı kaçması, dirseği zorlamak.',
     'standard_squat':
-        'Kurulum: Ayaklar omuz genisligi, parmaklar hafif disari.\n'
-        'Uygulama: Kalcayi geriye-asagi indir, topuktan iterek kalk.\n'
-        'Ipucu: Ayak tabanini yere kilitle.\n'
-        'Sik hata: Dizlerin ice cokmesi.',
+        'Kurulum: Ayaklar omuz genişliği, parmaklar hafif dışarı.\n'
+        'Uygulama: Kalçayı geriye-aşağı indir, topuktan iterek kalk.\n'
+        'İpucu: Ayak tabanını yere kilitle.\n'
+        'Sık hata: Dizlerin içe çökmesi.',
     'lunge':
-        'Kurulum: Dik durus, orta adim mesafesi.\n'
-        'Uygulama: Arka dizi yere yaklastir, on topuktan iterek don.\n'
-        'Ipucu: Govde dik, diz cizgisi sabit.\n'
-        'Sik hata: On dizin ice kacmasi.',
+        'Kurulum: Dik duruş, orta adım mesafesi.\n'
+        'Uygulama: Arka dizi yere yaklaştır, ön topuktan iterek dön.\n'
+        'İpucu: Gövde dik, diz çizgisi sabit.\n'
+        'Sık hata: Ön dizin içe kaçması.',
     'bulgarian_split_squat':
-      'Kurulum: Arka ayak yuksekte, on ayak sabit.\n'
-        'Uygulama: Duz asagi in, on bacakla yukari kalk.\n'
-        'Ipucu: Hareketi one degil asagi yap.\n'
-        'Sik hata: One asiri yigilmak, topugu kaldirmak.',
+      'Kurulum: Arka ayak yüksekte, ön ayak sabit.\n'
+        'Uygulama: Düz aşağı in, ön bacakla yukarı kalk.\n'
+        'İpucu: Hareketi öne değil aşağı yap.\n'
+        'Sık hata: Öne aşırı yığılmak, topuğu kaldırmak.',
     'box_jump':
-        'Kurulum: Ayaklar omuz genisligi, hafif comelme ile hazirlan.\n'
-        'Uygulama: Patlayici zipla, yumusak in, kontrollu inis yap.\n'
-        'Ipucu: Sessiz inis hedefle.\n'
-        'Sik hata: Sert inis, dizlerin ice cokmesi.',
+        'Kurulum: Ayaklar omuz genişliği, hafif çömelme ile hazırlan.\n'
+        'Uygulama: Patlayıcı zıpla, yumuşak in, kontrollü iniş yap.\n'
+        'İpucu: Sessiz iniş hedefle.\n'
+        'Sık hata: Sert iniş, dizlerin içe çökmesi.',
     'nordic_curl':
-        'Kurulum: Dizler yerde, ayaklar sabit, govde duz cizgi.\n'
-        'Uygulama: Yavas one in, hamstring ile frenle, destekle geri don.\n'
-        'Ipucu: Yavas inis en kritik kisimdir.\n'
-        'Sik hata: Kalcadan kirilmak, kontrolsuz dusmek.',
+        'Kurulum: Dizler yerde, ayaklar sabit, gövde düz çizgi.\n'
+        'Uygulama: Yavaş öne in, hamstring ile frenle, destekle geri dön.\n'
+        'İpucu: Yavaş iniş en kritik kısımdır.\n'
+        'Sık hata: Kalçadan kırılmak, kontrolsüz düşmek.',
     'pistol_squat':
-        'Kurulum: Tek ayak denge, diger bacak one uzatili.\n'
-        'Uygulama: Kontrollu comel, tek bacakla itip kalk.\n'
-        'Ipucu: Denge icin kollari one uzat.\n'
-        'Sik hata: Topugun kalkmasi, dizin ice kacmasi.',
+        'Kurulum: Tek ayak denge, diğer bacak öne uzatılı.\n'
+        'Uygulama: Kontrollü çömel, tek bacakla itip kalk.\n'
+        'İpucu: Denge için kolları öne uzat.\n'
+        'Sık hata: Topuğun kalkması, dizin içe kaçması.',
     'shrimp_squat':
-        'Kurulum: Tek ayak denge, diger bacak arkada bukulu.\n'
-        'Uygulama: Kontrollu in, dizi yaklastir, ayni cizgide kalk.\n'
-        'Ipucu: Inisi yavaslat.\n'
-        'Sik hata: Hizli sert inis, diz cizgisini bozmak.',
+        'Kurulum: Tek ayak denge, diğer bacak arkada bükülü.\n'
+        'Uygulama: Kontrollü in, dizi yaklaştır, aynı çizgide kalk.\n'
+        'İpucu: İnişi yavaşlat.\n'
+        'Sık hata: Hızlı sert iniş, diz çizgisini bozmak.',
     'wall_sit':
-        'Kurulum: Sirt duvarda, dizler yaklasik 90 derece.\n'
-        'Uygulama: Pozisyonu bozmadan sure tut.\n'
-        'Ipucu: Nefesi duzenli tut.\n'
-        'Sik hata: Dizlerin ice cokmesi.',
+        'Kurulum: Sırt duvarda, dizler yaklaşık 90 derece.\n'
+        'Uygulama: Pozisyonu bozmadan süre tut.\n'
+        'İpucu: Nefesi düzenli tut.\n'
+        'Sık hata: Dizlerin içe çökmesi.',
     'glute_bridge':
-        'Kurulum: Sirt yerde, dizler bukulu, topuklar kalcaya yakin.\n'
-        'Uygulama: Kalcayi yukari kaldir, ustte sik, kontrollu indir.\n'
-        'Ipucu: Yuku topukta tut.\n'
-        'Sik hata: Belden itmek, hizli dusmek.',
+        'Kurulum: Sırt yerde, dizler bükülü, topuklar kalçaya yakın.\n'
+        'Uygulama: Kalçayı yukarı kaldır, üstte sık, kontrollü indir.\n'
+        'İpucu: Yükü topukta tut.\n'
+        'Sık hata: Belden itmek, hızlı düşmek.',
     'calf_raise':
-        'Kurulum: Dik durus, ayaklar paralel.\n'
-        'Uygulama: Parmak ucuna yuksel, ustte kisa bekle, yavas in.\n'
-        'Ipucu: Tam aralik ve kontrol uygula.\n'
-        'Sik hata: Ziplayarak yapmak, yarim tekrar.',
+        'Kurulum: Dik duruş, ayaklar paralel.\n'
+        'Uygulama: Parmak ucuna yüksel, üstte kısa bekle, yavaş in.\n'
+        'İpucu: Tam aralık ve kontrol uygula.\n'
+        'Sık hata: Zıplayarak yapmak, yarım tekrar.',
     'plank':
-        'Kurulum: Dirsekler omuz altinda, govde duz cizgi.\n'
-        'Uygulama: Karin ve kalcayi sikip pozisyonu sureyle koru.\n'
-        'Ipucu: Boynu notr tut, kaburgayi asagida tut.\n'
-        'Sik hata: Belin sarkmasi, kalcayi fazla kaldirmak.',
+        'Kurulum: Dirsekler omuz altında, gövde düz çizgi.\n'
+        'Uygulama: Karın ve kalçayı sıkıp pozisyonu süreyle koru.\n'
+        'İpucu: Boynu nötr tut, kaburgayı aşağıda tut.\n'
+        'Sık hata: Belin sarkması, kalçayı fazla kaldırmak.',
     'side_plank':
-        'Kurulum: Dirsek omuz altinda, yan hizada denge kur.\n'
-        'Uygulama: Kalcayi kaldirip duz yanal cizgiyi sureyle koru.\n'
-        'Ipucu: Omzu kulaktan uzak, boynu notr tut.\n'
-        'Sik hata: Kalcayi dusurmek, govdeyi one dondurmek.',
+        'Kurulum: Dirsek omuz altında, yan hizada denge kur.\n'
+        'Uygulama: Kalçayı kaldırıp düz yanal çizgiyi süreyle koru.\n'
+        'İpucu: Omzu kulaktan uzak, boynu nötr tut.\n'
+        'Sık hata: Kalçayı düşürmek, gövdeyi öne döndürmek.',
     'support_hold_parallel_bar':
-        'Kurulum: Paralelde kollari kilitle, omuzlari asagi bastir.\n'
-        'Uygulama: Sallanmadan ust pozisyonu koru.\n'
-        'Ipucu: Govdeyi ve kalcayi sik.\n'
-        'Sik hata: Dirsegi kirma, omuz silkme.',
+        'Kurulum: Paralelde kolları kilitle, omuzları aşağı bastır.\n'
+        'Uygulama: Sallanmadan üst pozisyonu koru.\n'
+        'İpucu: Gövdeyi ve kalçayı sık.\n'
+        'Sık hata: Dirseği kırma, omuz silkme.',
     'l_sit_hold':
-        'Kurulum: Kollari kilitle, omuzlari asagi it.\n'
-        'Uygulama: Bacaklari one kaldirip L pozisyonunu sureyle koru.\n'
-        'Ipucu: Zorsa diz bukulu versiyonla basla.\n'
-        'Sik hata: Omuzlarin cokmesi, bacaklari dusurmek.',
+        'Kurulum: Kolları kilitle, omuzları aşağı it.\n'
+        'Uygulama: Bacakları öne kaldırıp L pozisyonunu süreyle koru.\n'
+        'İpucu: Zorsa diz bükülü versiyonla başla.\n'
+        'Sık hata: Omuzların çökmesi, bacakları düşürmek.',
     'hollow_body_hold':
-        'Kurulum: Sirt ustu, bel yere yapisik.\n'
-        'Uygulama: Omuz ve bacaklari kaldirip hollow pozisyonunu koru.\n'
-        'Ipucu: Bel kalkarsa bacaklari biraz yukari al.\n'
-        'Sik hata: Belin yerden ayrilmasi.',
+        'Kurulum: Sırt üstü, bel yere yapışık.\n'
+        'Uygulama: Omuz ve bacakları kaldırıp hollow pozisyonunu koru.\n'
+        'İpucu: Bel kalkarsa bacakları biraz yukarı al.\n'
+        'Sık hata: Belin yerden ayrılması.',
     'tuck_planche':
-        'Kurulum: Eller yerde/paralette, kollar kilitli, omuzlar one lean.\n'
-        'Uygulama: Dizleri gogse cekip ayaklari yerden keserek dengeyi koru.\n'
-        'Ipucu: Omuzlar ellerin onunde kalsin.\n'
-        'Sik hata: Dirsek bukmek, omuzlari geride birakmak.',
+        'Kurulum: Eller yerde/paralette, kollar kilitli, omuzlar öne lean.\n'
+        'Uygulama: Dizleri göğse çekip ayakları yerden keserek dengeyi koru.\n'
+        'İpucu: Omuzlar ellerin önünde kalsın.\n'
+        'Sık hata: Dirsek bükmek, omuzları geride bırakmak.',
   };
 
   static Exercise _toDomainExercise(String id, mli.Exercise source) {
@@ -266,7 +266,7 @@ class FakeExerciseRepository implements ExerciseRepository {
       compartmentWeights: compartments,
       description:
           exerciseDescriptions[id] ??
-          '${source.name} hareketi icin kas aktivasyon dagilimi.',
+          '${source.name} hareketi için kas aktivasyon dağılımı.',
       prerequisiteExercises: buildPrerequisites(id: id, level: level),
     );
   }

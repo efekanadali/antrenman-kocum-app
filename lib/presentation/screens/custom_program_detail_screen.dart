@@ -323,7 +323,7 @@ class CustomProgramDetailScreen extends ConsumerWidget {
                             ),
                             style: FilledButton.styleFrom(
                               backgroundColor: AppColors.volcanic,
-                              foregroundColor: Colors.white,
+                              foregroundColor: AppColors.onAccent,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                               ),

@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:calisthenics_app/presentation/theme/app_theme.dart';
+import 'package:calisthenics_app/presentation/widgets/ui/ui.dart';
 
 /// Hangi bilginin öncelikli olarak gösterileceğini belirten sekme filtresi.
 enum BiomechanicsTopic {
@@ -13,8 +14,7 @@ enum BiomechanicsTopic {
   final String label;
 }
 
-/// Biyomekanik Formül ve RIR Toparlanma modelini açıklayan
-/// "Premium Nordic & Cyber-Athlete" mat koyu temalı BottomSheet.
+/// Biyomekanik formül ve RIR toparlanma modelini açıklayan bottom sheet.
 Future<void> showBiomechanicsInfoSheet(
   BuildContext context, {
   BiomechanicsTopic initialTopic = BiomechanicsTopic.all,
@@ -43,17 +43,6 @@ class BiomechanicsInfoSheet extends StatefulWidget {
 class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
   late BiomechanicsTopic _selectedTopic;
 
-  static const Color _bg = AppColors.surface; // #13171C
-  static const Color _surface = AppColors.surfaceSoft; // #181D24
-  static const Color _border = AppColors.border; // #1E232A
-  static const Color _volcanic = AppColors.volcanic; // #FF5533
-  static const Color _emerald = AppColors.emerald; // #10B981
-  static const Color _amber = AppColors.amber; // #F59E0B
-  static const Color _red = AppColors.volcanic; // #FF5533
-  static const Color _textHigh = AppColors.textHigh; // #F1F5F9
-  static const Color _textMid = AppColors.textMid; // #94A3B8
-  static const Color _textMuted = AppColors.textMuted; // #64748B
-
   @override
   void initState() {
     super.initState();
@@ -62,54 +51,45 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final maxHeight = mediaQuery.size.height * 0.88;
+    final maxHeight = MediaQuery.of(context).size.height * 0.88;
+    final showMli = _selectedTopic == BiomechanicsTopic.all ||
+        _selectedTopic == BiomechanicsTopic.mli;
+    final showRecovery = _selectedTopic == BiomechanicsTopic.all ||
+        _selectedTopic == BiomechanicsTopic.recovery;
 
     return Container(
       constraints: BoxConstraints(maxHeight: maxHeight),
-      decoration: BoxDecoration(
-        color: _bg,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        border: Border.all(color: _border, width: 1),
+      decoration: const BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppRadius.sheet),
+        ),
       ),
       child: SafeArea(
         top: false,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 12),
-            // Sürükleme Tutamacı (Drag Handle)
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: _border,
-                  borderRadius: BorderRadius.circular(4),
-                ),
+            const SizedBox(height: 10),
+            Container(
+              width: 36,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.hairlineStrong,
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 12),
-
-            // Başlık Çubuğu
+            const SizedBox(height: AppSpace.lg),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpace.page,
+                0,
+                AppSpace.sm,
+                0,
+              ),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: _surface,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: _border),
-                    ),
-                    child: const Icon(
-                      Icons.biotech_rounded,
-                      color: _volcanic,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
                   const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,129 +97,68 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
                         Text(
                           'Biyomekanik & Toparlanma',
                           style: TextStyle(
-                            color: _textHigh,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.2,
+                            color: AppColors.textHigh,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: -0.4,
                           ),
                         ),
-                        SizedBox(height: 2),
+                        SizedBox(height: 4),
                         Text(
                           'Kalistenik iş yükü ve kas toparlanma dinamikleri',
-                          style: TextStyle(
-                            color: _textMid,
-                            fontSize: 12,
-                          ),
+                          style: AppText.bodyMuted,
                         ),
                       ],
                     ),
                   ),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close_rounded, color: _textMid, size: 20),
-                    splashRadius: 20,
+                    tooltip: 'Kapat',
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      color: AppColors.textMid,
+                      size: 20,
+                    ),
                   ),
                 ],
               ),
             ),
-
-            const SizedBox(height: 14),
-
-            // Konu Seçim Bölmeleri (Segmented Selector)
+            const SizedBox(height: AppSpace.lg),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: BiomechanicsTopic.values.map((topic) {
-                  final isSelected = _selectedTopic == topic;
-                  return Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 3),
-                      child: InkWell(
-                        onTap: () {
-                          setState(() {
-                            _selectedTopic = topic;
-                          });
-                        },
-                        borderRadius: BorderRadius.circular(10),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 180),
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? _volcanic.withValues(alpha: 0.15)
-                                : _surface,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: isSelected
-                                  ? _volcanic.withValues(alpha: 0.50)
-                                  : _border,
-                              width: 1,
-                            ),
-                          ),
-                          child: Center(
-                            child: Text(
-                              topic.label,
-                              style: TextStyle(
-                                color: isSelected ? _volcanic : _textMid,
-                                fontSize: 12,
-                                fontWeight: isSelected
-                                    ? FontWeight.w700
-                                    : FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpace.page),
+              child: AppSegmentedControl<BiomechanicsTopic>(
+                values: BiomechanicsTopic.values,
+                labelOf: (t) => t.label,
+                selected: _selectedTopic,
+                onChanged: (t) => setState(() => _selectedTopic = t),
               ),
             ),
-
-            const SizedBox(height: 12),
-            const Divider(color: _border, height: 1),
-
-            // Kaydırılabilir İçerik Alanı
+            const SizedBox(height: AppSpace.lg),
+            const Hairline(),
             Flexible(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpace.page,
+                  AppSpace.xxl,
+                  AppSpace.page,
+                  AppSpace.xxl,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (_selectedTopic == BiomechanicsTopic.all ||
-                        _selectedTopic == BiomechanicsTopic.mli) ...[
-                      _buildMliSection(),
-                      if (_selectedTopic == BiomechanicsTopic.all)
-                        const SizedBox(height: 20),
+                    if (showMli) _buildMliSection(),
+                    if (showMli && showRecovery) ...[
+                      const SizedBox(height: AppSpace.section),
+                      const Hairline(),
+                      const SizedBox(height: AppSpace.section),
                     ],
-                    if (_selectedTopic == BiomechanicsTopic.all ||
-                        _selectedTopic == BiomechanicsTopic.recovery) ...[
-                      _buildRecoverySection(),
-                      const SizedBox(height: 20),
-                    ],
-
-                    // Kapat Butonu
-                    SizedBox(
-                      width: double.infinity,
-                      height: 46,
-                      child: ElevatedButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _volcanic,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          'Anladım',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
+                    if (showRecovery) _buildRecoverySection(),
+                    const SizedBox(height: AppSpace.section),
+                    GhostButton(
+                      label: 'Anladım',
+                      expand: true,
+                      height: 48,
+                      onPressed: () => Navigator.of(context).pop(),
                     ),
                   ],
                 ),
@@ -256,140 +175,84 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: _volcanic.withValues(alpha: 0.14),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: _volcanic.withValues(alpha: 0.3),
-                  width: 1,
-                ),
-              ),
-              child: const Icon(Icons.bolt_rounded, color: _volcanic, size: 16),
-            ),
-            const SizedBox(width: 8),
-            const Text(
-              'MLI (Muscular Workload Index)',
-              style: TextStyle(
-                color: _textHigh,
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
+        const Text('MLI (Muscular Workload Index)', style: AppText.cardTitle),
+        const SizedBox(height: AppSpace.lg),
+        const SectionHeader(
+          'İş yükü hesaplama formülü',
+          padding: EdgeInsets.only(bottom: AppSpace.sm),
         ),
-        const SizedBox(height: 12),
-
-        // Formül Kutusu
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
-            color: _surface,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: _border, width: 1),
+            color: AppColors.surfaceRaised,
+            borderRadius: BorderRadius.circular(10),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'İŞ YÜKÜ HESAPLAMA FORMÜLÜ',
-                style: TextStyle(
-                  color: _volcanic,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.6,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: _border),
-                ),
-                child: const Text(
-                  'MLI = Set × Tekrar × Kaldıraç Zorluk Katsayısı',
-                  style: TextStyle(
-                    color: _textHigh,
-                    fontSize: 13,
-                    fontFamily: 'monospace',
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                '• Statik tutuşlarda süre: Süre (sn) ÷ 2 olarak hesaba katılır.\n'
-                '• Ek ağırlık eklendiğinde: (1 + Ek Ağırlık ÷ Vücut Ağırlığı) çarpanı uygulanır.',
-                style: TextStyle(color: _textMuted, fontSize: 11.5, height: 1.4),
-              ),
-            ],
+          child: const Text(
+            'MLI = Set × Tekrar × Kaldıraç Zorluk Katsayısı',
+            style: TextStyle(
+              color: AppColors.textHigh,
+              fontSize: 13,
+              fontFamily: 'monospace',
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
-
-        const SizedBox(height: 12),
-
-        // Açıklama: Vücut Ağırlığı ve Kaldıraç Farkları
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: _surface,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: _border, width: 1),
+        const SizedBox(height: AppSpace.md),
+        const Text(
+          '• Statik tutuşlarda süre: Süre (sn) ÷ 2 olarak hesaba katılır.\n'
+          '• Ek ağırlık eklendiğinde: (1 + Ek Ağırlık ÷ Vücut Ağırlığı) çarpanı uygulanır.',
+          style: TextStyle(
+            color: AppColors.textMid,
+            fontSize: 13,
+            height: 1.5,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Row(
-                children: [
-                  Icon(Icons.architecture_rounded, color: _emerald, size: 16),
-                  SizedBox(width: 6),
-                  Text(
-                    'Kalistenikte Kaldıraç Neden Önemli?',
-                    style: TextStyle(
-                      color: _textHigh,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Geleneksel ağırlık antrenmanında direnç plaka ağırlığı ile sabitlenir. '
-                'Kalistenikte ise kaslara binen yük vücut açısı ve eklem moment kolu (kaldıraç) ile değişir.',
-                style: TextStyle(color: _textMid, fontSize: 12, height: 1.45),
-              ),
-              const SizedBox(height: 10),
-              _buildLeverageRow('Eğimli Şınav (Incline)', '0.70x', 'Vücut ağırlığının ~%45\'i taşınır'),
-              const SizedBox(height: 6),
-              _buildLeverageRow('Standart Şınav', '1.00x', 'Vücut ağırlığının ~%64\'ü taşınır'),
-              const SizedBox(height: 6),
-              _buildLeverageRow('Dips & Barfiks', '1.30x', 'Tüm vücut kütlesi yerçekimine karşı çekilir'),
-              const SizedBox(height: 6),
-              _buildLeverageRow('Planche / Front Lever', '1.80x - 2.20x', 'Moment kolu uzar, kas gerilimi katlanır'),
-            ],
+        ),
+        const SizedBox(height: AppSpace.xxl),
+        const SectionHeader(
+          'Kalistenikte kaldıraç neden önemli?',
+          padding: EdgeInsets.only(bottom: AppSpace.sm),
+        ),
+        const Text(
+          'Geleneksel ağırlık antrenmanında direnç plaka ağırlığı ile sabitlenir. '
+          'Kalistenikte ise kaslara binen yük vücut açısı ve eklem moment kolu (kaldıraç) ile değişir.',
+          style: TextStyle(
+            color: AppColors.textMid,
+            fontSize: 13,
+            height: 1.5,
           ),
+        ),
+        const SizedBox(height: AppSpace.sm),
+        _buildLeverageRow(
+          'Eğimli Şınav (Incline)',
+          '0.70×',
+          'Vücut ağırlığının ~%45\'i taşınır',
+        ),
+        const Hairline(),
+        _buildLeverageRow(
+          'Standart Şınav',
+          '1.00×',
+          'Vücut ağırlığının ~%64\'ü taşınır',
+        ),
+        const Hairline(),
+        _buildLeverageRow(
+          'Dips & Barfiks',
+          '1.30×',
+          'Tüm vücut kütlesi yerçekimine karşı çekilir',
+        ),
+        const Hairline(),
+        _buildLeverageRow(
+          'Planche / Front Lever',
+          '1.80–2.20×',
+          'Moment kolu uzar, kas gerilimi katlanır',
         ),
       ],
     );
   }
 
   Widget _buildLeverageRow(String name, String factor, String note) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        color: _bg,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: _border),
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpace.md),
       child: Row(
         children: [
           Expanded(
@@ -398,35 +261,15 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
               children: [
                 Text(
                   name,
-                  style: const TextStyle(
-                    color: _textHigh,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppText.body.copyWith(fontWeight: FontWeight.w500),
                 ),
-                Text(
-                  note,
-                  style: const TextStyle(color: _textMuted, fontSize: 10.5),
-                ),
+                const SizedBox(height: 2),
+                Text(note, style: AppText.caption),
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: _emerald.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: _emerald.withValues(alpha: 0.3)),
-            ),
-            child: Text(
-              factor,
-              style: const TextStyle(
-                color: _emerald,
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
+          const SizedBox(width: AppSpace.md),
+          Text(factor, style: AppText.metricS),
         ],
       ),
     );
@@ -437,106 +280,71 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: _emerald.withValues(alpha: 0.14),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: _emerald.withValues(alpha: 0.3),
-                  width: 1,
-                ),
-              ),
-              child: const Icon(Icons.healing_rounded, color: _emerald, size: 16),
-            ),
-            const SizedBox(width: 8),
-            const Text(
-              'RIR Tabanlı Kas Toparlanması (Recovery)',
-              style: TextStyle(
-                color: _textHigh,
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
+        const Text(
+          'RIR Tabanlı Kas Toparlanması (Recovery)',
+          style: AppText.cardTitle,
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: AppSpace.md),
         const Text(
           'RIR (Reps in Reserve), set sonrasında tükenişe kalan tahmini tekrar mesafenizdir. '
           'Tükenişe yaklaştıkça kas mikroyırtıkları ve sinir sistemi (CNS) yorgunluğu katlanarak artar.',
-          style: TextStyle(color: _textMid, fontSize: 12, height: 1.45),
+          style: TextStyle(
+            color: AppColors.textMid,
+            fontSize: 13,
+            height: 1.5,
+          ),
         ),
-        const SizedBox(height: 12),
-
-        // 3 Kademe Kartı
-        _buildRirCard(
-          badgeColor: _red,
+        const SizedBox(height: AppSpace.lg),
+        _buildRirRow(
+          dotColor: AppColors.textHigh,
           rirRange: '0 - 1 RIR (Tükeniş / Maksimal Efor)',
-          hours: '48 - 72 Saat',
+          hours: '48–72 sa',
           description:
               'Kritik miyofibriler mikrohasar ve merkezi sinir sistemi tükenmesi. Kas lifi protein sentezi ve tam yenilenme için uzun dinlenme şarttır.',
-          icon: Icons.local_fire_department_rounded,
         ),
-        const SizedBox(height: 8),
-        _buildRirCard(
-          badgeColor: _amber,
+        const Hairline(),
+        _buildRirRow(
+          dotColor: AppColors.amber,
           rirRange: '2 - 3 RIR (Optimal Hipertrofi)',
-          hours: '36 - 48 Saat',
+          hours: '36–48 sa',
           description:
               'Maksimum kas uyarıcı mekanik gerilim ve dengeli yorgunluk. Kas grubu 1.5 - 2 günde süperkompansasyona ulaşır.',
-          icon: Icons.offline_bolt_rounded,
         ),
-        const SizedBox(height: 8),
-        _buildRirCard(
-          badgeColor: _emerald,
+        const Hairline(),
+        _buildRirRow(
+          dotColor: AppColors.emerald,
           rirRange: '4+ RIR (Hafif / Teknik & Hız)',
-          hours: '24 Saat',
+          hours: '24 sa',
           description:
               'Düşük mikrohasar ve hafif sinirsel yük. Yüksek frekanslı teknik ve beceri çalışmaları için ertesi gün tekrar hazırdır.',
-          icon: Icons.check_circle_outline_rounded,
         ),
-
-        const SizedBox(height: 12),
-
-        // Kümülatif Yorgunluk Notu
+        const SizedBox(height: AppSpace.xl),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppSpace.lg),
           decoration: BoxDecoration(
-            color: _surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: _border),
+            color: AppColors.surfaceRaised,
+            borderRadius: BorderRadius.circular(AppRadius.control),
           ),
-          child: const Row(
+          child: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.shield_rounded, color: _volcanic, size: 18),
-              SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Kümülatif Yorgunluk Koruması',
-                      style: TextStyle(
-                        color: _textHigh,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    SizedBox(height: 3),
-                    Text(
-                      'Bir kas grubu henüz %100 toparlanmadan tekrar çalıştırılırsa, '
-                      'kalan saatler sıfırlanmaz; yeni seansın RIR yükü kümülatif olarak eklenerek sürantrenman (overtraining) riski engellenir.',
-                      style: TextStyle(
-                        color: _textMuted,
-                        fontSize: 11,
-                        height: 1.4,
-                      ),
-                    ),
-                  ],
+              Text(
+                'Kümülatif yorgunluk koruması',
+                style: TextStyle(
+                  color: AppColors.textHigh,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(height: 4),
+              Text(
+                'Bir kas grubu henüz %100 toparlanmadan tekrar çalıştırılırsa, '
+                'kalan saatler sıfırlanmaz; yeni seansın RIR yükü kümülatif olarak eklenerek sürantrenman (overtraining) riski engellenir.',
+                style: TextStyle(
+                  color: AppColors.textMid,
+                  fontSize: 12.5,
+                  height: 1.45,
                 ),
               ),
             ],
@@ -546,66 +354,36 @@ class _BiomechanicsInfoSheetState extends State<BiomechanicsInfoSheet> {
     );
   }
 
-  Widget _buildRirCard({
-    required Color badgeColor,
+  Widget _buildRirRow({
+    required Color dotColor,
     required String rirRange,
     required String hours,
     required String description,
-    required IconData icon,
   }) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: _surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: _border),
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, color: badgeColor, size: 16),
-              const SizedBox(width: 6),
+              StatusDot(color: dotColor),
+              const SizedBox(width: AppSpace.sm),
               Expanded(
                 child: Text(
                   rirRange,
-                  style: const TextStyle(
-                    color: _textHigh,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: AppText.body.copyWith(fontWeight: FontWeight.w500),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: badgeColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(
-                    color: badgeColor.withValues(alpha: 0.3),
-                    width: 1,
-                  ),
-                ),
-                child: Text(
-                  hours,
-                  style: TextStyle(
-                    color: badgeColor,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
+              Text(hours, style: AppText.metricS),
             ],
           ),
           const SizedBox(height: 6),
-          Text(
-            description,
-            style: const TextStyle(
-              color: _textMid,
-              fontSize: 11,
-              height: 1.35,
+          Padding(
+            padding: const EdgeInsets.only(left: 14),
+            child: Text(
+              description,
+              style: AppText.caption.copyWith(height: 1.45),
             ),
           ),
         ],

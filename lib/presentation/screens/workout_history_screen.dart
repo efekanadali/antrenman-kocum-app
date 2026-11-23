@@ -12,7 +12,7 @@ const Color _bg = AppColors.background; // #0A0C0E
 const Color _surface = AppColors.surface; // #13171C
 const Color _surfaceSoft = AppColors.surfaceSoft; // #181D24
 const Color _border = AppColors.border; // #1E232A
-const Color _volcanic = AppColors.volcanic; // #FF5533
+const Color _volcanic = AppColors.accent; // #A3E635
 const Color _emerald = AppColors.emerald; // #10B981
 const Color _nordicIce = AppColors.nordicIce; // #38BDF8
 
@@ -154,7 +154,7 @@ class _ErrorView extends StatelessWidget {
               label: const Text('Tekrar Dene'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: _volcanic,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.onAccent,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -228,7 +228,7 @@ class _EmptyHistoryView extends StatelessWidget {
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: _volcanic,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.onAccent,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),

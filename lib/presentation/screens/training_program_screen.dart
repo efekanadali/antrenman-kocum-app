@@ -449,7 +449,7 @@ class TrainingProgramScreen extends StatelessWidget {
                   },
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.volcanic,
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppColors.onAccent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
@@ -683,7 +683,7 @@ class _StartWorkoutButton extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.volcanic,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.onAccent,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),

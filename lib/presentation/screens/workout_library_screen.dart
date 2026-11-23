@@ -10,6 +10,7 @@ import 'package:calisthenics_app/presentation/providers/exercise_list_provider.d
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/presentation/screens/home_screen.dart';
 import 'package:calisthenics_app/presentation/theme/app_theme.dart';
+import 'package:calisthenics_app/presentation/widgets/ui/ui.dart';
 
 class WorkoutLibraryScreen extends ConsumerStatefulWidget {
   const WorkoutLibraryScreen({super.key, this.showBottomNav = true});
@@ -26,9 +27,9 @@ class _WorkoutLibraryScreenState extends ConsumerState<WorkoutLibraryScreen> {
   final Set<MuscleCompartment> _selectedCompartments = {};
 
   List<String> _exerciseMuscleLabels(Exercise exercise) {
-    return targetRegions(exercise.compartmentWeights)
-        .map((region) => region.label)
-        .toList();
+    return targetRegions(
+      exercise.compartmentWeights,
+    ).map((region) => region.label).toList();
   }
 
   void _toggleRegion(MuscleRegion region) {
@@ -60,17 +61,17 @@ class _WorkoutLibraryScreenState extends ConsumerState<WorkoutLibraryScreen> {
   @override
   Widget build(BuildContext context) {
     final asyncExercises = ref.watch(exerciseListProvider);
+    final canPop = Navigator.of(context).canPop();
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: asyncExercises.when(
-          loading: () => const Center(
-            child: CircularProgressIndicator(color: AppColors.volcanic),
-          ),
+          loading: () =>
+              const Center(child: CircularProgressIndicator(strokeWidth: 2)),
           error: (error, _) => Center(
-            child: Text(
-              'Hata: $error',
-              style: const TextStyle(color: AppColors.textMid),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpace.page),
+              child: Text('Hata: $error', style: AppText.bodyMuted),
             ),
           ),
           data: (exercises) {
@@ -88,59 +89,40 @@ class _WorkoutLibraryScreenState extends ConsumerState<WorkoutLibraryScreen> {
               slivers: [
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 16.0, 20.0, 8.0),
-                    child: Row(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpace.page,
+                      AppSpace.lg,
+                      AppSpace.page,
+                      0,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _BackButton(
-                          onPressed: () => Navigator.of(context).maybePop(),
-                        ),
-                        const SizedBox(width: 14.0),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
-                              Text(
-                                'Hareket Kütüphanesi',
-                                style: TextStyle(
-                                  color: AppColors.textHigh,
-                                  fontSize: 22.0,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: -0.3,
-                                ),
-                              ),
-                              SizedBox(height: 3.0),
-                              Text(
-                                'Kalisthenik Egzersiz Kataloğu',
-                                style: TextStyle(
-                                  color: AppColors.textMid,
-                                  fontSize: 13.0,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10.0,
-                            vertical: 5.0,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.surfaceSoft,
-                            borderRadius: BorderRadius.circular(10.0),
-                            border: Border.all(
-                              color: AppColors.border,
-                              width: 1.0,
+                        if (canPop) ...[
+                          IconButton(
+                            onPressed: () => Navigator.of(context).maybePop(),
+                            icon: const Icon(Icons.arrow_back_rounded),
+                            color: AppColors.textHigh,
+                            tooltip: 'Geri',
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(
+                              minWidth: 40,
+                              minHeight: 40,
+                            ),
+                            style: IconButton.styleFrom(
+                              alignment: Alignment.centerLeft,
                             ),
                           ),
-                          child: Text(
-                            '${filteredWorkouts.length} Hareket',
-                            style: const TextStyle(
-                              color: AppColors.textMid,
-                              fontSize: 12.0,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                          const SizedBox(height: AppSpace.sm),
+                        ],
+                        const Text(
+                          'Hareket Kütüphanesi',
+                          style: AppText.pageTitle,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${filteredWorkouts.length} hareket · kalistenik katalog',
+                          style: AppText.bodyMuted,
                         ),
                       ],
                     ),
@@ -148,7 +130,12 @@ class _WorkoutLibraryScreenState extends ConsumerState<WorkoutLibraryScreen> {
                 ),
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 12.0, 20.0, 8.0),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpace.page,
+                      AppSpace.section,
+                      AppSpace.page,
+                      0,
+                    ),
                     child: _TargetRegionPicker(
                       selectedRegions: _selectedRegions,
                       selectedCompartments: _selectedCompartments,
@@ -159,45 +146,56 @@ class _WorkoutLibraryScreenState extends ConsumerState<WorkoutLibraryScreen> {
                   ),
                 ),
                 SliverPadding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final item = filteredWorkouts[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12.0),
-                          child: _WorkoutCard(
-                            exercise: item,
-                            muscleLabels: _exerciseMuscleLabels(item),
-                            onTap: () {
-                              Navigator.pushNamed(
-                                context,
-                                AppRoutes.detail,
-                                arguments: item,
-                              );
-                            },
-                          ),
-                        );
-                      },
-                      childCount: filteredWorkouts.length,
-                    ),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpace.page,
+                    AppSpace.lg,
+                    AppSpace.page,
+                    AppSpace.section,
                   ),
-                ),
-                const SliverToBoxAdapter(
-                  child: SizedBox(height: 32.0),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final item = filteredWorkouts[index];
+                      return DecoratedBox(
+                        decoration: BoxDecoration(
+                          border: index == 0
+                              ? null
+                              : const Border(
+                                  top: BorderSide(
+                                    color: AppColors.hairline,
+                                    width: AppSpace.hairline,
+                                  ),
+                                ),
+                        ),
+                        child: _WorkoutCard(
+                          exercise: item,
+                          muscleLabels: _exerciseMuscleLabels(item),
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.detail,
+                              arguments: item,
+                            );
+                          },
+                        ),
+                      );
+                    }, childCount: filteredWorkouts.length),
+                  ),
                 ),
               ],
             );
           },
         ),
       ),
-      bottomNavigationBar:
-          widget.showBottomNav ? const AppBottomNav(selectedIndex: 1) : null,
+      bottomNavigationBar: widget.showBottomNav
+          ? const AppBottomNav(selectedIndex: 1)
+          : null,
     );
   }
 }
 
+/// Kütüphane üstündeki etkileşimli anatomik kas filtresi: solda dikey bölge
+/// hapları, sağda seçimi vücut üzerinde vurgulayan ön/arka silüet. Hem haplara
+/// hem de silüetteki kaslara dokunarak filtrelenir.
 class _TargetRegionPicker extends StatelessWidget {
   const _TargetRegionPicker({
     required this.selectedRegions,
@@ -213,150 +211,184 @@ class _TargetRegionPicker extends StatelessWidget {
   final ValueChanged<MuscleCompartment> onToggleCompartment;
   final VoidCallback onClear;
 
+  static const List<MuscleRegion> _order = [
+    MuscleRegion.chest,
+    MuscleRegion.back,
+    MuscleRegion.shoulders,
+    MuscleRegion.arms,
+    MuscleRegion.legs,
+    MuscleRegion.core,
+  ];
+
+  static const double _pillColumnWidth = 92;
+
+  /// Seçili bölgelerin kompartımanları tam, alt bölge seçiliyse seçilmeyen
+  /// kardeşleri soluk tonla vurgulanır.
+  Map<MuscleCompartment, double> _highlight() {
+    final out = <MuscleCompartment, double>{};
+    for (final region in selectedRegions) {
+      final picked = region.compartments.where(selectedCompartments.contains);
+      for (final c in region.compartments) {
+        out[c] = picked.isEmpty || picked.contains(c) ? 1.0 : 0.3;
+      }
+    }
+    return out;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: AppColors.border, width: 1.0),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Text(
-                'Hedef Bölge Filtresi',
-                style: TextStyle(
-                  color: AppColors.textHigh,
-                  fontSize: 14.0,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.2,
-                ),
-              ),
-              const Spacer(),
-              if (selectedRegions.isNotEmpty || selectedCompartments.isNotEmpty)
-                GestureDetector(
+    final hasFilter =
+        selectedRegions.isNotEmpty || selectedCompartments.isNotEmpty;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(
+          'Anatomik kas filtresi',
+          padding: const EdgeInsets.only(bottom: AppSpace.md),
+          trailing: hasFilter
+              ? GestureDetector(
                   onTap: onClear,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0,
-                      vertical: 4.0,
+                  behavior: HitTestBehavior.opaque,
+                  child: Text(
+                    'Temizle',
+                    style: AppText.caption.copyWith(
+                      color: AppColors.textMid,
+                      fontWeight: FontWeight.w600,
                     ),
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceSoft,
-                      borderRadius: BorderRadius.circular(8.0),
-                      border: Border.all(
-                        color: AppColors.border,
-                        width: 1.0,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(
-                          Icons.close_rounded,
-                          size: 13.0,
-                          color: AppColors.volcanic,
+                  ),
+                )
+              : null,
+        ),
+        AppSurface(
+          padding: const EdgeInsets.all(AppSpace.lg),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              const gap = AppSpace.md;
+              const figureSpacing = AppSpace.sm;
+              final mapWidth = constraints.maxWidth - _pillColumnWidth - gap;
+              // İki silüet + boşluk genişliğe sığacak yükseklik (+ başlık).
+              final mapHeight =
+                  (((mapWidth - figureSpacing) / 2) * 370 / 200 + 18)
+                      .clamp(160.0, 300.0)
+                      .toDouble();
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: _pillColumnWidth,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _RegionPill(
+                          label: 'Tümü',
+                          isSelected: !hasFilter,
+                          onTap: onClear,
                         ),
-                        SizedBox(width: 4.0),
-                        Text(
-                          'Temizle',
-                          style: TextStyle(
-                            color: AppColors.volcanic,
-                            fontSize: 11.0,
-                            fontWeight: FontWeight.w600,
+                        for (final region in _order) ...[
+                          const SizedBox(height: 6),
+                          _RegionPill(
+                            label: region.label,
+                            isSelected: selectedRegions.contains(region),
+                            onTap: () => onToggleRegion(region),
                           ),
-                        ),
+                        ],
                       ],
                     ),
                   ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 6.0),
-          const Text(
-            'Bölgeye dokun; alt bölgelerle (kompartıman) daha da daralt.',
-            style: TextStyle(
-              color: AppColors.textMuted,
-              fontSize: 12.0,
-            ),
-          ),
-          const SizedBox(height: 12.0),
-          Wrap(
-            spacing: 8.0,
-            runSpacing: 8.0,
-            children: [
-              for (final region in MuscleRegion.values)
-                _RegionCard(
-                  label: region.label,
-                  isSelected: selectedRegions.contains(region),
-                  onTap: () => onToggleRegion(region),
-                ),
-            ],
-          ),
-          for (final region in MuscleRegion.values)
-            if (selectedRegions.contains(region) &&
-                region.compartments.length > 1) ...[
-              const SizedBox(height: 10.0),
-              Wrap(
-                spacing: 6.0,
-                runSpacing: 6.0,
-                children: [
-                  for (final compartment in region.compartments)
-                    _RegionCard(
-                      label: compartment.label,
-                      isSelected: selectedCompartments.contains(compartment),
-                      onTap: () => onToggleCompartment(compartment),
+                  const SizedBox(width: gap),
+                  Expanded(
+                    child: Center(
+                      child: Semantics(
+                        label: 'Kas haritası: filtrelemek için bir kasa dokun',
+                        child: AnatomicalMuscleMap(
+                          intensities: _highlight(),
+                          normalize: false,
+                          height: mapHeight,
+                          spacing: figureSpacing,
+                          onCompartmentTap: (c) => onToggleRegion(c.region),
+                        ),
+                      ),
                     ),
+                  ),
                 ],
-              ),
-            ],
-        ],
-      ),
+              );
+            },
+          ),
+        ),
+        for (final region in _order)
+          if (selectedRegions.contains(region) &&
+              region.compartments.length > 1) ...[
+            const SizedBox(height: AppSpace.md),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 4),
+                  child: Text(
+                    region.label,
+                    style: AppText.caption.copyWith(color: AppColors.textMid),
+                  ),
+                ),
+                for (final compartment in region.compartments)
+                  _RegionPill(
+                    label: compartment.label,
+                    compact: true,
+                    isSelected: selectedCompartments.contains(compartment),
+                    onTap: () => onToggleCompartment(compartment),
+                  ),
+              ],
+            ),
+          ],
+      ],
     );
   }
 }
 
-class _RegionCard extends StatelessWidget {
-  const _RegionCard({
+class _RegionPill extends StatelessWidget {
+  const _RegionPill({
     required this.label,
     required this.isSelected,
     required this.onTap,
+    this.compact = false,
   });
 
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(999);
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: radius,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
+          padding: EdgeInsets.symmetric(
+            horizontal: compact ? 12 : 14,
+            vertical: compact ? 6 : 8,
+          ),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.volcanic : AppColors.surfaceSoft,
-            borderRadius: BorderRadius.circular(12.0),
-            border: Border.all(
-              color: isSelected ? AppColors.volcanic : AppColors.border,
-              width: 1.0,
-            ),
+            color: isSelected ? AppColors.accent : Colors.transparent,
+            borderRadius: radius,
+            border: isSelected
+                ? null
+                : Border.all(color: AppColors.hairlineStrong, width: 1),
           ),
           child: Text(
             label,
-            style: TextStyle(
-              color: isSelected ? Colors.white : AppColors.textMid,
-              fontSize: 12.5,
-              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              letterSpacing: -0.1,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppText.caption.copyWith(
+              fontSize: compact ? 12 : 13,
+              fontWeight: FontWeight.w600,
+              color: isSelected ? AppColors.onAccent : AppColors.textMid,
             ),
           ),
         ),
@@ -376,14 +408,14 @@ class _WorkoutCard extends StatelessWidget {
   final List<String> muscleLabels;
   final VoidCallback onTap;
 
-  Color _levelColor(ExerciseLevel level) {
+  int _levelStep(ExerciseLevel level) {
     switch (level) {
       case ExerciseLevel.beginner:
-        return AppColors.emerald;
+        return 1;
       case ExerciseLevel.intermediate:
-        return AppColors.amber;
+        return 2;
       case ExerciseLevel.advanced:
-        return AppColors.volcanic;
+        return 3;
     }
   }
 
@@ -400,179 +432,71 @@ class _WorkoutCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final stripeColor = _levelColor(exercise.level);
-    final levelName = _levelName(exercise.level);
-
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14.0),
-        border: Border.all(color: AppColors.border, width: 1.0),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(14.0),
-          child: IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // 3px Zarif Dikey Seviye Şeridi
-                Container(
-                  width: 3.5,
-                  color: stripeColor,
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Koyu Mat Grafit İkon Kutusu
-                            Container(
-                              width: 42.0,
-                              height: 42.0,
-                              decoration: BoxDecoration(
-                                color: AppColors.surfaceSoft,
-                                borderRadius: BorderRadius.circular(10.0),
-                                border: Border.all(
-                                  color: AppColors.border,
-                                  width: 1.0,
-                                ),
-                              ),
-                              child: const Icon(
-                                Icons.fitness_center_rounded,
-                                color: AppColors.textHigh,
-                                size: 20.0,
-                              ),
-                            ),
-                            const SizedBox(width: 12.0),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    exercise.name,
-                                    style: const TextStyle(
-                                      color: AppColors.textHigh,
-                                      fontSize: 15.5,
-                                      fontWeight: FontWeight.w700,
-                                      letterSpacing: -0.2,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 3.0),
-                                  Text(
-                                    '${exercise.name} hareketi için biyomekanik aktivasyon profili.',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      color: AppColors.textMuted,
-                                      fontSize: 12.0,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 8.0),
-                            // Seviye Kapsülü
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 9.0,
-                                vertical: 4.0,
-                              ),
-                              decoration: BoxDecoration(
-                                color: stripeColor.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(8.0),
-                                border: Border.all(
-                                  color: stripeColor.withValues(alpha: 0.35),
-                                  width: 1.0,
-                                ),
-                              ),
-                              child: Text(
-                                levelName,
-                                style: TextStyle(
-                                  color: stripeColor,
-                                  fontSize: 11.0,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12.0),
-                        Wrap(
-                          spacing: 6.0,
-                          runSpacing: 6.0,
-                          children: muscleLabels
-                              .map(
-                                (label) => Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0,
-                                    vertical: 3.5,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.surfaceSoft,
-                                    borderRadius: BorderRadius.circular(6.0),
-                                    border: Border.all(
-                                      color: AppColors.border,
-                                      width: 1.0,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    label,
-                                    style: const TextStyle(
-                                      color: AppColors.textMid,
-                                      fontSize: 11.0,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                        ),
-                      ],
+    final step = _levelStep(exercise.level);
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpace.lg),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    exercise.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppText.body.copyWith(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
+                  const SizedBox(height: 4),
+                  Text(
+                    muscleLabels.isEmpty ? '—' : muscleLabels.join(' · '),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppText.caption.copyWith(fontSize: 13),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: AppSpace.lg),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    for (var i = 1; i <= 3; i++)
+                      Container(
+                        width: 10,
+                        height: 3,
+                        margin: EdgeInsets.only(left: i == 1 ? 0 : 2),
+                        decoration: BoxDecoration(
+                          color: i <= step
+                              ? AppColors.textHigh
+                              : AppColors.hairlineStrong,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  _levelName(exercise.level),
+                  style: AppText.caption.copyWith(fontSize: 11),
                 ),
               ],
             ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _BackButton extends StatelessWidget {
-  const _BackButton({required this.onPressed});
-
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(12.0),
-        child: Container(
-          width: 40.0,
-          height: 40.0,
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(12.0),
-            border: Border.all(color: AppColors.border, width: 1.0),
-          ),
-          child: const Icon(
-            Icons.arrow_back_rounded,
-            color: AppColors.textHigh,
-            size: 20.0,
-          ),
+            const SizedBox(width: AppSpace.sm),
+            const Icon(
+              Icons.chevron_right_rounded,
+              size: 20,
+              color: AppColors.textMuted,
+            ),
+          ],
         ),
       ),
     );

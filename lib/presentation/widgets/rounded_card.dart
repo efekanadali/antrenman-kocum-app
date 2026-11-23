@@ -1,8 +1,10 @@
 // lib/presentation/widgets/rounded_card.dart
 
 import 'package:flutter/material.dart';
-import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 
+import 'package:calisthenics_app/presentation/widgets/ui/app_surface.dart';
+
+/// Geriye dönük uyumluluk için [AppSurface] sarmalayıcısı.
 class RoundedCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
@@ -15,33 +17,17 @@ class RoundedCard extends StatelessWidget {
     required this.child,
     this.padding = const EdgeInsets.all(12.0),
     this.elevation = 0.0,
-    this.borderRadius = 14.0,
+    this.borderRadius = 16.0,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final card = Material(
-      color: AppColors.surface,
-      elevation: elevation,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(borderRadius),
-        side: const BorderSide(color: AppColors.border, width: 1.0),
-      ),
-      child: Padding(
-        padding: padding,
-        child: child,
-      ),
+    return AppSurface(
+      padding: padding,
+      radius: borderRadius,
+      onTap: onTap,
+      child: child,
     );
-
-    if (onTap != null) {
-      return InkWell(
-        borderRadius: BorderRadius.circular(borderRadius),
-        onTap: onTap,
-        child: card,
-      );
-    }
-
-    return card;
   }
 }

@@ -356,7 +356,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
                           },
                           style: FilledButton.styleFrom(
                             backgroundColor: AppColors.volcanic,
-                            foregroundColor: Colors.white,
+                            foregroundColor: AppColors.onAccent,
                           ),
                           child: const Text('Kaydet'),
                         ),
@@ -748,7 +748,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
                             backgroundColor: isWorkoutDone
                                 ? AppColors.emerald
                                 : AppColors.volcanic,
-                            foregroundColor: Colors.white,
+                            foregroundColor: AppColors.onAccent,
                             padding: const EdgeInsets.symmetric(vertical: 18.0),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14.0),
@@ -875,7 +875,7 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
                       label: 'BİTİR',
                       icon: Icons.stop_rounded,
                       backgroundColor: AppColors.volcanic,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppColors.onAccent,
                       borderColor: AppColors.volcanic,
                       onPressed: _finishWorkout,
                     ),

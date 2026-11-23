@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/presentation/theme/app_theme.dart';
+import 'package:calisthenics_app/presentation/widgets/ui/ui.dart';
 import 'package:calisthenics_app/core/local_storage/workout_history_storage.dart';
 import 'package:calisthenics_app/core/local_storage/workout_summary_storage.dart';
 import 'package:calisthenics_app/domain/enums/muscle_compartment.dart';
@@ -155,30 +156,16 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
       ]);
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: AppColors.surface,
-          behavior: SnackBarBehavior.floating,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14.0),
-            side: const BorderSide(color: AppColors.border, width: 1.0),
-          ),
-          content: const Row(
+        const SnackBar(
+          content: Row(
             children: [
               Icon(
-                Icons.check_circle_rounded,
+                Icons.check_circle_outline_rounded,
                 color: AppColors.emerald,
-                size: 20,
+                size: 18,
               ),
               SizedBox(width: 10),
-              Text(
-                'Seans kaydedildi',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
-              ),
+              Text('Seans kaydedildi'),
             ],
           ),
         ),
@@ -186,15 +173,17 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
     } catch (_) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text(
-            'Kaydetme başarısız',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-          ),
-          backgroundColor: Colors.red.shade800,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14.0),
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(
+                Icons.error_outline_rounded,
+                color: AppColors.danger,
+                size: 18,
+              ),
+              SizedBox(width: 10),
+              Text('Kaydetme başarısız'),
+            ],
           ),
         ),
       );
@@ -206,6 +195,14 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
     final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
     final s = d.inSeconds.remainder(60).toString().padLeft(2, '0');
     return '$m:$s';
+  }
+
+  void _goHome(BuildContext context) {
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      AppRoutes.home,
+      (route) => false,
+    );
   }
 
   // ── Build ────────────────────────────────────────────────────────────────
@@ -220,67 +217,74 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpace.page,
+            AppSpace.xxl,
+            AppSpace.page,
+            AppSpace.xxl,
+          ),
           children: [
-            // ── Header ────────────────────────────────────────────────────
             _buildHeader(context),
-            const SizedBox(height: 28),
-
-            // ── Metric Grid ───────────────────────────────────────────────
+            const SizedBox(height: AppSpace.xxl),
             _buildMetricGrid(),
-            const SizedBox(height: 24),
-
-            // ── Muscle Load Card ──────────────────────────────────────────
+            const SizedBox(height: AppSpace.section),
             _buildMuscleCard(load, sortedMuscles, totalMuscleLoad),
-            const SizedBox(height: 32),
-
-            // ── Primary CTA ───────────────────────────────────────────────
-            _SaveButton(
-              onPressed: () async {
-                await _saveSession(context);
-                if (!context.mounted) return;
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  AppRoutes.home,
-                  (route) => false,
-                );
-              },
-            ),
-            const SizedBox(height: 12),
-
-            // ── Secondary Actions ─────────────────────────────────────────
-            Row(
-              children: [
-                Expanded(
-                  child: _OutlineActionButton(
-                    icon: Icons.replay_rounded,
-                    label: 'Tekrar Başlat',
-                    onPressed: () {
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        AppRoutes.home,
-                        (route) => false,
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _OutlineActionButton(
-                    icon: Icons.exit_to_app_rounded,
-                    label: 'Kaydetmeden Çık',
-                    onPressed: () {
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        AppRoutes.home,
-                        (route) => false,
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
           ],
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpace.page,
+            AppSpace.md,
+            AppSpace.page,
+            AppSpace.md,
+          ),
+          decoration: const BoxDecoration(
+            color: AppColors.background,
+            border: Border(
+              top: BorderSide(
+                color: AppColors.hairline,
+                width: AppSpace.hairline,
+              ),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              PrimaryButton(
+                label: 'Seansı Kaydet ve Bitir',
+                onPressed: () async {
+                  await _saveSession(context);
+                  if (!context.mounted) return;
+                  _goHome(context);
+                },
+              ),
+              const SizedBox(height: AppSpace.sm),
+              Row(
+                children: [
+                  Expanded(
+                    child: GhostButton(
+                      label: 'Tekrar Başlat',
+                      icon: Icons.replay_rounded,
+                      expand: true,
+                      onPressed: () => _goHome(context),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpace.sm),
+                  Expanded(
+                    child: GhostButton(
+                      label: 'Kaydetmeden Çık',
+                      icon: Icons.logout_rounded,
+                      expand: true,
+                      onPressed: () => _goHome(context),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -289,80 +293,77 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
   // ── Header ──────────────────────────────────────────────────────────────
   Widget _buildHeader(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 88,
-          height: 88,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppColors.surface,
-            border: Border.all(
-              color: AppColors.emerald.withValues(alpha: 0.65),
-              width: 1.5,
+        Row(
+          children: [
+            const Icon(
+              Icons.check_circle_outline_rounded,
+              size: 16,
+              color: AppColors.emerald,
             ),
-          ),
-          child: const Icon(
-            Icons.emoji_events_rounded,
-            size: 42,
-            color: AppColors.emerald,
-          ),
+            const SizedBox(width: 6),
+            Text(
+              trUpper('Antrenman tamamlandı'),
+              style: AppText.sectionLabel.copyWith(color: AppColors.emerald),
+            ),
+          ],
         ),
-        const SizedBox(height: 18),
-        const Text(
-          'Antrenman Tamamlandı!',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: AppColors.textHigh,
-            fontSize: 24,
-            fontWeight: FontWeight.w800,
-            letterSpacing: -0.5,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          widget.args.exerciseName,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: AppColors.textMid,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+        const SizedBox(height: AppSpace.sm),
+        Text(widget.args.exerciseName, style: AppText.pageTitle),
       ],
     );
   }
 
   // ── Metric Grid ─────────────────────────────────────────────────────────
   Widget _buildMetricGrid() {
-    return Row(
-      children: [
-        Expanded(
-          child: _MetricCard(
-            icon: Icons.timer_outlined,
-            iconColor: AppColors.iceBlue,
-            label: 'Toplam Süre',
-            value: _formatDuration(widget.args.totalTime),
+    return AppSurface(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MetricValue(
+            value: widget.args.totalLoad.round().toString(),
+            unit: 'MLI',
+            label: 'Toplam yük',
+            style: AppText.metricXL,
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _MetricCard(
-            icon: Icons.fitness_center_rounded,
-            iconColor: AppColors.emerald,
-            label: 'Setler',
-            value: '${widget.args.setsCompleted} / ${widget.args.totalSets}',
+          const SizedBox(height: AppSpace.xl),
+          const Hairline(),
+          const SizedBox(height: AppSpace.lg),
+          IntrinsicHeight(
+            child: Row(
+              children: [
+                Expanded(
+                  child: MetricValue(
+                    value: _formatDuration(widget.args.totalTime),
+                    unit: 'dk',
+                    label: 'Toplam süre',
+                  ),
+                ),
+                const Hairline.vertical(),
+                const SizedBox(width: AppSpace.lg),
+                Expanded(
+                  child: MetricValue(
+                    value: '${widget.args.setsCompleted}',
+                    unit: '/${widget.args.totalSets}',
+                    label: 'Set',
+                  ),
+                ),
+                if (widget.args.averageRir != null) ...[
+                  const Hairline.vertical(),
+                  const SizedBox(width: AppSpace.lg),
+                  Expanded(
+                    child: MetricValue(
+                      value: widget.args.averageRir!.toStringAsFixed(1),
+                      label: 'Ort. RIR',
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _MetricCard(
-            icon: Icons.bolt_rounded,
-            iconColor: AppColors.volcanic,
-            label: 'Toplam Yük',
-            value: '${widget.args.totalLoad.round()} MLI',
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -372,138 +373,65 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
     List<MapEntry<MuscleRegion, double>> sortedMuscles,
     double totalMuscleLoad,
   ) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14.0),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: AppColors.iceBlue.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(8),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionHeader(
+          'Kas grubu yük dağılımı',
+          padding: EdgeInsets.only(bottom: AppSpace.md),
+        ),
+        AppSurface(
+          child: sortedMuscles.isEmpty
+              ? _buildEmptyMuscleState()
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (load.compartments.isNotEmpty) ...[
+                      Center(
+                        child: AnatomicalMuscleMap(
+                          intensities: load.compartments,
+                          height: 200,
+                          spacing: AppSpace.xl,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpace.xl),
+                      const Hairline(),
+                      const SizedBox(height: AppSpace.lg),
+                    ],
+                    for (final (i, entry) in sortedMuscles.indexed) ...[
+                      if (i > 0) const SizedBox(height: AppSpace.lg),
+                      _MuscleLoadRow(
+                        muscleName: entry.key.label,
+                        load: entry.value,
+                        ratio: totalMuscleLoad > 0
+                            ? entry.value / totalMuscleLoad
+                            : 0.0,
+                        compartments: [
+                          for (final c in entry.key.compartments)
+                            if ((load.compartments[c] ?? 0) > 0)
+                              MapEntry(c, load.compartments[c]!),
+                        ]..sort((a, b) => b.value.compareTo(a.value)),
+                      ),
+                    ],
+                  ],
                 ),
-                child: const Icon(
-                  Icons.analytics_outlined,
-                  color: AppColors.iceBlue,
-                  size: 18,
-                ),
-              ),
-              const SizedBox(width: 10),
-              const Text(
-                'Kas Grubu Yük Dağılımı',
-                style: TextStyle(
-                  color: AppColors.textHigh,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          if (sortedMuscles.isEmpty)
-            _buildEmptyMuscleState()
-          else
-            ...sortedMuscles.map(
-              (entry) => _MuscleLoadRow(
-                muscleName: entry.key.label,
-                load: entry.value,
-                ratio: totalMuscleLoad > 0
-                    ? entry.value / totalMuscleLoad
-                    : 0.0,
-                compartments: [
-                  for (final c in entry.key.compartments)
-                    if ((load.compartments[c] ?? 0) > 0)
-                      MapEntry(c, load.compartments[c]!),
-                ]..sort((a, b) => b.value.compareTo(a.value)),
-              ),
-            ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   Widget _buildEmptyMuscleState() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 12),
-      child: Row(
-        children: [
-          Icon(Icons.info_outline_rounded, color: AppColors.textMid, size: 18),
-          SizedBox(width: 8),
-          Text(
-            'Kas yükü verisi mevcut değil.',
-            style: TextStyle(color: AppColors.textMid, fontSize: 13),
-          ),
-        ],
-      ),
+    return const Row(
+      children: [
+        Icon(Icons.info_outline_rounded, color: AppColors.textMuted, size: 18),
+        SizedBox(width: AppSpace.sm),
+        Text('Kas yükü verisi mevcut değil.', style: AppText.bodyMuted),
+      ],
     );
   }
 }
 
 // ─── Sub-widgets ─────────────────────────────────────────────────────────────
-
-class _MetricCard extends StatelessWidget {
-  const _MetricCard({
-    required this.icon,
-    required this.iconColor,
-    required this.label,
-    required this.value,
-  });
-
-  final IconData icon;
-  final Color iconColor;
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14.0),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: iconColor, size: 22),
-          const SizedBox(height: 10),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              value,
-              style: const TextStyle(
-                color: AppColors.textHigh,
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.3,
-              ),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: AppColors.textMid,
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _MuscleLoadRow extends StatelessWidget {
   const _MuscleLoadRow({
@@ -523,169 +451,62 @@ class _MuscleLoadRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final evaluation = evaluateMuscleLoad(load);
-
-    final Color badgeBg;
-    final Color badgeFg;
+    final Color statusColor;
     switch (evaluation.level) {
       case MliStimulusLevel.optimal:
-        badgeBg = AppColors.emerald.withValues(alpha: 0.16);
-        badgeFg = AppColors.emerald;
+        statusColor = AppColors.emerald;
       case MliStimulusLevel.understimulated:
-        badgeBg = AppColors.iceBlue.withValues(alpha: 0.14);
-        badgeFg = AppColors.iceBlue;
+        statusColor = AppColors.textMuted;
       case MliStimulusLevel.overload:
-        badgeBg = AppColors.volcanic.withValues(alpha: 0.16);
-        badgeFg = AppColors.volcanic;
+        statusColor = AppColors.amber;
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  muscleName,
-                  style: const TextStyle(
-                    color: AppColors.textHigh,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: badgeBg,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  evaluation.label,
-                  style: TextStyle(
-                    color: badgeFg,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.3,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '${load.round()} pts',
-                style: const TextStyle(
-                  color: AppColors.volcanic,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: LinearProgressIndicator(
-              value: ratio.clamp(0.0, 1.0),
-              minHeight: 7,
-              backgroundColor: AppColors.surfaceSoft,
-              valueColor: AlwaysStoppedAnimation<Color>(badgeFg),
-            ),
-          ),
-          if (compartments.length > 1)
-            Padding(
-              padding: const EdgeInsets.only(top: 6),
-              child: Wrap(
-                spacing: 10,
-                runSpacing: 4,
-                children: [
-                  for (final c in compartments)
-                    Text(
-                      '${c.key.label} ${c.value.round()}',
-                      style: const TextStyle(
-                        color: AppColors.textMid,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                muscleName,
+                style: AppText.body.copyWith(fontWeight: FontWeight.w600),
               ),
             ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SaveButton extends StatelessWidget {
-  const _SaveButton({required this.onPressed});
-
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 54,
-      child: ElevatedButton.icon(
-        onPressed: onPressed,
-        icon: const Icon(Icons.save_alt_rounded, size: 20),
-        label: const Text(
-          'Seansı Kaydet & Bitir',
-          style: TextStyle(
-            fontWeight: FontWeight.w800,
-            fontSize: 15,
-            letterSpacing: 0.2,
-          ),
+            StatusDot(color: statusColor),
+            const SizedBox(width: 6),
+            Text(
+              evaluation.label,
+              style: AppText.caption.copyWith(fontSize: 11),
+            ),
+            const SizedBox(width: AppSpace.md),
+            SizedBox(
+              width: 44,
+              child: Text(
+                '${load.round()}',
+                textAlign: TextAlign.right,
+                style: AppText.metricS.copyWith(fontSize: 15),
+              ),
+            ),
+          ],
         ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.volcanic,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14.0),
-          ),
+        const SizedBox(height: AppSpace.sm),
+        SegmentedBar(
+          value: ratio.clamp(0.0, 1.0).toDouble(),
+          segments: 20,
+          color: AppColors.textHigh,
         ),
-      ),
-    );
-  }
-}
-
-class _OutlineActionButton extends StatelessWidget {
-  const _OutlineActionButton({
-    required this.icon,
-    required this.label,
-    required this.onPressed,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 48,
-      child: OutlinedButton.icon(
-        onPressed: onPressed,
-        icon: Icon(icon, size: 17),
-        label: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            label,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+        if (compartments.length > 1)
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(
+              [
+                for (final c in compartments)
+                  '${c.key.label} ${c.value.round()}',
+              ].join('  ·  '),
+              style: AppText.caption.copyWith(fontSize: 11.5),
+            ),
           ),
-        ),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.textMid,
-          side: const BorderSide(color: AppColors.border),
-          backgroundColor: AppColors.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14.0),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-        ),
-      ),
+      ],
     );
   }
 }

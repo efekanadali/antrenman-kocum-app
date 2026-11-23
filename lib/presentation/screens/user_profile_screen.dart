@@ -19,6 +19,7 @@ import 'package:calisthenics_app/data/services/firestore_service.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 import 'package:calisthenics_app/presentation/widgets/muscle_recovery_card.dart';
+import 'package:calisthenics_app/presentation/widgets/ui/ui.dart';
 
 class UserProfileScreen extends StatelessWidget {
   const UserProfileScreen({super.key, this.showBottomNav = true});
@@ -44,7 +45,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   static const Color _bgBottom = AppColors.background; // #0A0C0E
   static const Color _cardSurface = AppColors.surface; // #13171C
   static const Color _cardSurfaceSoft = AppColors.surfaceSoft; // #181D24
-  static const Color _accentPurple = AppColors.volcanic; // #FF5533
+  static const Color _accentPurple = AppColors.accent; // #A3E635
   static const Color _accentBlue = AppColors.emerald; // #10B981
   static const Color _textHigh = AppColors.textHigh; // #F1F5F9
   static const Color _textMid = AppColors.textMid; // #94A3B8
@@ -237,7 +238,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Kisisel Rekor Ekle',
+                      'Kişisel Rekor Ekle',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: _textHigh,
                         fontWeight: FontWeight.w700,
@@ -296,7 +297,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       activeThumbColor: _accentBlue,
                       contentPadding: EdgeInsets.zero,
                       title: Text(
-                        'Ekstra agirlik var',
+                        'Ekstra ağırlık var',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: _textHigh,
                           fontWeight: FontWeight.w600,
@@ -327,7 +328,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           context,
                         ).textTheme.bodyMedium?.copyWith(color: _textHigh),
                         decoration: _dialogInputDecoration(
-                          label: 'Ekstra agirlik (kg)',
+                          label: 'Ekstra ağırlık (kg)',
                         ),
                       ),
                     ],
@@ -371,8 +372,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               if (reps == null) {
                                 setDialogState(() {
                                   errorText = selectedIsTimed
-                                      ? 'Rekor suresini sadece sayi olarak gir.'
-                                      : 'Rekor tekrarini sadece sayi olarak gir.';
+                                      ? 'Rekor süresini yalnızca sayı olarak gir.'
+                                      : 'Rekor tekrarını yalnızca sayı olarak gir.';
                                 });
                                 return;
                               }
@@ -381,8 +382,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                   reps > _maxRecordValue) {
                                 setDialogState(() {
                                   errorText = selectedIsTimed
-                                      ? 'Rekor suresi $_minRecordValue-$_maxRecordValue saniye araliginda olmali.'
-                                      : 'Rekor tekrari $_minRecordValue-$_maxRecordValue araliginda olmali.';
+                                      ? 'Rekor süresi $_minRecordValue-$_maxRecordValue saniye aralığında olmalı.'
+                                      : 'Rekor tekrarı $_minRecordValue-$_maxRecordValue aralığında olmalı.';
                                 });
                                 return;
                               }
@@ -390,7 +391,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               if (hasExtraWeight && extraWeight == null) {
                                 setDialogState(() {
                                   errorText =
-                                      'Ekstra agirlik degerini girmelisin (ornek: 12.5).';
+                                      'Ekstra ağırlık değerini girmelisin (örnek: 12.5).';
                                 });
                                 return;
                               }
@@ -400,7 +401,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                       extraWeight > _maxExtraWeightKg)) {
                                 setDialogState(() {
                                   errorText =
-                                      'Ekstra agirlik $_minExtraWeightKg-$_maxExtraWeightKg kg araliginda olmali.';
+                                      'Ekstra ağırlık $_minExtraWeightKg-$_maxExtraWeightKg kg aralığında olmalı.';
                                 });
                                 return;
                               }
@@ -421,7 +422,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: _accentPurple,
-                              foregroundColor: _textHigh,
+                              foregroundColor: AppColors.onAccent,
                             ),
                             child: const Text('Kaydet'),
                           ),
@@ -535,7 +536,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Future<void> _editGender() async {
-    const genders = <String>['Kadin', 'Erkek', 'Belirtmek istemiyorum'];
+    const genders = <String>['Kadın', 'Erkek', 'Belirtmek istemiyorum'];
 
     final selected = await showDialog<String>(
       context: context,
@@ -618,8 +619,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       initialDate: initialDate,
       firstDate: DateTime(1950, 1, 1),
       lastDate: now,
-      helpText: 'Dogum tarihi sec',
-      cancelText: 'Iptal',
+      helpText: 'Doğum tarihi seç',
+      cancelText: 'İptal',
       confirmText: 'Kaydet',
       builder: (context, child) {
         final baseTheme = Theme.of(context);
@@ -650,7 +651,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             dividerColor: Colors.white12,
             dayForegroundColor: WidgetStateProperty.resolveWith((states) {
               if (states.contains(WidgetState.selected)) {
-                return _textHigh;
+                return AppColors.onAccent;
               }
               return _textHigh;
             }),
@@ -788,7 +789,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               );
                               if (parsed == null || parsed <= 0) {
                                 setDialogState(() {
-                                  errorText = 'Gecerli bir deger gir.';
+                                  errorText = 'Geçerli bir değer gir.';
                                 });
                                 return;
                               }
@@ -796,7 +797,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: _accentPurple,
-                              foregroundColor: _textHigh,
+                              foregroundColor: AppColors.onAccent,
                               padding: const EdgeInsets.symmetric(
                                 vertical: 12.0,
                               ),
@@ -929,7 +930,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               );
                               if (parsed == null || parsed <= 0) {
                                 setDialogState(() {
-                                  errorText = 'Gecerli bir deger gir.';
+                                  errorText = 'Geçerli bir değer gir.';
                                 });
                                 return;
                               }
@@ -937,7 +938,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: _accentPurple,
-                              foregroundColor: _textHigh,
+                              foregroundColor: AppColors.onAccent,
                               padding: const EdgeInsets.symmetric(
                                 vertical: 12.0,
                               ),
@@ -979,7 +980,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           .linkAnonymousWithGoogle();
       switch (result.status) {
         case GoogleLinkStatus.linked:
-          message = 'Hesabin Google ile baglandi. Verilerin korundu.';
+          message = 'Hesabın Google ile bağlandı. Verilerin korundu.';
           break;
         case GoogleLinkStatus.conflict:
           if (mounted) {
@@ -987,7 +988,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           }
           break;
         case GoogleLinkStatus.signedInExisting:
-          message = 'Mevcut Google hesabinla giris yapildi.';
+          message = 'Mevcut Google hesabınla giriş yapıldı.';
           _syncUserStreakAndStats();
           break;
         case GoogleLinkStatus.alreadyLinked:
@@ -995,9 +996,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           break;
       }
     } on FirebaseAuthException catch (e) {
-      message = e.message ?? 'Google ile baglama basarisiz oldu.';
+      message = e.message ?? 'Google ile bağlama başarısız oldu.';
     } catch (_) {
-      message = 'Google ile baglama basarisiz oldu. Lutfen tekrar dene.';
+      message = 'Google ile bağlama başarısız oldu. Lütfen tekrar dene.';
     } finally {
       if (mounted) {
         setState(() => _isLinkingGoogle = false);
@@ -1016,23 +1017,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       builder: (context) => AlertDialog(
         backgroundColor: _cardSurface,
         title: const Text(
-          'Hesap zaten kullanimda',
+          'Hesap zaten kullanımda',
           style: TextStyle(color: _textHigh),
         ),
         content: const Text(
-          'Bu Google hesabi daha once baska bir profile baglanmis. '
-          'Bu hesapla giris yaparsan su anki anonim verilerin bu cihazda '
-          'gorunmez olur ve Google hesabindaki verilerin yuklenir.',
+          'Bu Google hesabı daha önce başka bir profile bağlanmış. '
+          'Bu hesapla giriş yaparsan şu anki anonim verilerin bu cihazda '
+          'görünmez olur ve Google hesabındaki verilerin yüklenir.',
           style: TextStyle(color: _textMid),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Vazgec'),
+            child: const Text('Vazgeç'),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Hesapla giris yap'),
+            child: const Text('Hesapla giriş yap'),
           ),
         ],
       ),
@@ -1046,13 +1047,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'Giris basarisiz oldu.')),
+        SnackBar(content: Text(e.message ?? 'Giriş başarısız oldu.')),
       );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Giris basarisiz oldu.')));
+      ).showSnackBar(const SnackBar(content: Text('Giriş başarısız oldu.')));
     }
   }
 
@@ -1096,8 +1097,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   final trend = calculateSevenDayTrend(summaries);
                   final compartmentDistribution =
                       calculateCompartmentDistribution(summaries);
-                  final muscleDistribution =
-                      aggregateToRegions(compartmentDistribution);
+                  final muscleDistribution = aggregateToRegions(
+                    compartmentDistribution,
+                  );
                   final balanceText = summaries.isEmpty
                       ? 'Henüz yeterli antrenman verisi yok.'
                       : calculateBalanceText(compartmentDistribution);
@@ -1106,10 +1108,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     onRefresh: _refreshSummaries,
                     child: ListView(
                       padding: const EdgeInsets.fromLTRB(
-                        20.0,
-                        20.0,
-                        20.0,
-                        24.0,
+                        AppSpace.page,
+                        AppSpace.xxl,
+                        AppSpace.page,
+                        AppSpace.xxl,
                       ),
                       children: [
                         _UserHeader(
@@ -1117,53 +1119,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           email: isGoogleLinked ? authUser?.email : null,
                           photoUrl: isGoogleLinked ? authUser?.photoURL : null,
                         ),
-                        const SizedBox(height: 16.0),
-                        _GoogleLinkCard(
-                          isLinked: isGoogleLinked,
-                          isLoading: _isLinkingGoogle,
-                          onPressed: _linkGoogleAccount,
-                        ),
-                        const SizedBox(height: 12.0),
-                        BodyMetricsCard(
-                          heightCm: _heightCm,
-                          weightKg: _weightKg,
-                          gender: _gender,
-                          birthDateLabel: _birthDate == null
-                              ? 'Secilmedi'
-                              : '${formatDate(_birthDate!)} (${calculateAge(_birthDate!)} yas)',
-                          onEditHeight: () => _editMetric(
-                            title: 'Boy (cm)',
-                            unit: 'cm',
-                            currentValue: _heightCm,
-                            onApply: (value) => _heightCm = value,
-                          ),
-                          onEditWeight: () => _editMetric(
-                            title: 'Kilo (kg)',
-                            unit: 'kg',
-                            currentValue: _weightKg,
-                            onApply: (value) => _weightKg = value,
-                          ),
-                          onEditGender: _editGender,
-                          onEditBirthDate: _editBirthDate,
-                        ),
-                        const SizedBox(height: 12.0),
-                        GoalsCard(
-                          goalWeightKg: _goalWeightKg,
-                          targetWorkoutsPerWeek: _targetWorkoutsPerWeek,
-                          onEditGoalWeight: () => _editMetric(
-                            title: 'Hedef Kilo (kg)',
-                            unit: 'kg',
-                            currentValue: _goalWeightKg,
-                            onApply: (value) => _goalWeightKg = value,
-                          ),
-                          onEditTargetWorkouts: () => _editIntMetric(
-                            title: 'Haftalik Hedef Antrenman',
-                            unit: 'adet',
-                            currentValue: _targetWorkoutsPerWeek,
-                            onApply: (value) => _targetWorkoutsPerWeek = value,
-                          ),
-                        ),
-                        const SizedBox(height: 12.0),
+                        const SizedBox(height: AppSpace.xxl),
                         StatsCard(
                           totalWorkouts: _syncedTotalWorkouts > totalWorkouts
                               ? _syncedTotalWorkouts
@@ -1187,7 +1143,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             );
                           },
                         ),
-                        const SizedBox(height: 12.0),
+                        const SizedBox(height: AppSpace.md),
                         _WorkoutHistoryProfileCard(
                           totalWorkouts: _syncedTotalWorkouts > totalWorkouts
                               ? _syncedTotalWorkouts
@@ -1199,28 +1155,74 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             );
                           },
                         ),
-                        const SizedBox(height: 12.0),
+                        const SizedBox(height: AppSpace.section),
                         const MuscleRecoveryCard(),
-                        const SizedBox(height: 12.0),
+                        const SizedBox(height: AppSpace.section),
                         TrendCard(
                           currentSevenDayLoad: trend.current,
                           previousSevenDayLoad: trend.previous,
                         ),
-                        const SizedBox(height: 12.0),
+                        const SizedBox(height: AppSpace.section),
                         if (muscleDistribution.isNotEmpty) ...[
                           MuscleDistributionCard(
                             distribution: muscleDistribution,
                           ),
-                          const SizedBox(height: 12.0),
+                          const SizedBox(height: AppSpace.section),
                         ],
                         BalanceCard(message: balanceText),
-                        const SizedBox(height: 12.0),
+                        const SizedBox(height: AppSpace.section),
                         PersonalRecordsCard(
                           records: _personalRecords,
                           onAddRecord: _showAddPersonalRecordDialog,
                           onDeleteRecord: _deletePersonalRecord,
                         ),
-                        const SizedBox(height: 24.0),
+                        const SizedBox(height: AppSpace.section),
+                        BodyMetricsCard(
+                          heightCm: _heightCm,
+                          weightKg: _weightKg,
+                          gender: _gender,
+                          birthDateLabel: _birthDate == null
+                              ? 'Seçilmedi'
+                              : '${formatDate(_birthDate!)} (${calculateAge(_birthDate!)} yaş)',
+                          onEditHeight: () => _editMetric(
+                            title: 'Boy (cm)',
+                            unit: 'cm',
+                            currentValue: _heightCm,
+                            onApply: (value) => _heightCm = value,
+                          ),
+                          onEditWeight: () => _editMetric(
+                            title: 'Kilo (kg)',
+                            unit: 'kg',
+                            currentValue: _weightKg,
+                            onApply: (value) => _weightKg = value,
+                          ),
+                          onEditGender: _editGender,
+                          onEditBirthDate: _editBirthDate,
+                        ),
+                        const SizedBox(height: AppSpace.section),
+                        GoalsCard(
+                          goalWeightKg: _goalWeightKg,
+                          targetWorkoutsPerWeek: _targetWorkoutsPerWeek,
+                          onEditGoalWeight: () => _editMetric(
+                            title: 'Hedef Kilo (kg)',
+                            unit: 'kg',
+                            currentValue: _goalWeightKg,
+                            onApply: (value) => _goalWeightKg = value,
+                          ),
+                          onEditTargetWorkouts: () => _editIntMetric(
+                            title: 'Haftalık Hedef Antrenman',
+                            unit: 'adet',
+                            currentValue: _targetWorkoutsPerWeek,
+                            onApply: (value) => _targetWorkoutsPerWeek = value,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpace.section),
+                        _GoogleLinkCard(
+                          isLinked: isGoogleLinked,
+                          isLoading: _isLinkingGoogle,
+                          onPressed: _linkGoogleAccount,
+                        ),
+                        const SizedBox(height: AppSpace.section),
                       ],
                     ),
                   );
@@ -1230,6 +1232,88 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       bottomNavigationBar: widget.showBottomNav
           ? const AppBottomNav(selectedIndex: 3)
           : null,
+    );
+  }
+}
+
+/// iOS "inset grouped" stilinde bölüm: etiket + hairline ile ayrılmış satırlar.
+class _GroupSection extends StatelessWidget {
+  const _GroupSection({
+    required this.label,
+    required this.children,
+    this.trailing,
+  });
+
+  final String label;
+  final List<Widget> children;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(
+          label,
+          trailing: trailing,
+          padding: const EdgeInsets.only(left: 4, bottom: AppSpace.sm),
+        ),
+        AppSurface(
+          padding: EdgeInsets.zero,
+          child: Column(
+            children: [
+              for (var i = 0; i < children.length; i++) ...[
+                if (i > 0) const Hairline(indent: AppSpace.lg),
+                children[i],
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _GroupRow extends StatelessWidget {
+  const _GroupRow({required this.label, required this.value, this.onTap});
+
+  final String label;
+  final String value;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final chevron = onTap != null;
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpace.lg,
+          vertical: 15,
+        ),
+        child: Row(
+          children: [
+            Expanded(child: Text(label, style: AppText.bodyMuted)),
+            Flexible(
+              child: Text(
+                value,
+                textAlign: TextAlign.right,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppText.body.copyWith(fontWeight: FontWeight.w500),
+              ),
+            ),
+            if (chevron) ...[
+              const SizedBox(width: 6),
+              const Icon(
+                Icons.chevron_right_rounded,
+                size: 18,
+                color: AppColors.textMuted,
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }
@@ -1258,108 +1342,26 @@ class BodyMetricsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _GlassCard(
-      borderRadius: 14.0,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Vücut Ölçüleri',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: _ProfileScreenState._textHigh,
-                fontWeight: FontWeight.w600,
-                fontSize: 15.0,
-                letterSpacing: -0.2,
-              ),
-            ),
-            const SizedBox(height: 12.0),
-            _MetricEditRow(
-              label: 'Boy',
-              value: '${heightCm.toStringAsFixed(1)} cm',
-              onTap: onEditHeight,
-            ),
-            const SizedBox(height: 8.0),
-            _MetricEditRow(
-              label: 'Kilo',
-              value: '${weightKg.toStringAsFixed(1)} kg',
-              onTap: onEditWeight,
-            ),
-            const SizedBox(height: 8.0),
-            _MetricEditRow(
-              label: 'Cinsiyet',
-              value: gender,
-              onTap: onEditGender,
-            ),
-            const SizedBox(height: 8.0),
-            _MetricEditRow(
-              label: 'Doğum Tarihi',
-              value: birthDateLabel,
-              onTap: onEditBirthDate,
-            ),
-          ],
+    return _GroupSection(
+      label: 'Vücut',
+      children: [
+        _GroupRow(
+          label: 'Boy',
+          value: '${heightCm.toStringAsFixed(1)} cm',
+          onTap: onEditHeight,
         ),
-      ),
-    );
-  }
-}
-
-class _MetricEditRow extends StatelessWidget {
-  const _MetricEditRow({
-    required this.label,
-    required this.value,
-    required this.onTap,
-  });
-
-  final String label;
-  final String value;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12.0),
-        onTap: onTap,
-        child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
-          decoration: BoxDecoration(
-            color: _ProfileScreenState._cardSurfaceSoft,
-            borderRadius: BorderRadius.circular(12.0),
-            border: Border.all(color: _ProfileScreenState._border, width: 1.0),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  label,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: _ProfileScreenState._textMid,
-                    fontSize: 13.0,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              Text(
-                value,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: _ProfileScreenState._textHigh,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13.5,
-                ),
-              ),
-              const SizedBox(width: 8.0),
-              const Icon(
-                Icons.edit_rounded,
-                size: 15.0,
-                color: _ProfileScreenState._textMid,
-              ),
-            ],
-          ),
+        _GroupRow(
+          label: 'Kilo',
+          value: '${weightKg.toStringAsFixed(1)} kg',
+          onTap: onEditWeight,
         ),
-      ),
+        _GroupRow(label: 'Cinsiyet', value: gender, onTap: onEditGender),
+        _GroupRow(
+          label: 'Doğum tarihi',
+          value: birthDateLabel,
+          onTap: onEditBirthDate,
+        ),
+      ],
     );
   }
 }
@@ -1378,86 +1380,57 @@ class _GoogleLinkCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final disabled = isLinked || isLoading;
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14.0),
-        color: _ProfileScreenState._cardSurface,
-        border: Border.all(
-          color: isLinked
-              ? _ProfileScreenState._accentBlue.withValues(alpha: 0.35)
-              : _ProfileScreenState._border,
-          width: 1.0,
-        ),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(14.0),
+    return _GroupSection(
+      label: 'Hesap',
+      children: [
+        InkWell(
           onTap: disabled ? null : onPressed,
           child: Padding(
             padding: const EdgeInsets.symmetric(
-              vertical: 13.0,
-              horizontal: 16.0,
+              horizontal: AppSpace.lg,
+              vertical: 15,
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (isLoading)
                   const SizedBox(
-                    width: 18.0,
-                    height: 18.0,
+                    width: 16,
+                    height: 16,
                     child: CircularProgressIndicator(
-                      strokeWidth: 2.0,
-                      color: _ProfileScreenState._accentPurple,
+                      strokeWidth: 1.5,
+                      color: AppColors.textMid,
                     ),
-                  )
-                else if (isLinked)
-                  const Icon(
-                    Icons.check_circle_rounded,
-                    color: _ProfileScreenState._accentBlue,
-                    size: 19.0,
                   )
                 else
-                  Container(
-                    width: 22.0,
-                    height: 22.0,
-                    alignment: Alignment.center,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Text(
-                      'G',
-                      style: TextStyle(
-                        color: Color(0xFF4285F4),
-                        fontWeight: FontWeight.w900,
-                        fontSize: 14.0,
-                        height: 1.0,
-                      ),
-                    ),
+                  Icon(
+                    isLinked
+                        ? Icons.check_circle_outline_rounded
+                        : Icons.link_rounded,
+                    size: 18,
+                    color: isLinked ? AppColors.emerald : AppColors.textMid,
                   ),
-                const SizedBox(width: 10.0),
-                Text(
-                  isLoading
-                      ? 'Bağlanıyor...'
-                      : isLinked
-                      ? 'Google Hesabı Bağlı'
-                      : 'Google ile Hesabını Bağla',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: isLinked
-                        ? _ProfileScreenState._accentBlue
-                        : _ProfileScreenState._textHigh,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13.5,
+                const SizedBox(width: AppSpace.md),
+                Expanded(
+                  child: Text(
+                    isLoading
+                        ? 'Bağlanıyor…'
+                        : isLinked
+                        ? 'Google hesabı bağlı'
+                        : 'Google ile hesabını bağla',
+                    style: AppText.body.copyWith(fontWeight: FontWeight.w500),
                   ),
                 ),
+                if (!disabled)
+                  const Icon(
+                    Icons.chevron_right_rounded,
+                    size: 18,
+                    color: AppColors.textMuted,
+                  ),
               ],
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 }
@@ -1475,37 +1448,45 @@ class _UserHeader extends StatelessWidget {
     final hasEmail = email != null && email!.isNotEmpty;
     return Row(
       children: [
-        CircleAvatar(
-          radius: 28,
-          backgroundColor: _ProfileScreenState._cardSurfaceSoft,
-          backgroundImage: hasPhoto ? NetworkImage(photoUrl!) : null,
-          child: hasPhoto
-              ? null
-              : const Icon(
-                  Icons.person,
-                  size: 30,
-                  color: _ProfileScreenState._textHigh,
-                ),
+        Container(
+          padding: const EdgeInsets.all(2),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: AppColors.hairlineStrong,
+              width: AppSpace.hairline,
+            ),
+          ),
+          child: CircleAvatar(
+            radius: 26,
+            backgroundColor: AppColors.surfaceRaised,
+            backgroundImage: hasPhoto ? NetworkImage(photoUrl!) : null,
+            child: hasPhoto
+                ? null
+                : const Icon(
+                    Icons.person_outline_rounded,
+                    size: 26,
+                    color: AppColors.textMid,
+                  ),
+          ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppSpace.lg),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 username,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: _ProfileScreenState._textHigh,
-                  fontWeight: FontWeight.w800,
-                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppText.pageTitle.copyWith(fontSize: 24),
               ),
-              const SizedBox(height: 4.0),
+              const SizedBox(height: 2),
               Text(
-                hasEmail ? email! : 'Workout Insights',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: _ProfileScreenState._textMid,
-                  fontWeight: FontWeight.w500,
-                ),
+                hasEmail ? email! : 'Profil',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppText.caption,
               ),
             ],
           ),
@@ -1535,84 +1516,66 @@ class StatsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _GlassCard(
-      borderRadius: 22.0,
-      child: Padding(
-        padding: const EdgeInsets.all(14.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final lastLabel = lastWorkoutRelativeLabel == '-'
+        ? lastWorkoutDate
+        : lastWorkoutRelativeLabel;
+    return AppSurface(
+      padding: const EdgeInsets.symmetric(vertical: AppSpace.xl),
+      child: IntrinsicHeight(
+        child: Row(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Genel Istatistikler',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: _ProfileScreenState._textHigh,
-                    fontWeight: FontWeight.w700,
-                  ),
+            Expanded(
+              child: _TapMetric(
+                onTap: onHistoryTap,
+                child: MetricValue(
+                  value: '$totalWorkouts',
+                  label: 'Antrenman',
+                  style: AppText.metricL,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                 ),
-                if (onStreakTap != null)
-                  InkWell(
-                    borderRadius: BorderRadius.circular(8),
-                    onTap: onStreakTap,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Detaylar',
-                            style: Theme.of(context).textTheme.labelSmall
-                                ?.copyWith(
-                                  color: _ProfileScreenState._accentBlue,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                          ),
-                          const SizedBox(width: 2),
-                          const Icon(
-                            Icons.chevron_right_rounded,
-                            size: 16,
-                            color: _ProfileScreenState._accentBlue,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            _StatRow(
-              label: 'Mevcut Seri (Streak)',
-              value: '$streak gün 🔥',
-              labelColor: _ProfileScreenState._textMid,
-              valueColor: streak > 0
-                  ? const Color(0xFFFF9800)
-                  : _ProfileScreenState._textHigh,
-            ),
-            InkWell(
-              borderRadius: BorderRadius.circular(8),
-              onTap: onHistoryTap,
-              child: _StatRow(
-                label: 'Toplam antrenman',
-                value: '$totalWorkouts ›',
-                labelColor: _ProfileScreenState._textMid,
-                valueColor: _ProfileScreenState._accentBlue,
               ),
             ),
-            _StatRow(
-              label: 'Son antrenman',
-              value: lastWorkoutRelativeLabel == '-'
-                  ? lastWorkoutDate
-                  : '$lastWorkoutDate ($lastWorkoutRelativeLabel)',
-              labelColor: _ProfileScreenState._textMid,
-              valueColor: _ProfileScreenState._textHigh,
+            const Hairline.vertical(),
+            Expanded(
+              child: _TapMetric(
+                onTap: onStreakTap,
+                child: MetricValue(
+                  value: '$streak',
+                  unit: 'gün',
+                  label: 'Seri',
+                  style: AppText.metricL,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                ),
+              ),
+            ),
+            const Hairline.vertical(),
+            Expanded(
+              child: MetricValue(
+                value: lastLabel,
+                label: 'Son antrenman',
+                style: AppText.metricS,
+                crossAxisAlignment: CrossAxisAlignment.center,
+              ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _TapMetric extends StatelessWidget {
+  const _TapMetric({required this.child, this.onTap});
+
+  final Widget child;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppRadius.control),
+      child: Center(child: child),
     );
   }
 }
@@ -1628,66 +1591,12 @@ class _WorkoutHistoryProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _GlassCard(
-      borderRadius: 22.0,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(22.0),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 14.0,
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: AppColors.volcanic.withAlpha(35),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.history_rounded,
-                    color: AppColors.volcanic,
-                    size: 22,
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Antrenman Geçmişi',
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: _ProfileScreenState._textHigh,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        totalWorkouts > 0
-                            ? '$totalWorkouts tamamlanan seans ve MLI puanları'
-                            : 'Tamamlanan seansların dökümü',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: _ProfileScreenState._textMid,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: _ProfileScreenState._textMid,
-                  size: 15,
-                ),
-              ],
-            ),
-          ),
-        ),
+    return AppSurface(
+      padding: EdgeInsets.zero,
+      child: _GroupRow(
+        label: 'Antrenman geçmişi',
+        value: totalWorkouts > 0 ? '$totalWorkouts seans' : 'Döküm',
+        onTap: onTap,
       ),
     );
   }
@@ -1709,37 +1618,20 @@ class GoalsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _GlassCard(
-      borderRadius: 14.0,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Hedefler',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: _ProfileScreenState._textHigh,
-                fontWeight: FontWeight.w600,
-                fontSize: 15.0,
-                letterSpacing: -0.2,
-              ),
-            ),
-            const SizedBox(height: 12.0),
-            _MetricEditRow(
-              label: 'Hedef Kilo',
-              value: '${goalWeightKg.toStringAsFixed(1)} kg',
-              onTap: onEditGoalWeight,
-            ),
-            const SizedBox(height: 8.0),
-            _MetricEditRow(
-              label: 'Haftalık Hedef',
-              value: '$targetWorkoutsPerWeek antrenman',
-              onTap: onEditTargetWorkouts,
-            ),
-          ],
+    return _GroupSection(
+      label: 'Hedefler',
+      children: [
+        _GroupRow(
+          label: 'Hedef kilo',
+          value: '${goalWeightKg.toStringAsFixed(1)} kg',
+          onTap: onEditGoalWeight,
         ),
-      ),
+        _GroupRow(
+          label: 'Haftalık hedef',
+          value: '$targetWorkoutsPerWeek antrenman',
+          onTap: onEditTargetWorkouts,
+        ),
+      ],
     );
   }
 }
@@ -1753,35 +1645,64 @@ class MuscleDistributionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final sorted = distribution.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
+    final total = sorted.fold<double>(0, (a, e) => a + e.value);
+    final max = sorted.isEmpty ? 0.0 : sorted.first.value;
 
-    return _GlassCard(
-      child: Padding(
-        padding: const EdgeInsets.all(14.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Kas Dagilimi',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: _ProfileScreenState._textHigh,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 10),
-            ...sorted.map(
-              (item) => Padding(
-                padding: const EdgeInsets.only(bottom: 6.0),
-                child: _StatRow(
-                  label: item.key.label,
-                  value: item.value.toStringAsFixed(1),
-                  labelColor: _ProfileScreenState._textMid,
-                  valueColor: _ProfileScreenState._textHigh,
-                ),
-              ),
-            ),
-          ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionHeader(
+          'Kas dağılımı',
+          padding: EdgeInsets.only(left: 4, bottom: AppSpace.sm),
         ),
-      ),
+        AppSurface(
+          child: Column(
+            children: [
+              for (final (i, item) in sorted.indexed) ...[
+                if (i > 0) const SizedBox(height: 14),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 64,
+                      child: Text(
+                        item.key.label,
+                        style: AppText.body.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(2),
+                        child: LinearProgressIndicator(
+                          value: max <= 0 ? 0 : item.value / max,
+                          minHeight: 3,
+                          backgroundColor: AppColors.hairline,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            i == 0
+                                ? AppColors.textHigh
+                                : AppColors.chartNeutral,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 52,
+                      child: Text(
+                        total <= 0
+                            ? '-'
+                            : '%${(item.value / total * 100).round()}',
+                        textAlign: TextAlign.right,
+                        style: AppText.metricS.copyWith(fontSize: 14),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -1838,112 +1759,91 @@ class PersonalRecordsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _GlassCard(
-      borderRadius: 22.0,
-      child: Padding(
-        padding: const EdgeInsets.all(14.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    final addButton = TextButton.icon(
+      onPressed: onAddRecord,
+      style: TextButton.styleFrom(
+        foregroundColor: AppColors.textMid,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        minimumSize: const Size(0, 28),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+      icon: const Icon(Icons.add_rounded, size: 16),
+      label: Text(
+        'Ekle',
+        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textMid,
+        ),
+      ),
+    );
+
+    if (records.isEmpty) {
+      return _GroupSection(
+        label: 'Kişisel rekorlar',
+        trailing: addButton,
+        children: const [
+          Padding(
+            padding: EdgeInsets.all(AppSpace.lg),
+            child: Text(
+              'Henüz rekor eklenmedi. Hareket seçip rekorunu kaydet.',
+              style: AppText.bodyMuted,
+            ),
+          ),
+        ],
+      );
+    }
+
+    return _GroupSection(
+      label: 'Kişisel rekorlar',
+      trailing: addButton,
+      children: [
+        for (final (index, record) in records.indexed)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(AppSpace.lg, 6, 4, 6),
+            child: Row(
               children: [
                 Expanded(
                   child: Text(
-                    'Kisisel Rekorlar',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: _ProfileScreenState._textHigh,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    record.exerciseName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppText.body.copyWith(fontWeight: FontWeight.w500),
                   ),
                 ),
-                ElevatedButton.icon(
-                  onPressed: onAddRecord,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _ProfileScreenState._accentPurple,
-                    foregroundColor: _ProfileScreenState._textHigh,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10.0,
-                      vertical: 8.0,
-                    ),
-                    textStyle: Theme.of(context).textTheme.labelMedium
-                        ?.copyWith(fontWeight: FontWeight.w700),
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '${record.recordValue}',
+                        style: AppText.metricS,
+                      ),
+                      TextSpan(
+                        text: record.isTimed ? ' sn' : ' tekrar',
+                        style: AppText.unit,
+                      ),
+                      if (record.hasExtraWeight && record.extraWeightKg != null)
+                        TextSpan(
+                          text:
+                              '  +${record.extraWeightKg!.toStringAsFixed(1)} kg',
+                          style: AppText.unit,
+                        ),
+                    ],
                   ),
-                  icon: const Icon(Icons.add, size: 16.0),
-                  label: const Text('Ekle'),
+                ),
+                IconButton(
+                  onPressed: () => onDeleteRecord(index),
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    size: 16,
+                    color: AppColors.textMuted,
+                  ),
+                  tooltip: 'Sil',
                 ),
               ],
             ),
-            const SizedBox(height: 10.0),
-            if (records.isEmpty)
-              Text(
-                'Henuz rekor eklenmedi. Hareket secip rekorunu kaydet.',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: _ProfileScreenState._textMid,
-                ),
-              )
-            else
-              ...records.asMap().entries.map((entry) {
-                final index = entry.key;
-                final record = entry.value;
-                final extraWeightLabel =
-                    record.hasExtraWeight && record.extraWeightKg != null
-                    ? ' + ${record.extraWeightKg!.toStringAsFixed(1)} kg'
-                    : '';
-
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10.0,
-                      vertical: 10.0,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _ProfileScreenState._cardSurfaceSoft,
-                      borderRadius: BorderRadius.circular(14.0),
-                      border: Border.all(color: _ProfileScreenState._border),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                record.exerciseName,
-                                style: Theme.of(context).textTheme.bodyLarge
-                                    ?.copyWith(
-                                      color: _ProfileScreenState._textHigh,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                              ),
-                              const SizedBox(height: 2.0),
-                              Text(
-                                '${record.recordValue} ${record.isTimed ? 'sn' : 'tekrar'}$extraWeightLabel',
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(
-                                      color: _ProfileScreenState._textMid,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () => onDeleteRecord(index),
-                          icon: const Icon(
-                            Icons.delete_outline_rounded,
-                            color: Color(0xFFFF8E8E),
-                          ),
-                          tooltip: 'Sil',
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }),
-          ],
-        ),
-      ),
+          ),
+      ],
     );
   }
 }
@@ -1960,59 +1860,65 @@ class TrendCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final trendLabel = currentSevenDayLoad >= previousSevenDayLoad
-        ? 'Increasing'
-        : 'Decreasing';
-    final trendIcon = currentSevenDayLoad >= previousSevenDayLoad
-        ? Icons.trending_up
-        : Icons.trending_down;
-    final trendColor = currentSevenDayLoad >= previousSevenDayLoad
-        ? const Color(0xFF3DDC84)
-        : const Color(0xFFFF7A59);
+    final up = currentSevenDayLoad >= previousSevenDayLoad;
+    final delta = previousSevenDayLoad <= 0
+        ? null
+        : (currentSevenDayLoad - previousSevenDayLoad) /
+              previousSevenDayLoad *
+              100;
+    final trendColor = up ? AppColors.emerald : AppColors.textMid;
 
-    return _GlassCard(
-      child: Padding(
-        padding: const EdgeInsets.all(14.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Son 7 Gun Trendi',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: _ProfileScreenState._textHigh,
-                fontWeight: FontWeight.w700,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(
+          'Yük trendi',
+          padding: const EdgeInsets.only(left: 4, bottom: AppSpace.sm),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                up ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
+                size: 12,
+                color: trendColor,
               ),
-            ),
-            const SizedBox(height: 10),
-            _StatRow(
-              label: 'Son 7 gun toplam yuk',
-              value: currentSevenDayLoad.toStringAsFixed(1),
-              labelColor: _ProfileScreenState._textMid,
-              valueColor: _ProfileScreenState._textHigh,
-            ),
-            _StatRow(
-              label: 'Onceki 7 gun toplam yuk',
-              value: previousSevenDayLoad.toStringAsFixed(1),
-              labelColor: _ProfileScreenState._textMid,
-              valueColor: _ProfileScreenState._textHigh,
-            ),
-            const SizedBox(height: 4),
-            Row(
+              const SizedBox(width: 2),
+              Text(
+                delta == null
+                    ? (up ? 'Artış' : 'Düşüş')
+                    : '%${delta.abs().round()} ${up ? 'artış' : 'düşüş'}',
+                style: AppText.caption.copyWith(color: trendColor),
+              ),
+            ],
+          ),
+        ),
+        AppSurface(
+          child: IntrinsicHeight(
+            child: Row(
               children: [
-                Icon(trendIcon, size: 18.0, color: trendColor),
-                const SizedBox(width: 6.0),
-                Text(
-                  trendLabel,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: trendColor,
-                    fontWeight: FontWeight.w600,
+                Expanded(
+                  child: MetricValue(
+                    value: currentSevenDayLoad.toStringAsFixed(1),
+                    unit: 'MLI',
+                    label: 'Son 7 gün',
+                    style: AppText.metricL,
+                  ),
+                ),
+                const Hairline.vertical(),
+                const SizedBox(width: AppSpace.xl),
+                Expanded(
+                  child: MetricValue(
+                    value: previousSevenDayLoad.toStringAsFixed(1),
+                    unit: 'MLI',
+                    label: 'Önceki 7 gün',
+                    style: AppText.metricL.copyWith(color: AppColors.textMid),
                   ),
                 ),
               ],
             ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }
@@ -2024,88 +1930,14 @@ class BalanceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _GlassCard(
-      child: Padding(
-        padding: const EdgeInsets.all(14.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Denge Analizi',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: _ProfileScreenState._textHigh,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              message,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: _ProfileScreenState._textMid,
-              ),
-            ),
-          ],
+    return _GroupSection(
+      label: 'Denge',
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(AppSpace.lg),
+          child: Text(message, style: AppText.bodyMuted),
         ),
-      ),
-    );
-  }
-}
-
-class _StatRow extends StatelessWidget {
-  const _StatRow({
-    required this.label,
-    required this.value,
-    this.labelColor,
-    this.valueColor,
-  });
-
-  final String label;
-  final String value;
-  final Color? labelColor;
-  final Color? valueColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              label,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: labelColor),
-            ),
-          ),
-          Text(
-            value,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: valueColor,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _GlassCard extends StatelessWidget {
-  const _GlassCard({required this.child, this.borderRadius = 14.0});
-
-  final Widget child;
-  final double borderRadius;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: _ProfileScreenState._cardSurface,
-        borderRadius: BorderRadius.circular(borderRadius),
-        border: Border.all(color: _ProfileScreenState._border, width: 1.0),
-      ),
-      child: child,
+      ],
     );
   }
 }

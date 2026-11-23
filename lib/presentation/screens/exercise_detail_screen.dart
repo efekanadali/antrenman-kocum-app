@@ -11,10 +11,32 @@ import 'package:calisthenics_app/core/utils/enum_label.dart';
 import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/presentation/theme/app_theme.dart';
+import 'package:calisthenics_app/presentation/widgets/ui/ui.dart';
 
 final _allExercisesProvider = FutureProvider<List<Exercise>>((ref) {
   return ref.watch(exerciseRepositoryProvider).getAllExercises();
 });
+
+/// Bir bölgenin aktivasyon satırı. [percent] alt kompartıman yüzdelerinin
+/// toplamıdır; böylece "Göğüs %55" ile "Üst %5 · Orta %30 · Alt %20" her
+/// zaman tutarlıdır.
+class _ActivationRow {
+  const _ActivationRow({
+    required this.name,
+    required this.percent,
+    required this.rating,
+    required this.relative,
+    required this.parts,
+  });
+
+  final String name;
+  final int percent;
+  final int rating;
+
+  /// En baskın bölgeye göre 0–1.
+  final double relative;
+  final List<({String label, int percent})> parts;
+}
 
 class ExerciseDetailScreen extends ConsumerWidget {
   const ExerciseDetailScreen({super.key, required this.exercise});
@@ -25,21 +47,6 @@ class ExerciseDetailScreen extends ConsumerWidget {
     if (rating < 1) return 1;
     if (rating > 5) return 5;
     return rating;
-  }
-
-  double _ratingToPercent(int rating) {
-    final clamped = _clampRating(rating);
-    return clamped / 5.0;
-  }
-
-  Color _activationColor(double percent) {
-    if (percent >= 0.8) {
-      return AppColors.volcanic; // %80-100: Volkanik Turuncu (#FF5533)
-    } else if (percent >= 0.5) {
-      return AppColors.amber; // %50-70: Kehribar Sarı (#F59E0B)
-    } else {
-      return AppColors.emerald; // Düşük: Zümrüt Yeşili (#10B981)
-    }
   }
 
   String _activationLabel(int rating) {
@@ -95,234 +102,57 @@ class ExerciseDetailScreen extends ConsumerWidget {
     }
   }
 
-  /// Kompartıman ağırlıklarından bölge aktivasyon satırları: bölge puanı en
-  /// baskın bölgeye göre (1–5), alt satırda kompartıman payları (%).
-  List<({String name, int rating, String? detail})> _activationRows() {
+  /// Kompartıman ağırlıklarından bölge satırları. Kompartıman yüzdeleri tek
+  /// tek yuvarlanır, bölge yüzdesi bunların toplamıdır.
+  List<_ActivationRow> _activationRows() {
     final weights = exercise.compartmentWeights;
     if (weights.isEmpty) {
+      // Eski veri: yalnızca 1–5 kas puanları var.
       return [
         for (final muscle in exercise.targetMuscleGroups)
-          (
-            name: _localizedMuscleName(muscle),
-            rating: exercise.muscleRatings[muscle] ?? 1,
-            detail: null,
-          ),
+          () {
+            final rating = _clampRating(exercise.muscleRatings[muscle] ?? 1);
+            return _ActivationRow(
+              name: _localizedMuscleName(muscle),
+              percent: rating * 20,
+              rating: rating,
+              relative: rating / 5,
+              parts: const [],
+            );
+          }(),
       ];
     }
     final regions = targetRegions(weights);
     if (regions.isEmpty) return const [];
-    final maxWeight = regionWeight(weights, regions.first);
-    return [
-      for (final region in regions)
-        (
+
+    final rows = <_ActivationRow>[];
+    for (final region in regions) {
+      final parts = [
+        for (final c in region.compartments)
+          if ((weights[c] ?? 0) > 0)
+            (label: c.label, percent: ((weights[c] ?? 0) * 100).round()),
+      ];
+      rows.add(
+        _ActivationRow(
           name: region.label,
-          rating: (regionWeight(weights, region) / maxWeight * 5)
-              .round()
-              .clamp(1, 5)
-              .toInt(),
-          detail: [
-            for (final c in region.compartments)
-              if ((weights[c] ?? 0) > 0)
-                '${c.label} %${((weights[c] ?? 0) * 100).round()}',
-          ].join(' · '),
-        ),
-    ];
-  }
-
-  Widget _buildActivationBar(
-    BuildContext context,
-    String muscleName,
-    int rating, {
-    String? detail,
-  }) {
-    final clamped = _clampRating(rating);
-    final percent = _ratingToPercent(clamped);
-    final color = _activationColor(percent);
-    final label = _activationLabel(clamped);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceSoft,
-        borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: AppColors.border, width: 1.0),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                muscleName,
-                style: const TextStyle(
-                  color: AppColors.textHigh,
-                  fontSize: 14.0,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.2,
-                ),
-              ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3.5),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(6.0),
-                  border: Border.all(
-                    color: color.withValues(alpha: 0.35),
-                    width: 1.0,
-                  ),
-                ),
-                child: Text(
-                  '%${(percent * 100).round()} · $label',
-                  style: TextStyle(
-                    color: color,
-                    fontSize: 11.0,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10.0),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(999.0),
-            child: LinearProgressIndicator(
-              value: percent,
-              minHeight: 6.0,
-              backgroundColor: AppColors.surface,
-              valueColor: AlwaysStoppedAnimation<Color>(color),
-            ),
-          ),
-          if (detail != null && detail.isNotEmpty) ...[
-            const SizedBox(height: 6.0),
-            Text(
-              detail,
-              style: const TextStyle(
-                color: AppColors.textMid,
-                fontSize: 11.0,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFormattedDescription(BuildContext context, String description) {
-    final rawLines = description.split('\n');
-    final sections = <_DescriptionSection>[];
-
-    String currentTitle = '';
-    final currentLines = <String>[];
-
-    for (final rawLine in rawLines) {
-      final line = rawLine.trim();
-      if (line.isEmpty) continue;
-
-      if (line.startsWith('Kurulum:') ||
-          line.startsWith('Uygulama:') ||
-          line.startsWith('Ipucu:') ||
-          line.startsWith('İpucu:') ||
-          line.startsWith('Sik hata:') ||
-          line.startsWith('Sık hata:')) {
-        if (currentTitle.isNotEmpty || currentLines.isNotEmpty) {
-          sections.add(_DescriptionSection(
-            title: currentTitle,
-            body: currentLines.join(' '),
-          ));
-          currentLines.clear();
-        }
-        final colonIndex = line.indexOf(':');
-        currentTitle = line.substring(0, colonIndex + 1);
-        final rest = line.substring(colonIndex + 1).trim();
-        if (rest.isNotEmpty) {
-          currentLines.add(rest);
-        }
-      } else {
-        currentLines.add(line);
-      }
-    }
-
-    if (currentTitle.isNotEmpty || currentLines.isNotEmpty) {
-      sections.add(_DescriptionSection(
-        title: currentTitle,
-        body: currentLines.join(' '),
-      ));
-    }
-
-    if (sections.isEmpty) {
-      return Text(
-        description,
-        style: const TextStyle(
-          color: AppColors.textMid,
-          fontSize: 14.0,
-          height: 1.5,
+          percent: parts.fold(0, (a, p) => a + p.percent),
+          rating: 0,
+          relative: 0,
+          parts: parts,
         ),
       );
     }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: sections.map((section) {
-        Color dotColor = AppColors.nordicIce;
-        final lower = section.title.toLowerCase();
-        if (lower.contains('uygulama')) {
-          dotColor = AppColors.volcanic;
-        } else if (lower.contains('pucu')) {
-          dotColor = AppColors.amber;
-        } else if (lower.contains('hata')) {
-          dotColor = const Color(0xFFEF4444);
-        } else if (lower.contains('kurulum')) {
-          dotColor = AppColors.nordicIce;
-        }
-
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 14.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Küçük mat renkli nokta
-              Container(
-                margin: const EdgeInsets.only(top: 6.0, right: 10.0),
-                width: 6.0,
-                height: 6.0,
-                decoration: BoxDecoration(
-                  color: dotColor,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              Expanded(
-                child: RichText(
-                  text: TextSpan(
-                    children: [
-                      if (section.title.isNotEmpty)
-                        TextSpan(
-                          text: '${section.title} ',
-                          style: const TextStyle(
-                            color: AppColors.textHigh,
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.w700,
-                            height: 1.5,
-                          ),
-                        ),
-                      TextSpan(
-                        text: section.body,
-                        style: const TextStyle(
-                          color: AppColors.textMid,
-                          fontSize: 13.5,
-                          height: 1.55,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-    );
+    final maxPercent = rows.first.percent <= 0 ? 1 : rows.first.percent;
+    return [
+      for (final r in rows)
+        _ActivationRow(
+          name: r.name,
+          percent: r.percent,
+          rating: (r.percent / maxPercent * 5).round().clamp(1, 5).toInt(),
+          relative: (r.percent / maxPercent).clamp(0.0, 1.0).toDouble(),
+          parts: r.parts,
+        ),
+    ];
   }
 
   Exercise? _findExerciseByName({
@@ -340,334 +170,207 @@ class ExerciseDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final activationRows = _activationRows();
-    final prerequisiteLevelLabel = _prerequisiteLevelLabel(exercise.level);
+    final rows = _activationRows();
     final allExercisesAsync = ref.watch(_allExercisesProvider);
+    final weights = exercise.compartmentWeights;
 
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20.0, 16.0, 20.0, 32.0),
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpace.page,
+            AppSpace.sm,
+            AppSpace.page,
+            AppSpace.section,
+          ),
+          children: [
+            _Header(title: exercise.name),
+            const SizedBox(height: AppSpace.xl),
+            Row(
+              children: [
+                Expanded(
+                  child: _InfoTile(
+                    label: 'Seviye',
+                    value: exercise.level.label,
+                  ),
+                ),
+                const SizedBox(width: AppSpace.md),
+                Expanded(
+                  child: _InfoTile(
+                    label: 'Zorluk',
+                    value: exercise.difficulty.label,
+                  ),
+                ),
+              ],
+            ),
+            if (exercise.prerequisiteExercises.isNotEmpty) ...[
+              const SizedBox(height: AppSpace.section),
+              SectionHeader(
+                'Önce uzmanlaşman gerekenler',
+                padding: const EdgeInsets.only(bottom: AppSpace.md),
+                trailing: Text(
+                  _prerequisiteLevelLabel(exercise.level),
+                  style: AppText.caption.copyWith(color: AppColors.textMid),
+                ),
+              ),
+              Wrap(
+                spacing: AppSpace.sm,
+                runSpacing: AppSpace.sm,
+                children: [
+                  for (final name in exercise.prerequisiteExercises)
+                    _PrerequisiteChip(
+                      name: name,
+                      target: allExercisesAsync.maybeWhen(
+                        data: (all) =>
+                            _findExerciseByName(allExercises: all, name: name),
+                        orElse: () => null,
+                      ),
+                    ),
+                ],
+              ),
+            ],
+            const SizedBox(height: AppSpace.section),
+            _ActivationSection(
+              rows: rows,
+              weights: weights,
+              activationLabel: _activationLabel,
+            ),
+            const SizedBox(height: AppSpace.section),
+            const Hairline(),
+            const SizedBox(height: AppSpace.xxl),
+            const Text(
+              'Detaylı Açıklama & Form İpuçları',
+              style: AppText.cardTitle,
+            ),
+            const SizedBox(height: AppSpace.lg),
+            _FormattedDescription(description: exercise.description),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Başlık ve bilgi kutuları
+// ---------------------------------------------------------------------------
+
+class _Header extends StatelessWidget {
+  const _Header({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        IconButton(
+          onPressed: () => Navigator.of(context).maybePop(),
+          icon: const Icon(Icons.arrow_back_rounded, size: 22),
+          color: AppColors.textHigh,
+          tooltip: 'Geri',
+          visualDensity: VisualDensity.compact,
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+          style: IconButton.styleFrom(alignment: Alignment.centerLeft),
+        ),
+        const SizedBox(width: AppSpace.xs),
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Üst Gezinme Başlığı
-              Row(
-                children: [
-                  _BackButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                  ),
-                  const SizedBox(width: 14.0),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          exercise.name,
-                          style: const TextStyle(
-                            color: AppColors.textHigh,
-                            fontSize: 22.0,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.3,
-                          ),
-                        ),
-                        const SizedBox(height: 3.0),
-                        const Text(
-                          'Biyomekanik Hareket Detayı',
-                          style: TextStyle(
-                            color: AppColors.textMid,
-                            fontSize: 13.0,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              Text(
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: AppText.pageTitle.copyWith(fontSize: 24),
               ),
-              const SizedBox(height: 16.0),
+              const SizedBox(height: 2),
+              const Text(
+                'Biyomekanik hareket detayı',
+                style: AppText.bodyMuted,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
 
-              // Uzmanlaşman Gereken Hareketler Bölümü (Prerequisites)
-              if (exercise.prerequisiteExercises.isNotEmpty) ...[
-                Container(
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(16.0),
-                    border: Border.all(color: AppColors.border, width: 1.0),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Expanded(
-                            child: Text(
-                              'Uzmanlaşman Gereken Hareketler',
-                              style: TextStyle(
-                                color: AppColors.textHigh,
-                                fontSize: 14.5,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: -0.2,
-                              ),
-                            ),
-                          ),
-                          // Volkanik Turuncu Seviye Kapsülü
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10.0,
-                              vertical: 4.5,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.volcanic.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(8.0),
-                              border: Border.all(
-                                color: AppColors.volcanic.withValues(alpha: 0.35),
-                                width: 1.0,
-                              ),
-                            ),
-                            child: Text(
-                              prerequisiteLevelLabel,
-                              style: const TextStyle(
-                                color: AppColors.volcanic,
-                                fontSize: 11.0,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12.0),
-                      Wrap(
-                        spacing: 8.0,
-                        runSpacing: 8.0,
-                        children: exercise.prerequisiteExercises.map((name) {
-                          final matchedExercise = allExercisesAsync.maybeWhen(
-                            data: (allExercises) => _findExerciseByName(
-                              allExercises: allExercises,
-                              name: name,
-                            ),
-                            orElse: () => null,
-                          );
+class _InfoTile extends StatelessWidget {
+  const _InfoTile({required this.label, required this.value});
 
-                          return Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(10.0),
-                              onTap: matchedExercise == null
-                                  ? null
-                                  : () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        AppRoutes.detail,
-                                        arguments: matchedExercise,
-                                      );
-                                    },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10.0,
-                                  vertical: 6.0,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.surfaceSoft,
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  border: Border.all(
-                                    color: AppColors.border,
-                                    width: 1.0,
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(
-                                      Icons.check_circle_outline_rounded,
-                                      size: 14.0,
-                                      color: AppColors.volcanic,
-                                    ),
-                                    const SizedBox(width: 6.0),
-                                    Text(
-                                      name,
-                                      style: const TextStyle(
-                                        color: AppColors.textHigh,
-                                        fontSize: 12.0,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ),
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppSurface(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpace.lg,
+        vertical: AppSpace.md + 2,
+      ),
+      radius: AppRadius.control,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(trUpper(label), style: AppText.sectionLabel),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppText.cardTitle,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PrerequisiteChip extends StatelessWidget {
+  const _PrerequisiteChip({required this.name, required this.target});
+
+  final String name;
+  final Exercise? target;
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = target != null;
+    return Material(
+      color: AppColors.surfaceRaised,
+      borderRadius: BorderRadius.circular(AppRadius.control),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadius.control),
+        onTap: enabled
+            ? () => Navigator.pushNamed(
+                context,
+                AppRoutes.detail,
+                arguments: target,
+              )
+            : null,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                name,
+                style: AppText.caption.copyWith(
+                  color: AppColors.textHigh,
+                  fontWeight: FontWeight.w600,
                 ),
-                const SizedBox(height: 14.0),
+              ),
+              if (enabled) ...[
+                const SizedBox(width: 4),
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  size: 16,
+                  color: AppColors.textMuted,
+                ),
               ],
-
-              // 2 Sütunlu Minimalist Mat Grafit Seviye / Zorluk Bölmeleri
-              Container(
-                padding: const EdgeInsets.all(14.0),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(16.0),
-                  border: Border.all(color: AppColors.border, width: 1.0),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14.0,
-                          vertical: 12.0,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceSoft,
-                          borderRadius: BorderRadius.circular(12.0),
-                          border: Border.all(
-                            color: AppColors.border,
-                            width: 1.0,
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'SEVİYE',
-                              style: TextStyle(
-                                color: AppColors.textMuted,
-                                fontSize: 10.5,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                            const SizedBox(height: 4.0),
-                            Text(
-                              exercise.level.label,
-                              style: const TextStyle(
-                                color: AppColors.textHigh,
-                                fontSize: 15.0,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10.0),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14.0,
-                          vertical: 12.0,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceSoft,
-                          borderRadius: BorderRadius.circular(12.0),
-                          border: Border.all(
-                            color: AppColors.border,
-                            width: 1.0,
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'ZORLUK',
-                              style: TextStyle(
-                                color: AppColors.textMuted,
-                                fontSize: 10.5,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                            const SizedBox(height: 4.0),
-                            Text(
-                              exercise.difficulty.label,
-                              style: const TextStyle(
-                                color: AppColors.volcanic,
-                                fontSize: 15.0,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 14.0),
-
-              // Çalıştırdığı Bölgeler (Kas Aktivasyon Bölümü)
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(16.0),
-                  border: Border.all(color: AppColors.border, width: 1.0),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Çalıştırdığı Bölgeler',
-                      style: TextStyle(
-                        color: AppColors.textHigh,
-                        fontSize: 15.0,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.2,
-                      ),
-                    ),
-                    const SizedBox(height: 12.0),
-                    Column(
-                      children: activationRows.map((row) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: _buildActivationBar(
-                            context,
-                            row.name,
-                            row.rating,
-                            detail: row.detail,
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 14.0),
-
-              // Detaylı Açıklama (Kurulum, Uygulama, İpucu, Sık Hata)
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(16.0),
-                  border: Border.all(color: AppColors.border, width: 1.0),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Detaylı Açıklama & Form İpuçları',
-                      style: TextStyle(
-                        color: AppColors.textHigh,
-                        fontSize: 15.0,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.2,
-                      ),
-                    ),
-                    const SizedBox(height: 14.0),
-                    _buildFormattedDescription(
-                      context,
-                      exercise.description,
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
         ),
@@ -676,39 +379,231 @@ class ExerciseDetailScreen extends ConsumerWidget {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Hedef kaslar & aktivasyon
+// ---------------------------------------------------------------------------
+
+class _ActivationSection extends StatelessWidget {
+  const _ActivationSection({
+    required this.rows,
+    required this.weights,
+    required this.activationLabel,
+  });
+
+  final List<_ActivationRow> rows;
+  final Map<MuscleCompartment, double> weights;
+  final String Function(int rating) activationLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Hedef Kaslar & Aktivasyon', style: AppText.cardTitle),
+        const SizedBox(height: AppSpace.lg),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Wrap(
+                direction: Axis.vertical,
+                spacing: AppSpace.sm,
+                children: [
+                  for (final r in rows.take(6))
+                    _MusclePill(label: r.name, primary: r.relative >= 0.6),
+                ],
+              ),
+            ),
+            if (weights.isNotEmpty)
+              AnatomicalMuscleMap(intensities: weights, height: 236),
+          ],
+        ),
+        const SizedBox(height: AppSpace.xxl),
+        for (final (i, r) in rows.indexed) ...[
+          if (i > 0) const SizedBox(height: AppSpace.lg + 2),
+          _ActivationBar(row: r, label: activationLabel(r.rating)),
+        ],
+      ],
+    );
+  }
+}
+
+class _MusclePill extends StatelessWidget {
+  const _MusclePill({required this.label, required this.primary});
+
+  final String label;
+  final bool primary;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(10, 7, 14, 7),
+      decoration: BoxDecoration(
+        color: primary ? AppColors.accent : Colors.transparent,
+        borderRadius: BorderRadius.circular(999),
+        border: primary
+            ? null
+            : Border.all(color: AppColors.hairlineStrong, width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            primary
+                ? Icons.check_rounded
+                : Icons.radio_button_unchecked_rounded,
+            size: 15,
+            color: primary ? AppColors.onAccent : AppColors.textMuted,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: AppText.caption.copyWith(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: primary ? AppColors.onAccent : AppColors.textMid,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActivationBar extends StatelessWidget {
+  const _ActivationBar({required this.row, required this.label});
+
+  final _ActivationRow row;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final color =
+        AnatomicalMuscleMap.fillFor(row.relative, AppColors.accent) ??
+        AppColors.chartNeutral;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: '${row.name} ',
+                style: AppText.body.copyWith(fontWeight: FontWeight.w600),
+              ),
+              TextSpan(
+                text: '%${row.percent}',
+                style: AppText.metricS.copyWith(fontSize: 15),
+              ),
+              TextSpan(text: '  ·  $label', style: AppText.caption),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpace.sm),
+        SegmentedBar(
+          value: row.percent / 100,
+          segments: 20,
+          height: 4,
+          gap: 2,
+          color: color,
+        ),
+        if (row.parts.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Text(
+            [
+              for (final p in row.parts) '${p.label} %${p.percent}',
+            ].join('  ·  '),
+            style: AppText.caption.copyWith(fontSize: 11.5),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Açıklama
+// ---------------------------------------------------------------------------
+
 class _DescriptionSection {
   const _DescriptionSection({required this.title, required this.body});
   final String title;
   final String body;
 }
 
-class _BackButton extends StatelessWidget {
-  const _BackButton({required this.onPressed});
+class _FormattedDescription extends StatelessWidget {
+  const _FormattedDescription({required this.description});
 
-  final VoidCallback onPressed;
+  final String description;
+
+  static const _titles = [
+    'Kurulum:',
+    'Uygulama:',
+    'Ipucu:',
+    'İpucu:',
+    'Sik hata:',
+    'Sık hata:',
+  ];
+
+  List<_DescriptionSection> _parse() {
+    final sections = <_DescriptionSection>[];
+    var currentTitle = '';
+    final currentLines = <String>[];
+
+    for (final rawLine in description.split('\n')) {
+      final line = rawLine.trim();
+      if (line.isEmpty) continue;
+      if (_titles.any(line.startsWith)) {
+        if (currentTitle.isNotEmpty || currentLines.isNotEmpty) {
+          sections.add(
+            _DescriptionSection(
+              title: currentTitle,
+              body: currentLines.join(' '),
+            ),
+          );
+          currentLines.clear();
+        }
+        final colonIndex = line.indexOf(':');
+        currentTitle = line.substring(0, colonIndex);
+        final rest = line.substring(colonIndex + 1).trim();
+        if (rest.isNotEmpty) currentLines.add(rest);
+      } else {
+        currentLines.add(line);
+      }
+    }
+    if (currentTitle.isNotEmpty || currentLines.isNotEmpty) {
+      sections.add(
+        _DescriptionSection(title: currentTitle, body: currentLines.join(' ')),
+      );
+    }
+    return sections;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(12.0),
-        child: Container(
-          width: 40.0,
-          height: 40.0,
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(12.0),
-            border: Border.all(color: AppColors.border, width: 1.0),
+    final sections = _parse();
+    if (sections.isEmpty) {
+      return Text(description, style: AppText.bodyMuted.copyWith(height: 1.5));
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final (i, section) in sections.indexed) ...[
+          if (i > 0) ...[
+            const SizedBox(height: AppSpace.md),
+            const Hairline(),
+            const SizedBox(height: AppSpace.md),
+          ],
+          if (section.title.isNotEmpty) ...[
+            Text(trUpper(section.title), style: AppText.sectionLabel),
+            const SizedBox(height: 6),
+          ],
+          Text(
+            section.body,
+            style: AppText.body.copyWith(color: AppColors.textMid, height: 1.5),
           ),
-          child: const Icon(
-            Icons.arrow_back_rounded,
-            color: AppColors.textHigh,
-            size: 20.0,
-          ),
-        ),
-      ),
+        ],
+      ],
     );
   }
 }

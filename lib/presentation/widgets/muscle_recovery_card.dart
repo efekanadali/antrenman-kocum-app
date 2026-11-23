@@ -7,9 +7,10 @@ import 'package:calisthenics_app/domain/models/muscle_recovery_state.dart';
 import 'package:calisthenics_app/presentation/providers/muscle_recovery_provider.dart';
 import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 import 'package:calisthenics_app/presentation/widgets/biomechanics_info_sheet.dart';
+import 'package:calisthenics_app/presentation/widgets/ui/ui.dart';
 
-/// 6 ana bölgenin toparlanma durumunu gösterir; bir bölgeye dokunulduğunda
-/// kompartıman (17 alt bölge) ayrıntısı açılır.
+/// 6 ana bölgenin toparlanma durumunu WHOOP tarzı segmentli barlarla gösterir;
+/// bir bölgeye dokunulduğunda kompartıman (17 alt bölge) ayrıntısı açılır.
 ///
 /// Bölge durumu tüm kompartımanlarından türetilir: herhangi bir kompartımanı
 /// çalıştırılmış bölge "toparlanıyor" görünür ve hazır olma zamanı en geç
@@ -17,13 +18,8 @@ import 'package:calisthenics_app/presentation/widgets/biomechanics_info_sheet.da
 class MuscleRecoveryCard extends ConsumerStatefulWidget {
   const MuscleRecoveryCard({super.key});
 
-  static const Color _surface = AppColors.surface; // #13171C
-  static const Color _border = AppColors.border; // #1E232A
-  static const Color _ready = AppColors.emerald; // Mat Toparlanma Yeşili
-  static const Color _recovering = AppColors.volcanic; // Mat Volkanik Turuncu
-  static const Color _volcanic = AppColors.volcanic;
-  static const Color _textHigh = AppColors.textHigh; // #F1F5F9
-  static const Color _textMid = AppColors.textMid; // #94A3B8
+  static const Color _ready = AppColors.emerald;
+  static const Color _recovering = AppColors.amber;
 
   @override
   ConsumerState<MuscleRecoveryCard> createState() => _MuscleRecoveryCardState();
@@ -45,54 +41,49 @@ class _MuscleRecoveryCardState extends ConsumerState<MuscleRecoveryCard> {
     final regions = state.regions;
     final now = DateTime.now();
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: MuscleRecoveryCard._surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: MuscleRecoveryCard._border, width: 1),
+    final readyCount = MuscleRegion.values.where((r) {
+      final readyAt = regions[r]?.readyAt;
+      return readyAt == null || !now.isBefore(readyAt);
+    }).length;
+
+    return AppSurface(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpace.card,
+        AppSpace.lg,
+        AppSpace.md,
+        AppSpace.sm,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(
-                Icons.healing_rounded,
-                color: MuscleRecoveryCard._ready,
-                size: 18,
-              ),
-              const SizedBox(width: 8),
-              const Expanded(
-                child: Text(
-                  'Kas Toparlanma Durumu',
-                  style: TextStyle(
-                    color: MuscleRecoveryCard._textHigh,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: -0.2,
-                  ),
-                ),
-              ),
+              const Expanded(child: SectionHeader('Toparlanma')),
               if (async.isLoading)
-                const SizedBox(
-                  width: 14,
-                  height: 14,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: MuscleRecoveryCard._volcanic,
+                const Padding(
+                  padding: EdgeInsets.only(right: AppSpace.sm),
+                  child: SizedBox(
+                    width: 12,
+                    height: 12,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 1.5,
+                      color: AppColors.textMuted,
+                    ),
                   ),
                 ),
+              Text(
+                '$readyCount/${MuscleRegion.values.length} hazır',
+                style: AppText.caption.copyWith(color: AppColors.textMid),
+              ),
               IconButton(
                 icon: const Icon(
                   Icons.info_outline,
-                  color: MuscleRecoveryCard._textMid,
-                  size: 17,
+                  color: AppColors.textMuted,
+                  size: 16,
                 ),
                 tooltip: 'Toparlanma & RIR Bilgisi',
                 padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                 visualDensity: VisualDensity.compact,
                 onPressed: () => showBiomechanicsInfoSheet(
                   context,
@@ -101,61 +92,184 @@ class _MuscleRecoveryCardState extends ConsumerState<MuscleRecoveryCard> {
               ),
             ],
           ),
-          const SizedBox(height: 2),
-          const Text(
-            'RIR\'e ve kas büyüklüğüne göre kişiselleştirilmiş toparlanma · '
-            'ayrıntı için bölgeye dokun',
-            style: TextStyle(color: MuscleRecoveryCard._textMid, fontSize: 11.5),
+          const SizedBox(height: AppSpace.md),
+          _FatigueMap(state: state, now: now),
+          const SizedBox(height: AppSpace.md),
+          const Padding(
+            padding: EdgeInsets.only(right: AppSpace.sm),
+            child: Hairline(),
           ),
-          const SizedBox(height: 14),
-          for (final region in MuscleRegion.values) ...[
+          for (final (i, region) in MuscleRegion.values.indexed) ...[
+            if (i > 0)
+              const Padding(
+                padding: EdgeInsets.only(right: AppSpace.sm),
+                child: Hairline(),
+              ),
             InkWell(
               key: ValueKey('recovery-region-${region.name}'),
               borderRadius: BorderRadius.circular(8),
               onTap: () => _toggle(region),
-              child: _RecoveryBar(
-                label: region.label,
-                labelWidth: 52,
-                now: now,
-                trainedAt: regions[region]?.lastTrainedAt,
-                readyAt: regions[region]?.readyAt,
-                recoveryHours: regions[region]?.recoveryHours,
-                averageRir: regions[region]?.averageRir,
-                trailing: Icon(
-                  _expanded.contains(region)
-                      ? Icons.expand_less_rounded
-                      : Icons.expand_more_rounded,
-                  size: 18,
-                  color: MuscleRecoveryCard._textMid,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                child: _RecoveryBar(
+                  label: region.label,
+                  labelWidth: 64,
+                  now: now,
+                  trainedAt: regions[region]?.lastTrainedAt,
+                  readyAt: regions[region]?.readyAt,
+                  recoveryHours: regions[region]?.recoveryHours,
+                  averageRir: regions[region]?.averageRir,
+                  trailing: AnimatedRotation(
+                    turns: _expanded.contains(region) ? 0.5 : 0,
+                    duration: const Duration(milliseconds: 200),
+                    child: const Icon(
+                      Icons.expand_more_rounded,
+                      size: 18,
+                      color: AppColors.textMuted,
+                    ),
+                  ),
                 ),
               ),
             ),
-            if (_expanded.contains(region))
-              Padding(
-                padding: const EdgeInsets.only(left: 14, top: 6),
-                child: Column(
-                  children: [
-                    for (final c in region.compartments) ...[
-                      _RecoveryBar(
-                        key: ValueKey('recovery-compartment-${c.firestoreKey}'),
-                        label: c.label,
-                        labelWidth: 108,
-                        compact: true,
-                        now: now,
-                        trainedAt: state.compartments[c]?.lastTrainedAt,
-                        readyAt: state.compartments[c]?.readyAt,
-                        recoveryHours: state.compartments[c]?.recoveryHours,
-                        averageRir: state.compartments[c]?.averageRir,
+            AnimatedSize(
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+              alignment: Alignment.topCenter,
+              child: _expanded.contains(region)
+                  ? Padding(
+                      padding: const EdgeInsets.only(
+                        left: 4,
+                        bottom: AppSpace.md,
+                        right: AppSpace.sm,
                       ),
-                      const SizedBox(height: 6),
-                    ],
-                  ],
-                ),
-              ),
-            const SizedBox(height: 9),
+                      child: IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const Hairline.vertical(
+                              color: AppColors.hairlineStrong,
+                            ),
+                            const SizedBox(width: AppSpace.md),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  for (final c in region.compartments)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 6,
+                                      ),
+                                      child: _RecoveryBar(
+                                        key: ValueKey(
+                                          'recovery-compartment-${c.firestoreKey}',
+                                        ),
+                                        label: c.label,
+                                        labelWidth: 96,
+                                        compact: true,
+                                        now: now,
+                                        trainedAt: state
+                                            .compartments[c]
+                                            ?.lastTrainedAt,
+                                        readyAt: state.compartments[c]?.readyAt,
+                                        recoveryHours: state
+                                            .compartments[c]
+                                            ?.recoveryHours,
+                                        averageRir:
+                                            state.compartments[c]?.averageRir,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : const SizedBox(width: double.infinity),
+            ),
           ],
         ],
       ),
+    );
+  }
+}
+
+/// Ön/arka silüet üzerinde kompartıman yorgunluğu (1 − toparlanma).
+class _FatigueMap extends StatelessWidget {
+  const _FatigueMap({required this.state, required this.now});
+
+  final MuscleRecoveryState state;
+  final DateTime now;
+
+  @override
+  Widget build(BuildContext context) {
+    final fatigue = <MuscleCompartment, double>{};
+    state.compartments.forEach((c, r) {
+      final readyAt = r.readyAt;
+      if (!now.isBefore(readyAt)) return;
+      final hours = r.recoveryHours;
+      var progress = 0.0;
+      if (hours > 0) {
+        final elapsed = now.difference(r.lastTrainedAt).inMinutes;
+        progress = (elapsed / (hours * 60)).clamp(0.0, 1.0).toDouble();
+      }
+      fatigue[c] = 1 - progress;
+    });
+    return Row(
+      children: [
+        AnatomicalMuscleMap(
+          intensities: fatigue,
+          activeColor: MuscleRecoveryCard._recovering,
+          normalize: false,
+          height: 170,
+        ),
+        const SizedBox(width: AppSpace.lg),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                fatigue.isEmpty ? 'Tüm kaslar hazır' : 'Yorgun bölgeler',
+                style: AppText.body.copyWith(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                fatigue.isEmpty
+                    ? 'Son antrenmanlarının etkisi geçti.'
+                    : '${fatigue.length} alt bölge toparlanma sürecinde.',
+                style: AppText.caption,
+              ),
+              const SizedBox(height: AppSpace.md),
+              const _Legend(
+                color: MuscleRecoveryCard._recovering,
+                label: 'Yüksek yorgunluk',
+              ),
+              const SizedBox(height: 6),
+              _Legend(
+                color: MuscleRecoveryCard._recovering.withValues(alpha: 0.45),
+                label: 'Kısmen toparlandı',
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _Legend extends StatelessWidget {
+  const _Legend({required this.color, required this.label});
+
+  final Color color;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        StatusDot(color: color),
+        const SizedBox(width: 6),
+        Text(label, style: AppText.caption.copyWith(fontSize: 11)),
+      ],
     );
   }
 }
@@ -199,11 +313,23 @@ class _RecoveryBar extends StatelessWidget {
       final elapsed = now.difference(trainedAt!).inMinutes;
       progress = (elapsed / (recoveryHours! * 60)).clamp(0.0, 1.0).toDouble();
     }
-    final color =
-        ready ? MuscleRecoveryCard._ready : MuscleRecoveryCard._recovering;
+    final color = ready
+        ? MuscleRecoveryCard._ready
+        : MuscleRecoveryCard._recovering;
     final percent = (progress * 100).round();
 
+    final valueStyle = compact
+        ? AppText.caption.copyWith(
+            fontWeight: FontWeight.w600,
+            color: ready ? MuscleRecoveryCard._ready : AppColors.textMid,
+          )
+        : AppText.metricS.copyWith(
+            fontSize: 14,
+            color: ready ? MuscleRecoveryCard._ready : AppColors.textHigh,
+          );
+
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
@@ -212,65 +338,46 @@ class _RecoveryBar extends StatelessWidget {
               child: Text(
                 label,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: compact
-                      ? MuscleRecoveryCard._textMid
-                      : MuscleRecoveryCard._textHigh,
-                  fontSize: compact ? 11.5 : 13,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: compact
+                    ? AppText.caption.copyWith(
+                        fontSize: 12.5,
+                        color: AppColors.textMid,
+                      )
+                    : AppText.body.copyWith(fontWeight: FontWeight.w500),
               ),
             ),
             Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: progress,
-                  minHeight: compact ? 4 : 6,
-                  backgroundColor: MuscleRecoveryCard._border,
-                  valueColor: AlwaysStoppedAnimation<Color>(color),
-                ),
+              child: SegmentedBar(
+                value: progress,
+                height: compact ? 3 : 4,
+                color: color,
               ),
             ),
-            const SizedBox(width: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(
-                  color: color.withValues(alpha: 0.28),
-                  width: 1,
-                ),
-              ),
+            SizedBox(
+              width: compact ? 48 : 56,
               child: Text(
                 ready ? 'Hazır' : '%$percent',
-                style: TextStyle(
-                  color: color,
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w700,
-                ),
+                textAlign: TextAlign.right,
+                style: valueStyle,
               ),
             ),
             if (trailing != null) ...[
-              const SizedBox(width: 4),
+              const SizedBox(width: 6),
               trailing!,
-            ],
+            ] else if (!compact)
+              const SizedBox(width: 24),
           ],
         ),
         if (!ready)
-          Align(
-            alignment: Alignment.centerRight,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 2),
-              child: Text(
-                'Toparlanıyor · ${_remainingLabel(readyAt!.difference(now))}'
-                '${averageRir != null ? ' · RIR ${averageRir!.toStringAsFixed(1)}' : ''}',
-                style: const TextStyle(
-                  color: MuscleRecoveryCard._textMid,
-                  fontSize: 10,
-                ),
-              ),
+          Padding(
+            padding: EdgeInsets.only(left: labelWidth, top: compact ? 3 : 6),
+            child: Text(
+              '${compact ? '' : 'Toparlanıyor · '}'
+              '${_remainingLabel(readyAt!.difference(now))}'
+              '${averageRir != null ? ' · RIR ${averageRir!.toStringAsFixed(1)}' : ''}',
+              style: compact
+                  ? AppText.caption.copyWith(fontSize: 11)
+                  : AppText.caption,
             ),
           ),
       ],

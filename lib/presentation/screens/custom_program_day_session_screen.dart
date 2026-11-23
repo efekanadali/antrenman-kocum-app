@@ -17,8 +17,7 @@ import 'package:calisthenics_app/presentation/providers/exercise_repository_prov
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/presentation/screens/workout_summary_screen.dart';
 import 'package:calisthenics_app/presentation/theme/app_theme.dart';
-
-const String _sessionHeroImageAsset = 'assets/images/Incline-pushup.png';
+import 'package:calisthenics_app/presentation/widgets/ui/ui.dart';
 
 class CustomProgramDaySessionArgs {
   const CustomProgramDaySessionArgs({
@@ -245,17 +244,13 @@ class _CustomProgramDaySessionScreenState
     final selected = await showModalBottomSheet<_SetEffortResult>(
       isScrollControlled: true,
       context: context,
-      backgroundColor: AppColors.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
-        side: BorderSide(color: AppColors.border, width: 1.0),
-      ),
       builder: (context) {
         var tempRir = _defaultRir;
         return StatefulBuilder(
           builder: (context, setModalState) {
             return Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 20.0) +
+              padding:
+                  const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 20.0) +
                   EdgeInsets.only(
                     bottom: MediaQuery.viewInsetsOf(context).bottom,
                   ),
@@ -265,45 +260,53 @@ class _CustomProgramDaySessionScreenState
                 children: [
                   Text(
                     isTimed
-                        ? 'Kac saniye daha durabilirdin?'
-                        : 'Kac tekrar daha cikarabilirdin?',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.textHigh,
-                      fontWeight: FontWeight.w700,
-                    ),
+                        ? 'Kaç saniye daha durabilirdin?'
+                        : 'Kaç tekrar daha çıkarabilirdin?',
+                    style: AppText.cardTitle,
                   ),
-                  const SizedBox(height: 12.0),
+                  const SizedBox(height: 4.0),
+                  const Text(
+                    'Yedekte kalan tekrar (RIR)',
+                    style: AppText.caption,
+                  ),
+                  const SizedBox(height: AppSpace.lg),
                   Wrap(
-                    spacing: 8.0,
+                    spacing: AppSpace.sm,
+                    runSpacing: AppSpace.sm,
                     children: List.generate(isTimed ? 11 : 5, (rir) {
                       final isSelected = tempRir == rir;
-                      return ChoiceChip(
-                        label: Text('$rir'),
-                        selected: isSelected,
-                        onSelected: (_) {
+                      return GestureDetector(
+                        onTap: () {
                           HapticFeedback.selectionClick();
                           setModalState(() {
                             tempRir = rir;
                           });
                         },
-                        selectedColor: AppColors.iceBlue.withValues(alpha: 0.22),
-                        backgroundColor: AppColors.surfaceSoft,
-                        checkmarkColor: AppColors.iceBlue,
-                        side: BorderSide(
-                          color: isSelected
-                              ? AppColors.iceBlue
-                              : AppColors.border,
-                        ),
-                        labelStyle: TextStyle(
-                          color: isSelected
-                              ? AppColors.textHigh
-                              : AppColors.textMid,
-                          fontWeight: FontWeight.w700,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 150),
+                          width: 44,
+                          height: 44,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: isSelected
+                                ? AppColors.accent
+                                : AppColors.surfaceRaised,
+                          ),
+                          child: Text(
+                            '$rir',
+                            style: AppText.metricS.copyWith(
+                              fontSize: 15,
+                              color: isSelected
+                                  ? AppColors.onAccent
+                                  : AppColors.textMid,
+                            ),
+                          ),
                         ),
                       );
                     }),
                   ),
-                  const SizedBox(height: 12.0),
+                  const SizedBox(height: AppSpace.xl),
                   TextFormField(
                     initialValue: extraWeightText,
                     onChanged: (value) {
@@ -313,7 +316,7 @@ class _CustomProgramDaySessionScreenState
                       decimal: true,
                     ),
                     decoration: const InputDecoration(
-                      labelText: 'Ekstra agirlik (kg)',
+                      labelText: 'Ekstra ağırlık (kg)',
                       hintText: '0',
                     ),
                   ),
@@ -327,7 +330,7 @@ class _CustomProgramDaySessionScreenState
                       decimal: true,
                     ),
                     decoration: const InputDecoration(
-                      labelText: 'Vucut agirligi (kg)',
+                      labelText: 'Vücut ağırlığı (kg)',
                     ),
                   ),
                   const SizedBox(height: 12.0),
@@ -339,7 +342,7 @@ class _CustomProgramDaySessionScreenState
                           style: TextButton.styleFrom(
                             foregroundColor: AppColors.textMid,
                           ),
-                          child: const Text('Vazgec'),
+                          child: const Text('Vazgeç'),
                         ),
                       ),
                       const SizedBox(width: 8.0),
@@ -371,10 +374,6 @@ class _CustomProgramDaySessionScreenState
                               ),
                             );
                           },
-                          style: FilledButton.styleFrom(
-                            backgroundColor: AppColors.volcanic,
-                            foregroundColor: Colors.white,
-                          ),
                           child: const Text('Kaydet'),
                         ),
                       ),
@@ -466,8 +465,9 @@ class _CustomProgramDaySessionScreenState
       (sum, val) => sum + val,
     );
     if (totalLoad <= 0) {
-      final durationMinutes =
-          _workElapsed.inSeconds > 0 ? _workElapsed.inSeconds / 60.0 : 1.0;
+      final durationMinutes = _workElapsed.inSeconds > 0
+          ? _workElapsed.inSeconds / 60.0
+          : 1.0;
       totalLoad = durationMinutes * 100 * 1.25;
     }
 
@@ -552,11 +552,6 @@ class _CustomProgramDaySessionScreenState
   Future<void> _openRestSheet() async {
     final selected = await showModalBottomSheet<int>(
       context: context,
-      backgroundColor: AppColors.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
-        side: BorderSide(color: AppColors.border, width: 1.0),
-      ),
       builder: (context) {
         var tempValue = _restDurationSeconds.toDouble();
         return StatefulBuilder(
@@ -567,27 +562,26 @@ class _CustomProgramDaySessionScreenState
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Dinlenme suresi',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.textHigh,
-                      fontWeight: FontWeight.w700,
+                  const Text('Dinlenme süresi', style: AppText.cardTitle),
+                  const SizedBox(height: AppSpace.sm),
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: '${tempValue.toInt()}',
+                          style: AppText.metricL,
+                        ),
+                        const TextSpan(text: ' sn', style: AppText.unit),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 6.0),
-                  Text(
-                    '${tempValue.toInt()} sn',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodySmall?.copyWith(color: AppColors.textMid),
                   ),
                   Slider(
                     value: tempValue,
                     min: 30.0,
                     max: 180.0,
                     divisions: 15,
-                    activeColor: AppColors.iceBlue,
-                    inactiveColor: AppColors.border,
+                    activeColor: AppColors.textHigh,
+                    inactiveColor: AppColors.hairlineStrong,
                     label: '${tempValue.toInt()} sn',
                     onChanged: (value) {
                       setModalState(() {
@@ -596,25 +590,11 @@ class _CustomProgramDaySessionScreenState
                     },
                   ),
                   const SizedBox(height: 8.0),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: () {
-                        Navigator.pop(context, tempValue.toInt());
-                      },
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.iceBlue,
-                        foregroundColor: AppColors.background,
-                        padding: const EdgeInsets.symmetric(vertical: 12.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14.0),
-                        ),
-                      ),
-                      child: const Text(
-                        'Dinlenmeyi baslat',
-                        style: TextStyle(fontWeight: FontWeight.w700),
-                      ),
-                    ),
+                  PrimaryButton(
+                    label: 'Dinlenmeyi Başlat',
+                    onPressed: () {
+                      Navigator.pop(context, tempValue.toInt());
+                    },
                   ),
                 ],
               ),
@@ -651,298 +631,257 @@ class _CustomProgramDaySessionScreenState
             activeExercise.sets,
           );
     final isWorkoutDone = _isWorkoutComplete(day);
-    final actionLabel = isWorkoutDone ? 'ANTRENMANI TAMAMLA' : 'COMPLETE SET';
+    final actionLabel = isWorkoutDone ? 'Antrenmanı Tamamla' : 'Seti Tamamla';
     final targetLabel = activeExercise == null
-        ? '-'
-        : '${activeExercise.value} ${activeExercise.isTimed ? 'sn' : 'Reps'}'
-            '${activeExercise.loadKg != null ? ' • ${_formatKg(activeExercise.loadKg!)} kg' : ''}';
+        ? '—'
+        : '${activeExercise.value} ${activeExercise.isTimed ? 'sn' : 'tekrar'}'
+              '${activeExercise.loadKg != null ? ' · ${_formatKg(activeExercise.loadKg!)} kg' : ''}';
     final nextLabel = activeExercise == null
-        ? 'Egzersiz bulunamadi'
+        ? 'Egzersiz bulunamadı'
         : isWorkoutDone
-            ? 'Antrenman Tamamlandi'
-            : _restRemainingSeconds > 0
-                ? 'Dinlenme ${_formatSeconds(_restRemainingSeconds)}'
-                : activeExercise.exerciseName;
+        ? 'Antrenman tamamlandı'
+        : _restRemainingSeconds > 0
+        ? 'Dinlenme ${_formatSeconds(_restRemainingSeconds)}'
+        : activeExercise.exerciseName;
     final nextDetail = activeExercise == null
         ? ''
-        : '${activeExercise.sets} set • ${activeExercise.isTimed ? '${activeExercise.value} sn' : '${activeExercise.value} tekrar'}';
+        : '${activeExercise.sets} set · ${activeExercise.isTimed ? '${activeExercise.value} sn' : '${activeExercise.value} tekrar'}';
     final restProgress = _restDurationSeconds == 0
         ? 0.0
         : (_restRemainingSeconds / _restDurationSeconds).clamp(0.0, 1.0);
+    final activeWeights = activeExercise == null
+        ? const <MuscleCompartment, double>{}
+        : (_resolveExerciseDetail(activeExercise)?.compartmentWeights ??
+              const <MuscleCompartment, double>{});
 
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpace.page,
+            AppSpace.sm,
+            AppSpace.page,
+            AppSpace.lg,
+          ),
           child: Column(
             children: [
               Row(
                 children: [
                   _SessionTopIconButton(
                     icon: Icons.close_rounded,
+                    tooltip: 'Kapat',
                     onTap: () => Navigator.pop(context),
                   ),
                   const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10.0,
-                      vertical: 6.0,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(999.0),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 10.0,
-                          height: 10.0,
-                          decoration: const BoxDecoration(
-                            color: AppColors.iceBlue,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 6.0),
-                        Text(
-                          _formatDuration(_workElapsed),
-                          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                                color: AppColors.textHigh,
-                                fontWeight: FontWeight.w800,
-                              ),
-                        ),
-                      ],
-                    ),
+                  StatusDot(
+                    color: _workPaused ? AppColors.amber : AppColors.emerald,
+                  ),
+                  const SizedBox(width: AppSpace.sm),
+                  Text(
+                    _formatDuration(_workElapsed),
+                    style: AppText.metricS.copyWith(fontSize: 17),
                   ),
                   const Spacer(),
                   _SessionTopIconButton(
-                    icon: Icons.settings,
+                    icon: Icons.timer_outlined,
+                    tooltip: 'Dinlenme süresi',
                     onTap: _openRestSheet,
                   ),
                 ],
               ),
-              const SizedBox(height: 14.0),
+              const SizedBox(height: AppSpace.lg),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const _SessionHeroCard(),
-                      const SizedBox(height: 24.0),
+                      _SessionHeroCard(weights: activeWeights),
+                      const SizedBox(height: AppSpace.xxl),
                       Text(
-                        activeExercise?.exerciseName ?? 'Workout',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                              color: AppColors.textHigh,
-                              fontWeight: FontWeight.w900,
-                            ),
+                        trUpper(
+                          activeExercise == null
+                              ? 'Set —'
+                              : 'Set $activeSet / ${activeExercise.sets}',
+                        ),
+                        style: AppText.sectionLabel,
                       ),
-                      const SizedBox(height: 10.0),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _SessionTagChip(
-                            text: activeExercise == null
-                                ? 'Set -'
-                                : 'Set $activeSet of ${activeExercise.sets}',
-                            background: AppColors.surface,
-                            textColor: AppColors.textHigh,
-                            borderColor: AppColors.border,
-                          ),
-                          const SizedBox(width: 8.0),
-                          _SessionTagChip(
-                            text: 'Target: $targetLabel',
-                            background: AppColors.iceBlue.withValues(alpha: 0.16),
-                            textColor: AppColors.iceBlue,
-                            borderColor: AppColors.iceBlue.withValues(alpha: 0.45),
-                          ),
-                        ],
+                      const SizedBox(height: AppSpace.sm),
+                      Text(
+                        activeExercise?.exerciseName ?? 'Antrenman',
+                        style: AppText.pageTitle,
                       ),
-                      const SizedBox(height: 22.0),
-                      SizedBox(
-                        width: double.infinity,
-                        child: FilledButton.icon(
-                          onPressed: activeExercise == null
-                              ? null
-                              : isWorkoutDone
-                                  ? () => _finishSession(day)
-                                  : () => _completeSet(day),
-                          icon: const Icon(Icons.check_circle_rounded),
-                          label: Text(
-                            actionLabel,
-                            style: const TextStyle(fontWeight: FontWeight.w900),
-                          ),
-                          style: FilledButton.styleFrom(
-                            backgroundColor: isWorkoutDone
-                                ? AppColors.emerald
-                                : AppColors.volcanic,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 18.0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14.0),
+                      const SizedBox(height: AppSpace.lg),
+                      SegmentedBar(
+                        value: activeExercise == null
+                            ? 0
+                            : _completedForExercise(activeIndex) /
+                                  activeExercise.sets,
+                        segments: activeExercise?.sets.clamp(1, 12) ?? 1,
+                        height: 4,
+                        gap: 4,
+                        color: AppColors.textHigh,
+                      ),
+                      const SizedBox(height: AppSpace.xl),
+                      IntrinsicHeight(
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: MetricValue(
+                                value: targetLabel,
+                                label: 'Hedef',
+                                style: AppText.metricS.copyWith(fontSize: 17),
+                              ),
                             ),
-                          ),
+                            const Hairline.vertical(),
+                            const SizedBox(width: AppSpace.lg),
+                            Expanded(
+                              child: MetricValue(
+                                value: '${_completedSetCount()}',
+                                unit: '/${_totalSets(day)}',
+                                label: 'Toplam set',
+                                style: AppText.metricS.copyWith(fontSize: 17),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 18.0),
-                      Container(
-                        width: double.infinity,
+                      const SizedBox(height: AppSpace.xxl),
+                      AppSurface(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0,
-                          vertical: 14.0,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(14.0),
-                          border: Border.all(color: AppColors.border),
+                          horizontal: AppSpace.lg,
+                          vertical: AppSpace.md + 2,
                         ),
                         child: Row(
                           children: [
-                            Container(
-                              width: 42.0,
-                              height: 42.0,
-                              decoration: BoxDecoration(
-                                color: AppColors.surfaceSoft,
-                                shape: BoxShape.circle,
-                                border: Border.all(color: AppColors.border),
-                              ),
-                              child: const Icon(
-                                Icons.fitness_center_rounded,
-                                color: AppColors.iceBlue,
-                                size: 20.0,
-                              ),
-                            ),
-                            const SizedBox(width: 12.0),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'NEXT UP',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelSmall
-                                        ?.copyWith(
-                                          color: AppColors.textMuted,
-                                          letterSpacing: 1.0,
-                                          fontWeight: FontWeight.w800,
-                                        ),
+                                    trUpper('Sıradaki'),
+                                    style: AppText.sectionLabel,
                                   ),
-                                  const SizedBox(height: 2.0),
+                                  const SizedBox(height: 4),
                                   Text(
                                     nextLabel,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleSmall
-                                        ?.copyWith(
-                                          color: AppColors.textHigh,
-                                          fontWeight: FontWeight.w800,
-                                        ),
+                                    style: AppText.body.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                   if (nextDetail.isNotEmpty)
-                                    Text(
-                                      nextDetail,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.copyWith(color: AppColors.textMuted),
-                                    ),
+                                    Text(nextDetail, style: AppText.caption),
                                 ],
                               ),
                             ),
                             const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              size: 16.0,
-                              color: AppColors.textMid,
+                              Icons.chevron_right_rounded,
+                              size: 20,
+                              color: AppColors.textMuted,
                             ),
                           ],
                         ),
                       ),
                       if (_lastSetLoadByMuscle.isNotEmpty) ...[
-                        const SizedBox(height: 14.0),
+                        const SizedBox(height: AppSpace.section),
                         _LastSetLoadCard(
                           loads: _lastSetLoadByMuscle,
                           indicatorForLoad: _lastSetIndicator,
                         ),
                       ],
                       if (_workoutLoadByMuscle.isNotEmpty) ...[
-                        const SizedBox(height: 14.0),
+                        const SizedBox(height: AppSpace.section),
                         _WorkoutLoadCard(
                           loads: _workoutLoadByMuscle,
                           feedbackForLoad: _feedbackForLoad,
                         ),
                       ],
+                      const SizedBox(height: AppSpace.lg),
                     ],
                   ),
                 ),
               ),
               if (_restRemainingSeconds > 0) ...[
-                const SizedBox(height: 10.0),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(999.0),
-                  child: LinearProgressIndicator(
-                    value: restProgress,
-                    minHeight: 8.0,
-                    backgroundColor: AppColors.surfaceSoft,
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                      AppColors.iceBlue,
+                const SizedBox(height: AppSpace.md),
+                Row(
+                  children: [
+                    Text(
+                      'Dinlenme',
+                      style: AppText.caption.copyWith(color: AppColors.textMid),
                     ),
-                  ),
+                    const SizedBox(width: AppSpace.sm),
+                    Text(
+                      _formatSeconds(_restRemainingSeconds),
+                      style: AppText.metricS.copyWith(fontSize: 15),
+                    ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () => _addRestSeconds(30),
+                      child: Text(
+                        '+30 sn',
+                        style: AppText.caption.copyWith(
+                          color: AppColors.textHigh,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpace.lg),
+                    GestureDetector(
+                      onTap: _stopRestTimer,
+                      child: Text(
+                        'Bitir',
+                        style: AppText.caption.copyWith(
+                          color: AppColors.textHigh,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpace.sm),
+                SegmentedBar(
+                  value: restProgress.toDouble(),
+                  segments: 30,
+                  height: 4,
+                  gap: 2,
+                  color: AppColors.amber,
                 ),
               ],
-              const SizedBox(height: 12.0),
+              const SizedBox(height: AppSpace.md),
+              PrimaryButton(
+                label: actionLabel,
+                icon: Icons.check_rounded,
+                onPressed: activeExercise == null
+                    ? null
+                    : isWorkoutDone
+                    ? () => _finishSession(day)
+                    : () => _completeSet(day),
+              ),
+              const SizedBox(height: AppSpace.sm),
               Row(
                 children: [
                   Expanded(
-                    child: _SessionActionPill(
-                      label: _workPaused ? 'RESUME' : 'PAUSE',
+                    child: GhostButton(
+                      label: _workPaused ? 'Devam Et' : 'Duraklat',
                       icon: _workPaused
-                          ? Icons.play_circle_fill_rounded
-                          : Icons.pause_circle_filled_rounded,
-                      backgroundColor: AppColors.surface,
-                      foregroundColor: AppColors.textHigh,
+                          ? Icons.play_arrow_rounded
+                          : Icons.pause_rounded,
+                      expand: true,
                       onPressed: _togglePause,
                     ),
                   ),
-                  const SizedBox(width: 12.0),
+                  const SizedBox(width: AppSpace.sm),
                   Expanded(
-                    child: _SessionActionPill(
-                      label: 'STOP',
-                      icon: Icons.stop_circle_rounded,
-                      backgroundColor: AppColors.volcanic,
-                      foregroundColor: Colors.white,
+                    child: GhostButton(
+                      label: 'Bitir',
+                      icon: Icons.stop_rounded,
+                      expand: true,
+                      foregroundColor: AppColors.textMid,
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
                 ],
               ),
-              if (_restRemainingSeconds > 0)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    TextButton(
-                      onPressed: _stopRestTimer,
-                      child: Text(
-                        'Dinlenmeyi bitir',
-                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                              color: AppColors.volcanic,
-                              fontWeight: FontWeight.w700,
-                            ),
-                      ),
-                    ),
-                    const SizedBox(width: 6.0),
-                    TextButton(
-                      onPressed: () => _addRestSeconds(30),
-                      child: Text(
-                        '+30 saniye',
-                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                              color: AppColors.iceBlue,
-                              fontWeight: FontWeight.w700,
-                            ),
-                      ),
-                    ),
-                  ],
-                ),
             ],
           ),
         ),
@@ -952,156 +891,118 @@ class _CustomProgramDaySessionScreenState
 }
 
 class _SessionTopIconButton extends StatelessWidget {
-  const _SessionTopIconButton({required this.icon, required this.onTap});
+  const _SessionTopIconButton({
+    required this.icon,
+    required this.onTap,
+    required this.tooltip,
+  });
 
   final IconData icon;
   final VoidCallback onTap;
+  final String tooltip;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(999.0),
-      onTap: onTap,
-      child: Container(
-        width: 38.0,
-        height: 38.0,
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          shape: BoxShape.circle,
-          border: Border.all(color: AppColors.border),
+    return IconButton(
+      onPressed: onTap,
+      tooltip: tooltip,
+      icon: Icon(icon, size: 20),
+      color: AppColors.textHigh,
+      style: IconButton.styleFrom(
+        backgroundColor: AppColors.surface,
+        fixedSize: const Size(40, 40),
+        side: const BorderSide(
+          color: AppColors.hairlineStrong,
+          width: AppSpace.hairline,
         ),
-        child: Icon(icon, color: AppColors.textHigh, size: 19.0),
       ),
     );
   }
 }
 
+/// Aktif egzersizin çalıştırdığı kasların ön/arka haritası.
 class _SessionHeroCard extends StatelessWidget {
-  const _SessionHeroCard();
+  const _SessionHeroCard({required this.weights});
+
+  final Map<MuscleCompartment, double> weights;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: 290.0,
-      padding: const EdgeInsets.all(10.0),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14.0),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: const _SessionHeroFrame(
-        imageFit: BoxFit.contain,
-        imageAlignment: Alignment.center,
-      ),
-    );
-  }
-}
-
-class _SessionHeroFrame extends StatelessWidget {
-  const _SessionHeroFrame({
-    required this.imageFit,
-    required this.imageAlignment,
-  });
-
-  final BoxFit imageFit;
-  final Alignment imageAlignment;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceSoft,
-        borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12.0),
-        child: Image.asset(
-          _sessionHeroImageAsset,
-          fit: imageFit,
-          alignment: imageAlignment,
-          errorBuilder: (context, error, stackTrace) {
-            return const Center(
-              child: Icon(
-                Icons.accessibility_new_rounded,
-                size: 64.0,
-                color: AppColors.textHigh,
+    return AppSurface(
+      padding: const EdgeInsets.symmetric(vertical: AppSpace.xl),
+      child: Center(
+        child: weights.isEmpty
+            ? const SizedBox(
+                height: 200,
+                child: Icon(
+                  Icons.accessibility_new_outlined,
+                  size: 56,
+                  color: AppColors.textMuted,
+                ),
+              )
+            : AnatomicalMuscleMap(
+                intensities: weights,
+                height: 220,
+                spacing: AppSpace.xxl,
               ),
-            );
-          },
-        ),
       ),
     );
   }
 }
 
-class _SessionTagChip extends StatelessWidget {
-  const _SessionTagChip({
-    required this.text,
-    required this.background,
-    required this.textColor,
-    this.borderColor,
+/// Bölge anahtarlı yükleri ince barlarla listeler.
+class _LoadList extends StatelessWidget {
+  const _LoadList({
+    required this.title,
+    required this.loads,
+    required this.valueLabel,
   });
 
-  final String text;
-  final Color background;
-  final Color textColor;
-  final Color? borderColor;
+  final String title;
+  final Map<String, double> loads;
+  final String Function(MapEntry<String, double>) valueLabel;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: BorderRadius.circular(999.0),
-        border: borderColor != null ? Border.all(color: borderColor!) : null,
-      ),
-      child: Text(
-        text,
-        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: textColor,
-              fontWeight: FontWeight.w700,
-            ),
-      ),
-    );
-  }
-}
-
-class _SessionActionPill extends StatelessWidget {
-  const _SessionActionPill({
-    required this.label,
-    required this.icon,
-    required this.backgroundColor,
-    required this.foregroundColor,
-    required this.onPressed,
-  });
-
-  final String label;
-  final IconData icon;
-  final Color backgroundColor;
-  final Color foregroundColor;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return FilledButton.icon(
-      onPressed: onPressed,
-      style: FilledButton.styleFrom(
-        backgroundColor: backgroundColor,
-        foregroundColor: foregroundColor,
-        padding: const EdgeInsets.symmetric(vertical: 16.0),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14.0),
-          side: const BorderSide(color: AppColors.border),
+    final sorted = loads.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    final max = sorted.isEmpty ? 1.0 : sorted.first.value;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(
+          title,
+          padding: const EdgeInsets.only(bottom: AppSpace.md),
         ),
-      ),
-      icon: Icon(icon, size: 18.0),
-      label: Text(
-        label,
-        style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: 0.5),
-      ),
+        for (final (i, entry) in sorted.indexed) ...[
+          if (i > 0) const SizedBox(height: AppSpace.md),
+          Row(
+            children: [
+              SizedBox(
+                width: 72,
+                child: Text(
+                  regionFromKey(entry.key)?.label ?? entry.key,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppText.body.copyWith(fontWeight: FontWeight.w500),
+                ),
+              ),
+              Expanded(
+                child: SegmentedBar(
+                  value: max <= 0 ? 0 : entry.value / max,
+                  segments: 16,
+                  height: 3,
+                  color: AppColors.textHigh,
+                ),
+              ),
+              const SizedBox(width: AppSpace.md),
+              Text(
+                valueLabel(entry),
+                style: AppText.caption.copyWith(color: AppColors.textMid),
+              ),
+            ],
+          ),
+        ],
+      ],
     );
   }
 }
@@ -1114,53 +1015,10 @@ class _WorkoutLoadCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sorted = loads.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-
-    return Container(
-      padding: const EdgeInsets.all(14.0),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14.0),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Kas Yük Sonucu',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppColors.textHigh,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 10.0),
-          for (final entry in sorted)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      regionFromKey(entry.key)?.label ?? entry.key,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textHigh,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    '${entry.value.round()} • ${feedbackForLoad(entry.value)}',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.iceBlue,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-        ],
-      ),
+    return _LoadList(
+      title: 'Kas yük sonucu',
+      loads: loads,
+      valueLabel: (e) => '${e.value.round()} · ${feedbackForLoad(e.value)}',
     );
   }
 }
@@ -1173,53 +1031,10 @@ class _LastSetLoadCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sorted = loads.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-
-    return Container(
-      padding: const EdgeInsets.all(14.0),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14.0),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Son Set Etkisi',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppColors.textHigh,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 10.0),
-          for (final entry in sorted)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      regionFromKey(entry.key)?.label ?? entry.key,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textHigh,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    '+${entry.value.round()} (${indicatorForLoad(entry.value)})',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.emerald,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-        ],
-      ),
+    return _LoadList(
+      title: 'Son set etkisi',
+      loads: loads,
+      valueLabel: (e) => '+${e.value.round()} · ${indicatorForLoad(e.value)}',
     );
   }
 }
