@@ -5,32 +5,43 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 
 import 'package:calisthenics_app/domain/enums/exercise_level.dart';
-import 'package:calisthenics_app/domain/enums/muscle_group.dart';
+import 'package:calisthenics_app/domain/enums/muscle_compartment.dart';
 
 // 1. Filtre durumunu tutan, değişmez (immutable) state sınıfı.
+//    Kas filtresi 6 bölge + 17 kompartıman üzerinden çalışır
+//    (bkz. domain/services/muscle_filter.dart).
 class FilterState {
   final ExerciseLevel? level;
-  final Set<MuscleGroup> muscleGroups;
+  final Set<MuscleRegion> regions;
+  final Set<MuscleCompartment> compartments;
 
-  const FilterState({this.level, this.muscleGroups = const {}});
+  const FilterState({
+    this.level,
+    this.regions = const {},
+    this.compartments = const {},
+  });
+
+  bool get hasMuscleFilter => regions.isNotEmpty || compartments.isNotEmpty;
 
   FilterState copyWith({
     ValueGetter<ExerciseLevel?>? level,
-    Set<MuscleGroup>? muscleGroups,
+    Set<MuscleRegion>? regions,
+    Set<MuscleCompartment>? compartments,
   }) {
     return FilterState(
       level: level != null ? level() : this.level,
-      muscleGroups: muscleGroups ?? this.muscleGroups,
+      regions: regions ?? this.regions,
+      compartments: compartments ?? this.compartments,
     );
   }
 }
 
-// FilterState için provider ekleyin
-final filterStateNotifierProvider = StateNotifierProvider<FilterNotifier, FilterState>((ref) {
+// FilterState için provider
+final filterStateNotifierProvider =
+    StateNotifierProvider<FilterNotifier, FilterState>((ref) {
   return FilterNotifier();
 });
 
-// StateNotifier sınıfı ekleyin (FilterState'i yönetmek için)
 class FilterNotifier extends StateNotifier<FilterState> {
   FilterNotifier() : super(const FilterState());
 
@@ -38,13 +49,20 @@ class FilterNotifier extends StateNotifier<FilterState> {
     state = state.copyWith(level: () => level);
   }
 
-  void toggleMuscleGroup(MuscleGroup muscleGroup) {
-    final newGroups = Set<MuscleGroup>.from(state.muscleGroups);
-    if (newGroups.contains(muscleGroup)) {
-      newGroups.remove(muscleGroup);
+  void toggleRegion(MuscleRegion region) {
+    final regions = Set<MuscleRegion>.from(state.regions);
+    final compartments = Set<MuscleCompartment>.from(state.compartments);
+    if (!regions.remove(region)) {
+      regions.add(region);
     } else {
-      newGroups.add(muscleGroup);
+      compartments.removeWhere((c) => c.region == region);
     }
-    state = state.copyWith(muscleGroups: newGroups);
+    state = state.copyWith(regions: regions, compartments: compartments);
+  }
+
+  void toggleCompartment(MuscleCompartment compartment) {
+    final compartments = Set<MuscleCompartment>.from(state.compartments);
+    if (!compartments.remove(compartment)) compartments.add(compartment);
+    state = state.copyWith(compartments: compartments);
   }
 }

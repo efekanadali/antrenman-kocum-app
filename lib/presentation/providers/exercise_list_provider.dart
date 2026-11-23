@@ -2,6 +2,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart';
+import 'package:calisthenics_app/domain/services/muscle_filter.dart';
 import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
 import 'package:calisthenics_app/presentation/providers/filter_provider.dart';
 
@@ -15,19 +16,21 @@ final filteredExerciseListProvider =
   final allExercises = await ref.watch(exerciseListProvider.future);
   final filter = ref.watch(filterStateNotifierProvider);
 
-  if (filter.level == null && filter.muscleGroups.isEmpty) {
+  if (filter.level == null && !filter.hasMuscleFilter) {
     return allExercises;
   }
 
   return allExercises.where((exercise) {
     final levelMatch = filter.level == null || exercise.level == filter.level;
 
-    // Egzersizin hedef kas gruplarından HERHANGİ BİRİ,
-    // seçili filtre kas gruplarında var mı diye kontrol edilir.
-    final muscleGroupMatch = filter.muscleGroups.isEmpty ||
-        exercise.targetMuscleGroups
-            .any((muscle) => filter.muscleGroups.contains(muscle));
+    // Seçili bölge / kompartımanlardan HERHANGİ BİRİ hedefleniyor mu?
+    final muscleMatch = matchesMuscleFilter(
+      exercise.compartmentWeights,
+      regions: filter.regions,
+      compartments: filter.compartments,
+      matchAll: false,
+    );
 
-    return levelMatch && muscleGroupMatch;
+    return levelMatch && muscleMatch;
   }).toList();
 });

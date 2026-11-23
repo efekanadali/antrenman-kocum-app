@@ -1,6 +1,8 @@
 // lib/domain/models/workout_session_summary.dart
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:calisthenics_app/domain/enums/muscle_compartment.dart';
+import 'package:calisthenics_app/domain/models/muscle_load_snapshot.dart';
 
 /// Represents a completed workout session retrieved from Firestore or local storage.
 class WorkoutSessionSummary {
@@ -9,7 +11,17 @@ class WorkoutSessionSummary {
   final int durationSeconds;
   final List<String> exercisesDone;
   final double totalMliWorkload;
+
+  /// Kayıttaki eski (v1) kas anahtarları aynen (`muscleWorkloads` /
+  /// `muscleLoad`).
   final Map<String, double> muscleWorkloads;
+
+  /// Kompartıman + bölge görünümü. v2 kayıtlarda `compartmentWorkloads`'tan,
+  /// eski kayıtlarda [muscleWorkloads] bölünerek elde edilir.
+  final MuscleLoadSnapshot load;
+
+  /// Kaydın şema sürümü (alan yoksa 1).
+  final int schemaVersion;
 
   const WorkoutSessionSummary({
     required this.id,
@@ -18,7 +30,13 @@ class WorkoutSessionSummary {
     required this.exercisesDone,
     required this.totalMliWorkload,
     this.muscleWorkloads = const {},
+    this.load = const MuscleLoadSnapshot(),
+    this.schemaVersion = 1,
   });
+
+  Map<MuscleCompartment, double> get compartmentWorkloads => load.compartments;
+
+  Map<MuscleRegion, double> get regionWorkloads => load.regions;
 
   /// Factory constructor to parse Firestore document into [WorkoutSessionSummary].
   factory WorkoutSessionSummary.fromFirestore(
@@ -81,6 +99,11 @@ class WorkoutSessionSummary {
       exercisesDone: exercises,
       totalMliWorkload: workload,
       muscleWorkloads: parsedMuscle,
+      load: MuscleLoadSnapshot.parse(
+        compartmentRaw: data['compartmentWorkloads'],
+        legacyRaw: parsedMuscle,
+      ),
+      schemaVersion: (data['schemaVersion'] as num?)?.toInt() ?? 1,
     );
   }
 
@@ -93,6 +116,8 @@ class WorkoutSessionSummary {
       'exercisesDone': exercisesDone,
       'totalMliWorkload': totalMliWorkload,
       'muscleWorkloads': muscleWorkloads,
+      'compartmentWorkloads': load.compartmentsByKey,
+      'schemaVersion': schemaVersion,
     };
   }
 }

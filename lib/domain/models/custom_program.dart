@@ -1,5 +1,23 @@
 // lib/domain/models/custom_program.dart
 
+/// Kullanıcının yazdığı yük değerini (`62,5`, `60`, ` 40 kg`) okur; boş,
+/// sayısal olmayan veya ≤ 0 değerler için `null`.
+double? parseLoadKgInput(String raw) {
+  final cleaned = raw.toLowerCase().replaceAll('kg', '').replaceAll(',', '.').trim();
+  final value = double.tryParse(cleaned);
+  if (value == null || value <= 0) return null;
+  return value;
+}
+
+/// Listelerde gösterilen yük eki (` • 62.5 kg`); yük yoksa boş.
+String formatLoadKgSuffix(double? loadKg) {
+  if (loadKg == null) return '';
+  final text = loadKg == loadKg.roundToDouble()
+      ? loadKg.toStringAsFixed(0)
+      : loadKg.toStringAsFixed(1);
+  return ' • $text kg';
+}
+
 class CustomProgramExercise {
   final String exerciseId;
   final String exerciseName;

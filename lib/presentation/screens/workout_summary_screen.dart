@@ -6,7 +6,10 @@ import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 import 'package:calisthenics_app/core/local_storage/workout_history_storage.dart';
 import 'package:calisthenics_app/core/local_storage/workout_summary_storage.dart';
+import 'package:calisthenics_app/domain/enums/muscle_compartment.dart';
+import 'package:calisthenics_app/domain/models/muscle_load_snapshot.dart';
 import 'package:calisthenics_app/domain/services/mli_calculator.dart';
+import 'package:calisthenics_app/domain/services/muscle_key_mapper.dart';
 import 'package:calisthenics_app/domain/services/recovery_calculator.dart';
 import 'package:calisthenics_app/data/services/firestore_service.dart';
 
@@ -20,6 +23,8 @@ class WorkoutSummaryArgs {
     required this.totalLoad,
     required this.muscleLoad,
     this.muscleRir = const {},
+    this.compartmentLoad = const {},
+    this.compartmentRir = const {},
     this.averageRir,
   });
 
@@ -30,7 +35,36 @@ class WorkoutSummaryArgs {
   final double totalLoad;
   final Map<String, double> muscleLoad;
   final Map<String, double> muscleRir;
+
+  /// 17 kompartıman bazında seans yükü (v2). Boşsa [muscleLoad] bölünür.
+  final Map<MuscleCompartment, double> compartmentLoad;
+
+  /// Kompartıman bazında yük ağırlıklı ortalama RIR.
+  final Map<MuscleCompartment, double> compartmentRir;
   final double? averageRir;
+
+  /// Kompartıman + bölge görünümü (eşlenemeyen `Genel` vb. korunur).
+  MuscleLoadSnapshot get load => compartmentLoad.isNotEmpty
+      ? MuscleLoadSnapshot(compartments: compartmentLoad)
+      : MuscleLoadSnapshot.parse(legacyRaw: muscleLoad);
+
+  /// Eski sürümlerin okuduğu bölge anahtarlı harita (`chest` … `legs`);
+  /// kompartıman verisi yoksa gelen harita (ör. `Genel`) aynen kullanılır.
+  Map<String, double> get legacyMuscleLoad =>
+      compartmentLoad.isNotEmpty ? load.legacyRegionLoad : muscleLoad;
+
+  /// Kompartıman RIR'ı; yalnızca eski anahtarlar varsa her kompartıman,
+  /// bölgesine eşlenen anahtarın RIR'ını alır.
+  Map<MuscleCompartment, double> get effectiveCompartmentRir {
+    if (compartmentRir.isNotEmpty) return compartmentRir;
+    final result = <MuscleCompartment, double>{};
+    muscleRir.forEach((key, rir) {
+      for (final c in expandRecoveryKey(key)) {
+        result[c] = rir;
+      }
+    });
+    return result;
+  }
 }
 
 // ─── Screen ──────────────────────────────────────────────────────────────────
@@ -56,7 +90,9 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
         'durationSeconds': widget.args.totalTime.inSeconds,
         'exercisesDone': [widget.args.exerciseName],
         'totalMliWorkload': widget.args.totalLoad,
-        'muscleWorkloads': widget.args.muscleLoad,
+        'muscleWorkloads': widget.args.legacyMuscleLoad,
+        'compartmentWorkloads': widget.args.load.compartmentsByKey,
+        'schemaVersion': kMuscleDataSchemaVersion,
         'exerciseName': widget.args.exerciseName,
         'totalDurationSeconds': widget.args.totalTime.inSeconds,
         'exercises': [
@@ -67,15 +103,15 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
           },
         ],
         'totalLoad': widget.args.totalLoad,
-        'muscleLoad': widget.args.muscleLoad,
+        'muscleLoad': widget.args.legacyMuscleLoad,
         'setsCompleted': widget.args.setsCompleted,
         'totalSets': widget.args.totalSets,
       };
 
       final firestore = ref.read(firestoreServiceProvider);
-      final recovery = buildSessionRecovery(
-        muscleLoad: widget.args.muscleLoad,
-        muscleRir: widget.args.muscleRir,
+      final recovery = buildCompartmentRecovery(
+        compartmentLoad: widget.args.load.compartments,
+        compartmentRir: widget.args.effectiveCompartmentRir,
         completedAt: completedAt,
         defaultRir: widget.args.averageRir ?? kDefaultRir,
       );
@@ -106,8 +142,9 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
     final summaryEntry = WorkoutSummaryEntry(
       date: completedAt,
       totalLoad: widget.args.totalLoad,
-      muscleLoad: widget.args.muscleLoad,
+      muscleLoad: widget.args.legacyMuscleLoad,
       duration: widget.args.totalTime.inSeconds,
+      load: widget.args.load,
     );
 
     try {
@@ -174,12 +211,10 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
   // ── Build ────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    final sortedMuscles = widget.args.muscleLoad.entries.toList()
+    final load = widget.args.load;
+    final sortedMuscles = load.regions.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
-    final totalMuscleLoad = widget.args.muscleLoad.values.fold(
-      0.0,
-      (sum, v) => sum + v,
-    );
+    final totalMuscleLoad = load.mappedTotal;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -196,7 +231,7 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
             const SizedBox(height: 24),
 
             // ── Muscle Load Card ──────────────────────────────────────────
-            _buildMuscleCard(sortedMuscles, totalMuscleLoad),
+            _buildMuscleCard(load, sortedMuscles, totalMuscleLoad),
             const SizedBox(height: 32),
 
             // ── Primary CTA ───────────────────────────────────────────────
@@ -333,7 +368,8 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
 
   // ── Muscle Load Card ────────────────────────────────────────────────────
   Widget _buildMuscleCard(
-    List<MapEntry<String, double>> sortedMuscles,
+    MuscleLoadSnapshot load,
+    List<MapEntry<MuscleRegion, double>> sortedMuscles,
     double totalMuscleLoad,
   ) {
     return Container(
@@ -378,11 +414,16 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
           else
             ...sortedMuscles.map(
               (entry) => _MuscleLoadRow(
-                muscleName: entry.key,
+                muscleName: entry.key.label,
                 load: entry.value,
                 ratio: totalMuscleLoad > 0
                     ? entry.value / totalMuscleLoad
                     : 0.0,
+                compartments: [
+                  for (final c in entry.key.compartments)
+                    if ((load.compartments[c] ?? 0) > 0)
+                      MapEntry(c, load.compartments[c]!),
+                ]..sort((a, b) => b.value.compareTo(a.value)),
               ),
             ),
         ],
@@ -469,11 +510,15 @@ class _MuscleLoadRow extends StatelessWidget {
     required this.muscleName,
     required this.load,
     required this.ratio,
+    this.compartments = const [],
   });
 
   final String muscleName;
   final double load;
   final double ratio;
+
+  /// Bölgenin kompartıman ayrıntısı (Türkçe etiket + yük).
+  final List<MapEntry<MuscleCompartment, double>> compartments;
 
   @override
   Widget build(BuildContext context) {
@@ -547,6 +592,25 @@ class _MuscleLoadRow extends StatelessWidget {
               valueColor: AlwaysStoppedAnimation<Color>(badgeFg),
             ),
           ),
+          if (compartments.length > 1)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Wrap(
+                spacing: 10,
+                runSpacing: 4,
+                children: [
+                  for (final c in compartments)
+                    Text(
+                      '${c.key.label} ${c.value.round()}',
+                      style: const TextStyle(
+                        color: AppColors.textMid,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                ],
+              ),
+            ),
         ],
       ),
     );

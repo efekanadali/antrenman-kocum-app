@@ -266,7 +266,8 @@ class CustomProgramDetailScreen extends ConsumerWidget {
                                               Text(
                                                 exercise.isTimed
                                                     ? '${exercise.sets} set × ${exercise.value} sn'
-                                                    : '${exercise.sets} set × ${exercise.value} tekrar',
+                                                    : '${exercise.sets} set × ${exercise.value} tekrar'
+                                                        '${formatLoadKgSuffix(exercise.loadKg)}',
                                                 style: const TextStyle(
                                                   color: AppColors.textMid,
                                                   fontSize: 11.5,

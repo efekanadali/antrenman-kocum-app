@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart';
 import 'package:calisthenics_app/domain/enums/exercise_level.dart';
+import 'package:calisthenics_app/domain/enums/muscle_compartment.dart';
 import 'package:calisthenics_app/domain/enums/muscle_group.dart';
+import 'package:calisthenics_app/domain/services/muscle_filter.dart';
 import 'package:calisthenics_app/core/utils/enum_label.dart';
 import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
@@ -93,12 +95,50 @@ class ExerciseDetailScreen extends ConsumerWidget {
     }
   }
 
-  Widget _buildActivationBar(BuildContext context, MuscleGroup muscle, int rating) {
+  /// Kompartıman ağırlıklarından bölge aktivasyon satırları: bölge puanı en
+  /// baskın bölgeye göre (1–5), alt satırda kompartıman payları (%).
+  List<({String name, int rating, String? detail})> _activationRows() {
+    final weights = exercise.compartmentWeights;
+    if (weights.isEmpty) {
+      return [
+        for (final muscle in exercise.targetMuscleGroups)
+          (
+            name: _localizedMuscleName(muscle),
+            rating: exercise.muscleRatings[muscle] ?? 1,
+            detail: null,
+          ),
+      ];
+    }
+    final regions = targetRegions(weights);
+    if (regions.isEmpty) return const [];
+    final maxWeight = regionWeight(weights, regions.first);
+    return [
+      for (final region in regions)
+        (
+          name: region.label,
+          rating: (regionWeight(weights, region) / maxWeight * 5)
+              .round()
+              .clamp(1, 5)
+              .toInt(),
+          detail: [
+            for (final c in region.compartments)
+              if ((weights[c] ?? 0) > 0)
+                '${c.label} %${((weights[c] ?? 0) * 100).round()}',
+          ].join(' · '),
+        ),
+    ];
+  }
+
+  Widget _buildActivationBar(
+    BuildContext context,
+    String muscleName,
+    int rating, {
+    String? detail,
+  }) {
     final clamped = _clampRating(rating);
     final percent = _ratingToPercent(clamped);
     final color = _activationColor(percent);
     final label = _activationLabel(clamped);
-    final muscleName = _localizedMuscleName(muscle);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
@@ -153,6 +193,17 @@ class ExerciseDetailScreen extends ConsumerWidget {
               valueColor: AlwaysStoppedAnimation<Color>(color),
             ),
           ),
+          if (detail != null && detail.isNotEmpty) ...[
+            const SizedBox(height: 6.0),
+            Text(
+              detail,
+              style: const TextStyle(
+                color: AppColors.textMid,
+                fontSize: 11.0,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -289,9 +340,7 @@ class ExerciseDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final muscleRatings = exercise.targetMuscleGroups
-        .map((muscle) => MapEntry(muscle, exercise.muscleRatings[muscle] ?? 1))
-        .toList();
+    final activationRows = _activationRows();
     final prerequisiteLevelLabel = _prerequisiteLevelLabel(exercise.level);
     final allExercisesAsync = ref.watch(_allExercisesProvider);
 
@@ -574,13 +623,14 @@ class ExerciseDetailScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 12.0),
                     Column(
-                      children: muscleRatings.map((entry) {
+                      children: activationRows.map((row) {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 8.0),
                           child: _buildActivationBar(
                             context,
-                            entry.key,
-                            entry.value,
+                            row.name,
+                            row.rating,
+                            detail: row.detail,
                           ),
                         );
                       }).toList(),

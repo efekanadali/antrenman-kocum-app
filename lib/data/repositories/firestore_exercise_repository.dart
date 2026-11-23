@@ -7,6 +7,7 @@ import 'package:calisthenics_app/domain/enums/muscle_group.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart';
 import 'package:calisthenics_app/data/repositories/exercise_repository.dart';
 import 'package:calisthenics_app/data/repositories/fake_exercise_repository.dart';
+import 'package:calisthenics_app/data/services/exercise_catalog_sync.dart';
 import 'package:calisthenics_app/domain/services/muscle_group_derivation.dart';
 import 'package:calisthenics_app/domain/services/muscle_key_mapper.dart';
 
@@ -32,19 +33,15 @@ class FirestoreExerciseRepository implements ExerciseRepository {
   @override
   Future<List<Exercise>> getAllExercises() async {
     try {
+      final local = await _fallbackRepository.getAllExercises();
       final snapshot = await _firestore.collection('exercises').get();
-      if (snapshot.docs.isEmpty) {
-        return await _fallbackRepository.getAllExercises();
-      }
-
-      final exercises = snapshot.docs.map((doc) {
+      final remote = snapshot.docs.map((doc) {
         return _mapDocToExercise(doc.id, doc.data());
       }).toList();
 
-      if (exercises.isEmpty) {
-        return await _fallbackRepository.getAllExercises();
-      }
-
+      // Yerel biyomekanik bilinen id'lerde kazanır; yalnızca uzakta olan
+      // egzersizler eklenir.
+      final exercises = mergeExerciseCatalog(local: local, remote: remote);
       _cachedExercises = exercises;
       return exercises;
     } catch (_) {

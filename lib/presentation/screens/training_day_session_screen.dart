@@ -217,6 +217,8 @@ class _TrainingDaySessionScreenState
         totalLoad: totalLoad,
         muscleLoad: muscleLoad,
         muscleRir: muscleRir,
+        compartmentLoad: calculateWorkoutCompartmentLoad(entries),
+        compartmentRir: calculateWorkoutCompartmentRir(entries),
         averageRir: kDefaultRir,
       ),
     );

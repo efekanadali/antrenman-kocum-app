@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:calisthenics_app/domain/models/exercise_database.dart';
 import 'package:calisthenics_app/core/local_storage/workout_summary_storage.dart';
 import 'package:calisthenics_app/domain/models/workout_session_summary.dart';
 import 'package:calisthenics_app/domain/models/custom_program.dart';
-import 'package:calisthenics_app/domain/models/muscle_recovery.dart';
+import 'package:calisthenics_app/data/services/exercise_catalog_sync.dart';
+import 'package:calisthenics_app/domain/enums/muscle_compartment.dart';
+import 'package:calisthenics_app/domain/models/muscle_recovery_state.dart';
 import 'package:calisthenics_app/domain/services/recovery_calculator.dart';
 
 final firestoreServiceProvider = Provider<FirestoreService>((ref) {
@@ -200,29 +201,33 @@ class FirestoreService {
     });
   }
 
-  // 5. Veritabanı Boşsa Egzersiz Kütüphanesini Otomatik Tohumlama
+  // 5. Egzersiz Kataloğunu Sürümlü Tohumlama
+  /// `meta/exercise_catalog.version` yerel [kExerciseCatalogVersion]'dan
+  /// küçükse (veya yoksa) tüm kütüphane `merge: true` ile yeniden yazılır.
+  /// Dokümanlar `compartments`, `type`, `schemaVersion` ve eski `muscles`
+  /// alanlarını içerir.
   Future<void> seedIfNeeded() async {
     try {
-      final snapshot = await _firestore.collection('exercises').limit(1).get();
-      if (snapshot.docs.isNotEmpty) {
+      final metaRef = _firestore
+          .collection(kCatalogMetaCollection)
+          .doc(kCatalogMetaDoc);
+      final meta = await metaRef.get();
+      if (!shouldUpsertExerciseCatalog(meta.data()?['version'])) {
         return;
       }
 
       final batch = _firestore.batch();
       final collection = _firestore.collection('exercises');
-
-      exerciseDatabase.forEach((id, exercise) {
-        final docRef = collection.doc(id);
-        batch.set(docRef, {
-          'id': id,
-          'name': exercise.name,
-          'difficulty': exercise.difficulty,
-          'leverageFactor': exercise.difficulty,
-          'type': 'calisthenics',
-          'muscles': exercise.muscles,
-          'createdAt': FieldValue.serverTimestamp(),
+      buildExerciseCatalogDocs().forEach((id, doc) {
+        batch.set(collection.doc(id), {
+          ...doc,
+          'updatedAt': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
       });
+      batch.set(metaRef, {
+        'version': kExerciseCatalogVersion,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
 
       await batch.commit();
     } catch (_) {
@@ -280,36 +285,37 @@ class FirestoreService {
     await _customProgramsRef(uid).doc(programId).delete();
   }
 
-  // 8. Kas Toparlanma Durumu (users/{uid}/muscle_recovery/{muscle})
-  /// Seans sonrası kas bazlı toparlanma kayıtlarını (mevcutla birleştirerek)
-  /// yazar ve `users/{uid}` belgesine son toparlanma güncellemesini işler.
+  // 8. Kas Toparlanma Durumu (users/{uid}/muscle_recovery/{id})
+  /// Seans sonrası kompartıman kayıtlarını (17 id) ve eski sürümler için
+  /// bölge kayıtlarını (6 id) mevcut dokümanlarla birleştirerek yazar.
+  /// Ayrıntı: [buildRecoveryWrites].
   Future<void> saveSessionRecovery(
-    Map<RecoveryMuscle, MuscleRecoveryRecord> incoming,
+    Map<MuscleCompartment, CompartmentRecoveryRecord> incoming,
   ) async {
     if (incoming.isEmpty) return;
     try {
       final uid = await getOrCreateUserId();
       final userRef = _firestore.collection('users').doc(uid);
       final recoveryRef = userRef.collection('muscle_recovery');
-      final batch = _firestore.batch();
 
-      for (final entry in incoming.entries) {
-        final doc = recoveryRef.doc(entry.key.name);
-        MuscleRecoveryRecord? existing;
+      final existing = <String, Map<String, dynamic>>{};
+      for (final id in recoveryDocIdsFor(incoming)) {
         try {
-          final snap = await doc.get();
-          final data = snap.data();
-          if (data != null) existing = MuscleRecoveryRecord.fromMap(data);
+          final data = (await recoveryRef.doc(id).get()).data();
+          if (data != null) existing[id] = data;
         } catch (_) {
-          existing = null;
+          // Okunamayan doküman: yeni kayıt olarak yazılır
         }
-        final merged = mergeRecovery(existing, entry.value);
-        batch.set(doc, {
-          ...merged.toMap(),
-          'updatedAt': FieldValue.serverTimestamp(),
-        }, SetOptions(merge: true));
       }
 
+      final batch = _firestore.batch();
+      buildRecoveryWrites(incoming: incoming, existingDocs: existing)
+          .forEach((id, data) {
+        batch.set(recoveryRef.doc(id), {
+          ...data,
+          'updatedAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+      });
       batch.set(userRef, {
         'lastRecoveryUpdateAt': DateTime.now().toIso8601String(),
       }, SetOptions(merge: true));
@@ -320,7 +326,9 @@ class FirestoreService {
     }
   }
 
-  Stream<List<MuscleRecoveryRecord>> getMuscleRecoveryStream() async* {
+  /// Kompartıman dokümanlarını önceleyen, eksikleri eski bölge
+  /// dokümanlarından tamamlayan canlı toparlanma durumu.
+  Stream<MuscleRecoveryState> getMuscleRecoveryStream() async* {
     final uid = await getOrCreateUserId();
     yield* _firestore
         .collection('users')
@@ -328,10 +336,9 @@ class FirestoreService {
         .collection('muscle_recovery')
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs
-          .map((doc) => MuscleRecoveryRecord.fromMap(doc.data()))
-          .whereType<MuscleRecoveryRecord>()
-          .toList();
+      return parseRecoveryDocs({
+        for (final doc in snapshot.docs) doc.id: doc.data(),
+      });
     });
   }
 }

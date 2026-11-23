@@ -555,6 +555,8 @@ class _WorkoutSessionScreenState extends State<WorkoutSessionScreen> {
         totalLoad: totalLoad,
         muscleLoad: muscleLoad,
         muscleRir: muscleRir,
+        compartmentLoad: calculateWorkoutCompartmentLoad(workoutEntries),
+        compartmentRir: calculateWorkoutCompartmentRir(workoutEntries),
         averageRir: averageRir,
       ),
     );

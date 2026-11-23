@@ -2,11 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:calisthenics_app/domain/models/exercise.dart';
 import 'package:calisthenics_app/domain/enums/exercise_level.dart';
-import 'package:calisthenics_app/domain/enums/muscle_group.dart';
+import 'package:calisthenics_app/domain/enums/muscle_compartment.dart';
+import 'package:calisthenics_app/domain/services/muscle_filter.dart';
 import 'package:calisthenics_app/core/utils/enum_label.dart';
-import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
+import 'package:calisthenics_app/presentation/providers/exercise_list_provider.dart';
 import 'package:calisthenics_app/presentation/providers/favorite_provider.dart';
 import 'package:calisthenics_app/presentation/providers/filter_provider.dart';
 import 'package:calisthenics_app/presentation/widgets/exercise_card.dart';
@@ -174,7 +174,7 @@ class FavoritesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final exerciseRepository = ref.watch(exerciseRepositoryProvider);
+    final asyncExercises = ref.watch(exerciseListProvider);
     final favorites = ref.watch(favoriteProvider);
     final filterState = ref.watch(filterStateNotifierProvider);
 
@@ -286,29 +286,27 @@ class FavoritesScreen extends ConsumerWidget {
                   Wrap(
                     spacing: 12.0,
                     runSpacing: 12.0,
-                    children: MuscleGroup.values.map((muscle) {
-                      final isSelected = filterState.muscleGroups.contains(
-                        muscle,
-                      );
-                      return FilterChip(
+                    children: [
+                      for (final region in MuscleRegion.values)
+                      FilterChip(
                         label: Text(
-                          muscle.label.toUpperCase(),
+                          region.label.toUpperCase(),
                           style: Theme.of(context).textTheme.labelMedium
                               ?.copyWith(
-                                color: isSelected ? Colors.white : null,
+                                color: filterState.regions.contains(region) ? Colors.white : null,
                                 fontWeight: FontWeight.w600,
                               ),
                         ),
-                        selected: isSelected,
-                        onSelected: (selected) {
+                        selected: filterState.regions.contains(region),
+                        onSelected: (_) {
                           ref
                               .read(filterStateNotifierProvider.notifier)
-                              .toggleMuscleGroup(muscle);
+                              .toggleRegion(region);
                         },
                         backgroundColor: Colors.transparent,
                         selectedColor: Theme.of(context).colorScheme.primary,
                         side: BorderSide(
-                          color: isSelected
+                          color: filterState.regions.contains(region)
                               ? Colors.transparent
                               : Theme.of(
                                   context,
@@ -316,27 +314,66 @@ class FavoritesScreen extends ConsumerWidget {
                           width: 1.5,
                         ),
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0,
+                          horizontal: 12.0,
                           vertical: 12.0,
                         ),
-                      );
-                    }).toList(),
+                      ),
+                    ],
                   ),
+                  for (final region in MuscleRegion.values)
+                    if (filterState.regions.contains(region) &&
+                        region.compartments.length > 1) ...[
+                      const SizedBox(height: 10.0),
+                      Wrap(
+                        spacing: 8.0,
+                        runSpacing: 8.0,
+                        children: [
+                          for (final compartment in region.compartments)
+                      FilterChip(
+                        label: Text(
+                          compartment.label,
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(
+                                color: filterState.compartments.contains(compartment) ? Colors.white : null,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                        selected: filterState.compartments.contains(compartment),
+                        onSelected: (_) {
+                          ref
+                              .read(filterStateNotifierProvider.notifier)
+                              .toggleCompartment(compartment);
+                        },
+                        backgroundColor: Colors.transparent,
+                        selectedColor: Theme.of(context).colorScheme.primary,
+                        side: BorderSide(
+                          color: filterState.compartments.contains(compartment)
+                              ? Colors.transparent
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.outline.withAlpha(102),
+                          width: 1.5,
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0,
+                          vertical: 8.0,
+                        ),
+                      ),
+                        ],
+                      ),
+                    ],
                 ],
               ),
             ),
             Expanded(
-              child: FutureBuilder<List<Exercise>>(
-                future: exerciseRepository.getAllExercises(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Hata: ${snapshot.error}'));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              child: asyncExercises.when(
+                loading: () =>
+                    const Center(child: CircularProgressIndicator()),
+                error: (error, _) => Center(child: Text('Hata: $error')),
+                data: (exercises) {
+                  if (exercises.isEmpty) {
                     return const EmptyState(title: 'Henüz favori eklemedin');
                   } else {
-                    final exercises = snapshot.data!;
                     var favoriteExercises = exercises
                         .where((exercise) => favorites.contains(exercise.id))
                         .toList();
@@ -348,12 +385,15 @@ class FavoritesScreen extends ConsumerWidget {
                           .toList();
                     }
 
-                    // Apply muscle group filters
-                    if (filterState.muscleGroups.isNotEmpty) {
+                    // Bölge / kompartıman filtresi (herhangi biri eşleşirse)
+                    if (filterState.hasMuscleFilter) {
                       favoriteExercises = favoriteExercises
                           .where(
-                            (ex) => ex.targetMuscleGroups.any(
-                              (mg) => filterState.muscleGroups.contains(mg),
+                            (ex) => matchesMuscleFilter(
+                              ex.compartmentWeights,
+                              regions: filterState.regions,
+                              compartments: filterState.compartments,
+                              matchAll: false,
                             ),
                           )
                           .toList();

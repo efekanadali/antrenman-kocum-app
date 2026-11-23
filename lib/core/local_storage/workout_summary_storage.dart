@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:calisthenics_app/domain/enums/muscle_compartment.dart';
+import 'package:calisthenics_app/domain/models/muscle_load_snapshot.dart';
 import 'package:path_provider/path_provider.dart';
 
 class WorkoutSummaryEntry {
@@ -9,18 +11,33 @@ class WorkoutSummaryEntry {
     required this.totalLoad,
     required this.muscleLoad,
     required this.duration,
-  });
+    MuscleLoadSnapshot? load,
+    this.schemaVersion = kMuscleDataSchemaVersion,
+  }) : load = load ?? MuscleLoadSnapshot.parse(legacyRaw: muscleLoad);
 
   final DateTime date;
   final double totalLoad;
+
+  /// Eski biçim (bölge / kas anahtarları). Geriye dönük uyumluluk için
+  /// yazılmaya devam eder.
   final Map<String, double> muscleLoad;
   final int duration;
+
+  /// Kompartıman + bölge görünümü.
+  final MuscleLoadSnapshot load;
+
+  /// Kaydın şema sürümü (alan yoksa 1).
+  final int schemaVersion;
+
+  Map<MuscleCompartment, double> get compartmentLoad => load.compartments;
 
   Map<String, dynamic> toJson() {
     return {
       'date': date.toIso8601String(),
       'totalLoad': totalLoad,
       'muscleLoad': muscleLoad,
+      'compartmentLoad': load.compartmentsByKey,
+      'schemaVersion': schemaVersion,
       'duration': duration,
     };
   }
@@ -42,6 +59,11 @@ class WorkoutSummaryEntry {
       totalLoad: (json['totalLoad'] as num?)?.toDouble() ?? 0.0,
       muscleLoad: parsedMuscleLoad,
       duration: (json['duration'] as num?)?.toInt() ?? 0,
+      load: MuscleLoadSnapshot.parse(
+        compartmentRaw: json['compartmentLoad'],
+        legacyRaw: parsedMuscleLoad,
+      ),
+      schemaVersion: (json['schemaVersion'] as num?)?.toInt() ?? 1,
     );
   }
 }

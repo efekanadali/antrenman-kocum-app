@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:calisthenics_app/core/utils/exercise_unit.dart';
 import 'package:calisthenics_app/core/local_storage/workout_summary_storage.dart';
+import 'package:calisthenics_app/domain/enums/muscle_compartment.dart';
 import 'package:calisthenics_app/domain/models/workout_session_summary.dart';
+import 'package:calisthenics_app/domain/services/muscle_key_mapper.dart';
+import 'package:calisthenics_app/domain/services/push_pull_balance.dart';
 import 'package:calisthenics_app/presentation/providers/workout_history_provider.dart';
 import 'package:calisthenics_app/presentation/screens/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -98,6 +101,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             totalLoad: session.totalMliWorkload,
             muscleLoad: session.muscleWorkloads,
             duration: session.durationSeconds,
+            load: session.load,
+            schemaVersion: session.schemaVersion,
           ),
         )
         .toList();
@@ -1089,12 +1094,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ? relativeDayLabel(lastWorkoutDate)
                       : '-';
                   final trend = calculateSevenDayTrend(summaries);
-                  final muscleDistribution = calculateMuscleDistribution(
-                    summaries,
-                  );
+                  final compartmentDistribution =
+                      calculateCompartmentDistribution(summaries);
+                  final muscleDistribution =
+                      aggregateToRegions(compartmentDistribution);
                   final balanceText = summaries.isEmpty
                       ? 'Henüz yeterli antrenman verisi yok.'
-                      : calculateBalanceText(muscleDistribution);
+                      : calculateBalanceText(compartmentDistribution);
 
                   return RefreshIndicator(
                     onRefresh: _refreshSummaries,
@@ -1741,7 +1747,7 @@ class GoalsCard extends StatelessWidget {
 class MuscleDistributionCard extends StatelessWidget {
   const MuscleDistributionCard({super.key, required this.distribution});
 
-  final Map<String, double> distribution;
+  final Map<MuscleRegion, double> distribution;
 
   @override
   Widget build(BuildContext context) {
@@ -1766,7 +1772,7 @@ class MuscleDistributionCard extends StatelessWidget {
               (item) => Padding(
                 padding: const EdgeInsets.only(bottom: 6.0),
                 child: _StatRow(
-                  label: muscleDisplayName(item.key),
+                  label: item.key.label,
                   value: item.value.toStringAsFixed(1),
                   labelColor: _ProfileScreenState._textMid,
                   valueColor: _ProfileScreenState._textHigh,
@@ -2117,18 +2123,15 @@ DateTime calculateLastWorkoutDate(List<WorkoutSummaryEntry> summaries) {
   return sorted.first.date;
 }
 
-Map<String, double> calculateMuscleDistribution(
+/// Özetlerin kompartıman yüklerini toplar (eski kayıtlar bölünerek okunur).
+Map<MuscleCompartment, double> calculateCompartmentDistribution(
   List<WorkoutSummaryEntry> summaries,
 ) {
-  final result = <String, double>{};
+  final result = <MuscleCompartment, double>{};
   for (final summary in summaries) {
-    for (final entry in summary.muscleLoad.entries) {
-      result.update(
-        entry.key,
-        (value) => value + entry.value,
-        ifAbsent: () => entry.value,
-      );
-    }
+    summary.compartmentLoad.forEach((c, value) {
+      result[c] = (result[c] ?? 0) + value;
+    });
   }
   return result;
 }
@@ -2154,30 +2157,9 @@ Map<String, double> calculateMuscleDistribution(
   return (current: current, previous: previous);
 }
 
-String calculateBalanceText(Map<String, double> distribution) {
-  final pushMuscles = {'chest', 'shoulders', 'triceps', 'quads'};
-  final pullMuscles = {'back', 'biceps', 'hamstrings', 'glutes'};
-
-  double push = 0.0;
-  double pull = 0.0;
-
-  for (final entry in distribution.entries) {
-    final key = entry.key.toLowerCase();
-    if (pushMuscles.contains(key)) {
-      push += entry.value;
-    }
-    if (pullMuscles.contains(key)) {
-      pull += entry.value;
-    }
-  }
-
-  if (push > pull * 1.15) {
-    return 'Push muscles are dominant. Pull muscles are lacking.';
-  }
-  if (pull > push * 1.15) {
-    return 'Pull muscles are dominant. Push muscles are lacking.';
-  }
-  return 'Balanced training';
+/// İtiş / çekiş dengesi mesajı (sınıflandırma: [movementPatternOf]).
+String calculateBalanceText(Map<MuscleCompartment, double> distribution) {
+  return computePushPullBalance(distribution).message;
 }
 
 String formatDate(DateTime date) {
@@ -2210,31 +2192,4 @@ String relativeDayLabel(DateTime date) {
     return 'Dun';
   }
   return '$diff gun once';
-}
-
-String muscleDisplayName(String key) {
-  switch (key.toLowerCase()) {
-    case 'chest':
-      return 'Chest';
-    case 'back':
-      return 'Back';
-    case 'shoulders':
-      return 'Shoulders';
-    case 'biceps':
-      return 'Biceps';
-    case 'triceps':
-      return 'Triceps';
-    case 'core':
-      return 'Core';
-    case 'quads':
-      return 'Quads';
-    case 'hamstrings':
-      return 'Hamstrings';
-    case 'glutes':
-      return 'Glutes';
-    case 'calves':
-      return 'Calves';
-    default:
-      return key;
-  }
 }

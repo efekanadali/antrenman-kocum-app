@@ -5,11 +5,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:calisthenics_app/domain/enums/muscle_compartment.dart';
 import 'package:calisthenics_app/domain/models/custom_program.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart' as domain;
 import 'package:calisthenics_app/domain/models/mli_models.dart' as mli;
 import 'package:calisthenics_app/domain/services/mli_calculator.dart';
 import 'package:calisthenics_app/domain/services/exercise_mli_resolver.dart';
+import 'package:calisthenics_app/domain/services/muscle_key_mapper.dart';
 import 'package:calisthenics_app/domain/services/recovery_calculator.dart';
 import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
@@ -48,6 +50,10 @@ class _CustomProgramDaySessionScreenState
   Map<String, double> _lastSetLoadByMuscle = <String, double>{};
   Map<String, double> _workoutLoadByMuscle = <String, double>{};
   Map<String, double> _workoutRirByMuscle = <String, double>{};
+  Map<MuscleCompartment, double> _workoutCompartmentLoad =
+      <MuscleCompartment, double>{};
+  Map<MuscleCompartment, double> _workoutCompartmentRir =
+      <MuscleCompartment, double>{};
   static const int _defaultRir = 2;
   static const double _defaultBodyWeightKg = 70.0;
   double _lastBodyWeightKg = _defaultBodyWeightKg;
@@ -134,12 +140,14 @@ class _CustomProgramDaySessionScreenState
                   durationInSeconds: actualValue,
                   extraWeightKg: extraWeightKg,
                   bodyWeightKg: bodyWeightKg,
+                  loadKg: customExercise.loadKg,
                 )
               : mli.WorkoutSet(
                   reps: actualValue,
                   rir: rir,
                   extraWeightKg: extraWeightKg,
                   bodyWeightKg: bodyWeightKg,
+                  loadKg: customExercise.loadKg,
                 ),
         );
       }
@@ -155,31 +163,22 @@ class _CustomProgramDaySessionScreenState
 
     final totals = calculateWorkoutLoad(entries);
     final rirs = calculateWorkoutMuscleRir(entries);
+    final compartmentTotals = calculateWorkoutCompartmentLoad(entries);
+    final compartmentRirs = calculateWorkoutCompartmentRir(entries);
     setState(() {
       _workoutLoadByMuscle = totals;
       _workoutRirByMuscle = rirs;
+      _workoutCompartmentLoad = compartmentTotals;
+      _workoutCompartmentRir = compartmentRirs;
     });
   }
 
-  String _feedbackForLoad(double score) {
-    if (score < 200) {
-      return 'Low';
-    }
-    if (score <= 600) {
-      return 'Good';
-    }
-    return 'High';
-  }
+  /// Seans boyunca bir bölgenin biriken yükü (bölge bazlı) – kalibre edilmiş
+  /// tek eşik kaynağı: [evaluateMuscleLoad] (37.6 / 103.4).
+  String _feedbackForLoad(double score) => evaluateMuscleLoad(score).label;
 
-  String _lastSetIndicator(double score) {
-    if (score < 80) {
-      return 'Low';
-    }
-    if (score <= 180) {
-      return 'Good';
-    }
-    return 'High';
-  }
+  /// Son setin bir bölgeye etkisi – aynı kalibre eşikler.
+  String _lastSetIndicator(double score) => evaluateMuscleLoad(score).label;
 
   @override
   void dispose() {
@@ -426,12 +425,14 @@ class _CustomProgramDaySessionScreenState
               durationInSeconds: targetValue,
               extraWeightKg: effort.extraWeightKg,
               bodyWeightKg: effort.bodyWeightKg,
+              loadKg: activeExercise.loadKg,
             )
           : mli.WorkoutSet(
               reps: targetValue,
               rir: effort.rir,
               extraWeightKg: effort.extraWeightKg,
               bodyWeightKg: effort.bodyWeightKg,
+              loadKg: activeExercise.loadKg,
             ),
     );
 
@@ -489,6 +490,8 @@ class _CustomProgramDaySessionScreenState
         totalLoad: totalLoad,
         muscleLoad: muscleLoad,
         muscleRir: _workoutRirByMuscle,
+        compartmentLoad: _workoutCompartmentLoad,
+        compartmentRir: _workoutCompartmentRir,
       ),
     );
   }
@@ -631,6 +634,9 @@ class _CustomProgramDaySessionScreenState
     _startRestTimer();
   }
 
+  static String _formatKg(double kg) =>
+      kg == kg.roundToDouble() ? kg.toStringAsFixed(0) : kg.toStringAsFixed(1);
+
   @override
   Widget build(BuildContext context) {
     final day = widget.args.day;
@@ -648,7 +654,8 @@ class _CustomProgramDaySessionScreenState
     final actionLabel = isWorkoutDone ? 'ANTRENMANI TAMAMLA' : 'COMPLETE SET';
     final targetLabel = activeExercise == null
         ? '-'
-        : '${activeExercise.value} ${activeExercise.isTimed ? 'sn' : 'Reps'}';
+        : '${activeExercise.value} ${activeExercise.isTimed ? 'sn' : 'Reps'}'
+            '${activeExercise.loadKg != null ? ' • ${_formatKg(activeExercise.loadKg!)} kg' : ''}';
     final nextLabel = activeExercise == null
         ? 'Egzersiz bulunamadi'
         : isWorkoutDone
@@ -1121,7 +1128,7 @@ class _WorkoutLoadCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Kas Yuk Sonucu',
+            'Kas Yük Sonucu',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: AppColors.textHigh,
               fontWeight: FontWeight.w800,
@@ -1135,7 +1142,7 @@ class _WorkoutLoadCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      entry.key,
+                      regionFromKey(entry.key)?.label ?? entry.key,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: AppColors.textHigh,
                         fontWeight: FontWeight.w600,
@@ -1180,7 +1187,7 @@ class _LastSetLoadCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Last Set Impact',
+            'Son Set Etkisi',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: AppColors.textHigh,
               fontWeight: FontWeight.w800,
@@ -1194,7 +1201,7 @@ class _LastSetLoadCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      entry.key,
+                      regionFromKey(entry.key)?.label ?? entry.key,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: AppColors.textHigh,
                         fontWeight: FontWeight.w600,

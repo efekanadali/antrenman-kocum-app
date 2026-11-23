@@ -3,9 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calisthenics_app/domain/enums/exercise_level.dart';
-import 'package:calisthenics_app/domain/enums/muscle_group.dart';
+import 'package:calisthenics_app/domain/enums/muscle_compartment.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart';
-import 'package:calisthenics_app/presentation/providers/exercise_repository_provider.dart';
+import 'package:calisthenics_app/domain/services/muscle_filter.dart';
+import 'package:calisthenics_app/presentation/providers/exercise_list_provider.dart';
 import 'package:calisthenics_app/presentation/routes/app_routes.dart';
 import 'package:calisthenics_app/presentation/screens/home_screen.dart';
 import 'package:calisthenics_app/presentation/theme/app_theme.dart';
@@ -21,117 +22,67 @@ class WorkoutLibraryScreen extends ConsumerStatefulWidget {
 }
 
 class _WorkoutLibraryScreenState extends ConsumerState<WorkoutLibraryScreen> {
-  final Set<MuscleGroup> _selectedMuscleGroups = {};
-  late final Future<List<Exercise>> _exerciseFuture;
-
-  static const List<MuscleGroup> _libraryGroups = [
-    MuscleGroup.chest,
-    MuscleGroup.back,
-    MuscleGroup.shoulders,
-    MuscleGroup.biceps,
-    MuscleGroup.triceps,
-    MuscleGroup.core,
-    MuscleGroup.quads,
-    MuscleGroup.hamstrings,
-    MuscleGroup.glutes,
-    MuscleGroup.calves,
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _exerciseFuture =
-        ref.read(exerciseRepositoryProvider).getAllExercises();
-  }
-
-  List<MuscleGroup> _allMuscleGroups() {
-    return _libraryGroups;
-  }
+  final Set<MuscleRegion> _selectedRegions = {};
+  final Set<MuscleCompartment> _selectedCompartments = {};
 
   List<String> _exerciseMuscleLabels(Exercise exercise) {
-    return exercise.targetMuscleGroups.map(_muscleLabel).toList();
+    return targetRegions(exercise.compartmentWeights)
+        .map((region) => region.label)
+        .toList();
   }
 
-  String _muscleLabel(MuscleGroup group) {
-    switch (group) {
-      case MuscleGroup.chest:
-        return 'Göğüs';
-      case MuscleGroup.back:
-        return 'Sırt';
-      case MuscleGroup.shoulders:
-        return 'Omuz';
-      case MuscleGroup.biceps:
-        return 'Biceps';
-      case MuscleGroup.triceps:
-        return 'Triceps';
-      case MuscleGroup.core:
-        return 'Karın / Core';
-      case MuscleGroup.quads:
-        return 'Ön Bacak';
-      case MuscleGroup.hamstrings:
-        return 'Arka Bacak';
-      case MuscleGroup.glutes:
-        return 'Kalça';
-      case MuscleGroup.calves:
-        return 'Kalf';
-      case MuscleGroup.legs:
-        return 'Bacak';
-    }
-  }
-
-  void _toggleMuscleGroup(MuscleGroup group) {
+  void _toggleRegion(MuscleRegion region) {
     setState(() {
-      if (_selectedMuscleGroups.contains(group)) {
-        _selectedMuscleGroups.remove(group);
+      if (!_selectedRegions.remove(region)) {
+        _selectedRegions.add(region);
       } else {
-        _selectedMuscleGroups.add(group);
+        // Bölge kapatılınca alt kompartıman seçimleri de kalkar.
+        _selectedCompartments.removeWhere((c) => c.region == region);
       }
     });
   }
 
-  void _clearMuscleGroups() {
+  void _toggleCompartment(MuscleCompartment compartment) {
     setState(() {
-      _selectedMuscleGroups.clear();
+      if (!_selectedCompartments.remove(compartment)) {
+        _selectedCompartments.add(compartment);
+      }
+    });
+  }
+
+  void _clearFilters() {
+    setState(() {
+      _selectedRegions.clear();
+      _selectedCompartments.clear();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final asyncExercises = ref.watch(exerciseListProvider);
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: FutureBuilder<List<Exercise>>(
-          future: _exerciseFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(
-                  color: AppColors.volcanic,
-                ),
-              );
-            }
-
-            if (snapshot.hasError) {
-              return Center(
-                child: Text(
-                  'Hata: ${snapshot.error}',
-                  style: const TextStyle(color: AppColors.textMid),
-                ),
-              );
-            }
-
-            final exercises = snapshot.data ?? <Exercise>[];
-            final availableGroups = _allMuscleGroups();
-            final filteredWorkouts = _selectedMuscleGroups.isEmpty
-                ? exercises
-                : exercises
-                    .where(
-                      (exercise) => _selectedMuscleGroups.every(
-                        (group) =>
-                            exercise.targetMuscleGroups.contains(group),
-                      ),
-                    )
-                    .toList();
+        child: asyncExercises.when(
+          loading: () => const Center(
+            child: CircularProgressIndicator(color: AppColors.volcanic),
+          ),
+          error: (error, _) => Center(
+            child: Text(
+              'Hata: $error',
+              style: const TextStyle(color: AppColors.textMid),
+            ),
+          ),
+          data: (exercises) {
+            final filteredWorkouts = exercises
+                .where(
+                  (exercise) => matchesMuscleFilter(
+                    exercise.compartmentWeights,
+                    regions: _selectedRegions,
+                    compartments: _selectedCompartments,
+                  ),
+                )
+                .toList();
 
             return CustomScrollView(
               slivers: [
@@ -199,11 +150,11 @@ class _WorkoutLibraryScreenState extends ConsumerState<WorkoutLibraryScreen> {
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20.0, 12.0, 20.0, 8.0),
                     child: _TargetRegionPicker(
-                      availableGroups: availableGroups,
-                      selectedGroups: _selectedMuscleGroups,
-                      onToggleGroup: _toggleMuscleGroup,
-                      labelBuilder: _muscleLabel,
-                      onClear: _clearMuscleGroups,
+                      selectedRegions: _selectedRegions,
+                      selectedCompartments: _selectedCompartments,
+                      onToggleRegion: _toggleRegion,
+                      onToggleCompartment: _toggleCompartment,
+                      onClear: _clearFilters,
                     ),
                   ),
                 ),
@@ -249,17 +200,17 @@ class _WorkoutLibraryScreenState extends ConsumerState<WorkoutLibraryScreen> {
 
 class _TargetRegionPicker extends StatelessWidget {
   const _TargetRegionPicker({
-    required this.availableGroups,
-    required this.selectedGroups,
-    required this.onToggleGroup,
-    required this.labelBuilder,
+    required this.selectedRegions,
+    required this.selectedCompartments,
+    required this.onToggleRegion,
+    required this.onToggleCompartment,
     required this.onClear,
   });
 
-  final List<MuscleGroup> availableGroups;
-  final Set<MuscleGroup> selectedGroups;
-  final ValueChanged<MuscleGroup> onToggleGroup;
-  final String Function(MuscleGroup) labelBuilder;
+  final Set<MuscleRegion> selectedRegions;
+  final Set<MuscleCompartment> selectedCompartments;
+  final ValueChanged<MuscleRegion> onToggleRegion;
+  final ValueChanged<MuscleCompartment> onToggleCompartment;
   final VoidCallback onClear;
 
   @override
@@ -286,7 +237,7 @@ class _TargetRegionPicker extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              if (selectedGroups.isNotEmpty)
+              if (selectedRegions.isNotEmpty || selectedCompartments.isNotEmpty)
                 GestureDetector(
                   onTap: onClear,
                   child: Container(
@@ -327,7 +278,7 @@ class _TargetRegionPicker extends StatelessWidget {
           ),
           const SizedBox(height: 6.0),
           const Text(
-            'İlgili kas grubuna dokunarak egzersizleri daralt.',
+            'Bölgeye dokun; alt bölgelerle (kompartıman) daha da daralt.',
             style: TextStyle(
               color: AppColors.textMuted,
               fontSize: 12.0,
@@ -337,16 +288,32 @@ class _TargetRegionPicker extends StatelessWidget {
           Wrap(
             spacing: 8.0,
             runSpacing: 8.0,
-            children: availableGroups
-                .map(
-                  (group) => _RegionCard(
-                    label: labelBuilder(group),
-                    isSelected: selectedGroups.contains(group),
-                    onTap: () => onToggleGroup(group),
-                  ),
-                )
-                .toList(),
+            children: [
+              for (final region in MuscleRegion.values)
+                _RegionCard(
+                  label: region.label,
+                  isSelected: selectedRegions.contains(region),
+                  onTap: () => onToggleRegion(region),
+                ),
+            ],
           ),
+          for (final region in MuscleRegion.values)
+            if (selectedRegions.contains(region) &&
+                region.compartments.length > 1) ...[
+              const SizedBox(height: 10.0),
+              Wrap(
+                spacing: 6.0,
+                runSpacing: 6.0,
+                children: [
+                  for (final compartment in region.compartments)
+                    _RegionCard(
+                      label: compartment.label,
+                      isSelected: selectedCompartments.contains(compartment),
+                      onTap: () => onToggleCompartment(compartment),
+                    ),
+                ],
+              ),
+            ],
         ],
       ),
     );

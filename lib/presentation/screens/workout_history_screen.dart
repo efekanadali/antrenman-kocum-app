@@ -564,12 +564,15 @@ class _WorkoutSessionCard extends StatelessWidget {
                     ),
 
                     // Kas Grupları Dağılımı (varsa)
-                    if (session.muscleWorkloads.isNotEmpty) ...[
+                    if (session.regionWorkloads.isNotEmpty) ...[
                       const SizedBox(height: 10),
                       Wrap(
                         spacing: 6,
                         runSpacing: 4,
-                        children: session.muscleWorkloads.entries.take(4).map((entry) {
+                        children: (session.regionWorkloads.entries.toList()
+                              ..sort((a, b) => b.value.compareTo(a.value)))
+                            .take(4)
+                            .map((entry) {
                           return Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
@@ -578,7 +581,7 @@ class _WorkoutSessionCard extends StatelessWidget {
                               border: Border.all(color: _border, width: 1),
                             ),
                             child: Text(
-                              '${entry.key}: ${entry.value.round()}p',
+                              '${entry.key.label}: ${entry.value.round()}p',
                               style: const TextStyle(
                                 color: _textMuted,
                                 fontSize: 10,

@@ -4,7 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calisthenics_app/domain/models/workout_session_summary.dart';
-import 'package:calisthenics_app/domain/services/muscle_key_mapper.dart';
+import 'package:calisthenics_app/domain/enums/muscle_compartment.dart';
 import 'package:calisthenics_app/presentation/providers/workout_history_provider.dart';
 import 'package:calisthenics_app/presentation/theme/app_theme.dart';
 import 'package:calisthenics_app/presentation/widgets/muscle_recovery_card.dart';
@@ -25,13 +25,9 @@ const Color _textHigh = AppColors.textHigh; // #F1F5F9
 const Color _textMid = AppColors.textMid; // #94A3B8
 const Color _textMuted = AppColors.textMuted; // #64748B
 
-const List<String> _muscleLabels = [
-  'Göğüs',
-  'Sırt',
-  'Omuz',
-  'Kol',
-  'Karın',
-  'Bacak',
+/// `MuscleRegion.values` sırasıyla bölge etiketleri.
+final List<String> _muscleLabels = [
+  for (final region in MuscleRegion.values) region.label,
 ];
 
 // Mat Nordic kas paleti
@@ -47,10 +43,6 @@ const List<Color> _muscleColors = [
 const List<String> _weekdayShort = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
 
 enum AnalyticsRange { weekly, monthly }
-
-/// Kas anahtarını `_muscleLabels` indeksine çevirir.
-/// `_muscleLabels` sırası `MuscleRegion.values` sırasıyla aynıdır.
-int? _muscleBucket(String rawKey) => regionFromKey(rawKey)?.index;
 
 class _AnalyticsData {
   _AnalyticsData({
@@ -103,9 +95,9 @@ _AnalyticsData _compute(List<WorkoutSessionSummary> sessions, int days) {
     daily[idx] += s.totalMliWorkload;
     total += s.totalMliWorkload;
     count++;
-    s.muscleWorkloads.forEach((key, value) {
-      final bucket = _muscleBucket(key);
-      if (bucket != null) muscles[bucket] += value;
+    // Kompartıman verisi (v2) ya da bölünmüş eski anahtarlar → 6 bölge.
+    s.regionWorkloads.forEach((region, value) {
+      muscles[region.index] += value;
     });
   }
 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calisthenics_app/core/utils/exercise_unit.dart';
 import 'package:calisthenics_app/domain/models/exercise.dart';
+import 'package:calisthenics_app/domain/enums/exercise_type.dart';
 import 'package:calisthenics_app/domain/models/custom_program.dart';
 import 'package:calisthenics_app/presentation/providers/exercise_list_provider.dart';
 import 'package:calisthenics_app/presentation/providers/custom_program_provider.dart';
@@ -209,7 +210,25 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
       exerciseName: chosen.name,
     );
 
-    final config = await _promptSetRep(isTimed: isTimed);
+    // Vücut geliştirme hareketlerinde hedef yük (kg) da sorulur.
+    final isBodybuilding = ExerciseMliResolver(catalog: exercises)
+            .build(
+              CustomProgramExercise(
+                exerciseId: chosen.id,
+                exerciseName: chosen.name,
+                sets: 1,
+                value: 1,
+                isTimed: isTimed,
+              ),
+              detail: chosen,
+            )
+            .type ==
+        ExerciseType.bodybuilding;
+
+    final config = await _promptSetRep(
+      isTimed: isTimed,
+      askLoad: isBodybuilding,
+    );
     if (config == null) {
       return;
     }
@@ -223,12 +242,17 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
           sets: config.sets,
           value: config.value,
           isTimed: config.isTimed,
+          loadKg: config.loadKg,
         ),
       );
     });
   }
 
-  Future<_SetRepConfig?> _promptSetRep({required bool isTimed}) async {
+  Future<_SetRepConfig?> _promptSetRep({
+    required bool isTimed,
+    bool askLoad = false,
+  }) async {
+    final loadController = TextEditingController();
     final result = await showDialog<_SetRepConfig>(
       context: context,
       builder: (context) {
@@ -298,6 +322,37 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                         });
                       },
                     ),
+                    if (askLoad) ...[
+                      const SizedBox(height: 12.0),
+                      TextField(
+                        key: const ValueKey('load-kg-field'),
+                        controller: loadController,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        style: const TextStyle(color: AppColors.textHigh),
+                        decoration: InputDecoration(
+                          labelText: 'Hedef Yük',
+                          suffixText: 'kg',
+                          labelStyle: const TextStyle(color: AppColors.textMid),
+                          suffixStyle: const TextStyle(color: AppColors.textMid),
+                          filled: true,
+                          fillColor: AppColors.surfaceSoft,
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14.0),
+                            borderSide: const BorderSide(
+                              color: AppColors.border,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14.0),
+                            borderSide: const BorderSide(
+                              color: AppColors.volcanic,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 20.0),
                     Row(
                       children: [
@@ -311,7 +366,14 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                         const Spacer(),
                         FilledButton(
                           onPressed: () => Navigator.of(context).pop(
-                            _SetRepConfig(sets, targetValue, isTimed),
+                            _SetRepConfig(
+                              sets,
+                              targetValue,
+                              isTimed,
+                              loadKg: askLoad
+                                  ? parseLoadKgInput(loadController.text)
+                                  : null,
+                            ),
                           ),
                           style: FilledButton.styleFrom(
                             backgroundColor: AppColors.volcanic,
@@ -333,6 +395,7 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
       },
     );
 
+    loadController.dispose();
     return result;
   }
 
@@ -353,6 +416,7 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
           sets: e.sets,
           value: e.value,
           isTimed: e.isTimed,
+          loadKg: e.loadKg,
         ),
       ),
     );
@@ -397,6 +461,7 @@ class _CustomPlanScreenState extends ConsumerState<CustomPlanScreen> {
                       sets: exercise.sets,
                       value: exercise.value,
                       isTimed: exercise.isTimed,
+                      loadKg: exercise.loadKg,
                     ),
                   )
                   .toList(),
@@ -955,7 +1020,8 @@ class _ExerciseRow extends StatelessWidget {
                 Text(
                   exercise.isTimed
                       ? '${exercise.sets} set × ${exercise.value} sn'
-                      : '${exercise.sets} set × ${exercise.value} tekrar',
+                      : '${exercise.sets} set × ${exercise.value} tekrar'
+                          '${formatLoadKgSuffix(exercise.loadKg)}',
                   style: const TextStyle(
                     color: AppColors.textMid,
                     fontSize: 11.5,
@@ -1347,6 +1413,7 @@ class _DraftExercise {
     required this.sets,
     required this.value,
     required this.isTimed,
+    this.loadKg,
   });
 
   final String exerciseId;
@@ -1354,12 +1421,14 @@ class _DraftExercise {
   final int sets;
   final int value;
   final bool isTimed;
+  final double? loadKg;
 }
 
 class _SetRepConfig {
-  const _SetRepConfig(this.sets, this.value, this.isTimed);
+  const _SetRepConfig(this.sets, this.value, this.isTimed, {this.loadKg});
 
   final int sets;
   final int value;
   final bool isTimed;
+  final double? loadKg;
 }
